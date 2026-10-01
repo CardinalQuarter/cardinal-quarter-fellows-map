@@ -17,6 +17,9 @@ export type Selection = { fellow: Fellow; fly: boolean };
 const STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
 const SOURCE = "fellows";
 const LAYER = "fellows-circles";
+/** Unclustered copy of the data, shown only while exporting "individual pins". */
+const FLAT_SOURCE = "fellows-flat";
+const FLAT_LAYER = "fellows-flat-circles";
 /** Cluster right up to the last zoom so fellows at one address always show as a counted ring. */
 const MAX_ZOOM = 15;
 const CLUSTER_MAX_ZOOM = MAX_ZOOM - 1;
@@ -272,33 +275,73 @@ async function exportPng(map: MlMap, markers: Iterable<maplibregl.Marker>): Prom
 }
 
 /** A "download image" button styled like the zoom control, placed beneath it. */
+/** Wait until the map has loaded and drawn everything, so a layer change is really on the canvas. */
+const whenIdle = (map: MlMap) => new Promise<void>((r) => { map.once("idle", () => r()); map.triggerRepaint(); });
+
+async function download(map: MlMap, markers: Iterable<maplibregl.Marker>, mode: "clusters" | "pins") {
+  const flat = mode === "pins";
+  if (flat) {
+    // Swap the clustered layer and its HTML markers for the plain copy, just for the capture.
+    map.setLayoutProperty(LAYER, "visibility", "none");
+    map.setLayoutProperty(FLAT_LAYER, "visibility", "visible");
+    for (const m of markers) m.getElement().style.visibility = "hidden";
+    await whenIdle(map);
+  }
+  try {
+    const blob = await exportPng(map, flat ? [] : markers);
+    if (!blob) return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `cardinal-quarter-map-${new Date().toISOString().slice(0, 10)}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } finally {
+    if (flat) {
+      map.setLayoutProperty(FLAT_LAYER, "visibility", "none");
+      map.setLayoutProperty(LAYER, "visibility", "visible");
+      for (const m of markers) m.getElement().style.visibility = "";
+    }
+  }
+}
+
+/** A "download image" button styled like the zoom control, with a choice of clusters or plain pins. */
 class ExportControl implements maplibregl.IControl {
   private el?: HTMLElement;
   constructor(private getMarkers: () => Iterable<maplibregl.Marker>) {}
   onAdd(map: MlMap) {
     const el = document.createElement("div");
-    el.className = "maplibregl-ctrl maplibregl-ctrl-group";
+    el.className = "maplibregl-ctrl maplibregl-ctrl-group export-ctrl";
     const btn = document.createElement("button");
     btn.type = "button";
     btn.title = "Download map as image";
     btn.setAttribute("aria-label", btn.title);
+    btn.setAttribute("aria-haspopup", "menu");
     btn.innerHTML =
       '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e2d29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
-    btn.addEventListener("click", async () => {
-      btn.disabled = true;
-      try {
-        const blob = await exportPng(map, this.getMarkers());
-        if (!blob) return;
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `cardinal-quarter-map-${new Date().toISOString().slice(0, 10)}.png`;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-      } finally {
-        btn.disabled = false;
-      }
+    const menu = document.createElement("div");
+    menu.className = "export-menu";
+    menu.setAttribute("role", "menu");
+    menu.hidden = true;
+    const close = () => { menu.hidden = true; btn.setAttribute("aria-expanded", "false"); };
+    for (const [mode, label] of [["clusters", "Clusters as shown"], ["pins", "Individual pins"]] as const) {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.setAttribute("role", "menuitem");
+      item.textContent = label;
+      item.addEventListener("click", async () => {
+        close();
+        btn.disabled = true;
+        try { await download(map, [...this.getMarkers()], mode); } finally { btn.disabled = false; }
+      });
+      menu.appendChild(item);
+    }
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      menu.hidden = !menu.hidden;
+      btn.setAttribute("aria-expanded", String(!menu.hidden));
     });
-    el.appendChild(btn);
+    document.addEventListener("click", close);
+    el.append(btn, menu);
     this.el = el;
     return el;
   }
@@ -404,6 +447,20 @@ export function MapView({ pins, selection, onSelect }: Props) {
           "circle-stroke-width": 1.75,
         },
       });
+      map.addSource(FLAT_SOURCE, { type: "geojson", data: toGeoJson(pinsRef.current) });
+      map.addLayer({
+        id: FLAT_LAYER,
+        type: "circle",
+        source: FLAT_SOURCE,
+        layout: { visibility: "none" },
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 5, 8, 8],
+          "circle-color": ["get", "color"],
+          "circle-opacity": 0.95,
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-width": 1.75,
+        },
+      });
       map.on("mouseenter", LAYER, () => (map.getCanvas().style.cursor = "pointer"));
       map.on("mouseleave", LAYER, () => (map.getCanvas().style.cursor = ""));
       map.on("click", LAYER, (e: MapMouseEvent) => {
@@ -442,7 +499,9 @@ export function MapView({ pins, selection, onSelect }: Props) {
     // Cluster ids are reassigned on new data, so drop every cached marker.
     for (const m of markers.current.values()) m.remove();
     markers.current.clear();
-    src?.setData(toGeoJson(pins));
+    const geo = toGeoJson(pins);
+    src?.setData(geo);
+    (map.getSource(FLAT_SOURCE) as maplibregl.GeoJSONSource | undefined)?.setData(geo);
     // A popup for a fellow who was just filtered out would be misleading.
     closePopup();
     if (pins.length === 0) return;

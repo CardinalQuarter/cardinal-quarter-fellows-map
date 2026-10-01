@@ -40,3 +40,9 @@ body { margin: 0; font-family: var(--font-sans); color: #2e2d29; background: #ff
   background-position: right 14px center;
   padding-right: 38px;
 }
+
+/* Image download menu, dropping out to the left of the camera button. */
+.export-ctrl { position: relative; }
+.export-menu { position: absolute; right: 100%; top: 0; margin-right: 6px; min-width: 160px; background: #fff; border-radius: 4px; box-shadow: 0 1px 4px rgba(46,45,41,.25); padding: 4px 0; }
+.export-menu button { display: block; width: 100%; height: auto; padding: 6px 12px; text-align: left; font: 14px var(--font-sans); color: #2e2d29; background: none; border: 0; white-space: nowrap; cursor: pointer; }
+.export-menu button:hover { background: #f4f4f4; }
