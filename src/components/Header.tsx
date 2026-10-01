@@ -4,6 +4,8 @@ import { Search, type SearchHit } from "./Search";
 const MAX_TABS = 6;
 
 type Props = {
+  /** Hide the Stanford identity bar and site title (for iframes on other Haas pages). */
+  embed?: boolean;
   periods: PeriodMeta[];
   periodSlug: string;
   onPeriod: (slug: string) => void;
@@ -12,7 +14,7 @@ type Props = {
   onText: (text: string) => void;
 };
 
-export function Header({ periods, periodSlug, onPeriod, fellows, onSearch, onText }: Props) {
+export function Header({ embed = false, periods, periodSlug, onPeriod, fellows, onSearch, onText }: Props) {
   const tabs = [...periods.map((p) => ({ slug: p.slug, label: p.displayName }))];
   if (periods.length > 1) tabs.push({ slug: ALL_PERIODS, label: "All periods" });
   // Tabs stop scanning well past a handful; beyond that a select scales without wrapping.
@@ -21,6 +23,7 @@ export function Header({ periods, periodSlug, onPeriod, fellows, onSearch, onTex
   return (
     <header className="relative z-20 shadow-[0_1px_3px_rgba(46,45,41,.12)]">
       {/* Stanford identity bar */}
+      {!embed && (
       <div className="bg-black px-5">
         <div className="flex h-9 items-center gap-3 text-sm text-white">
           <a href="https://www.stanford.edu" className="font-serif text-[19px] font-bold leading-none tracking-tight text-white no-underline">
@@ -32,15 +35,18 @@ export function Header({ periods, periodSlug, onPeriod, fellows, onSearch, onTex
           </a>
         </div>
       </div>
+      )}
 
       {/* Site header */}
       <div className="border-b border-black-20 bg-white px-5">
-        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3 pt-4">
-          <div className="pb-3">
-            <a href="./" className="font-serif text-[26px] font-semibold leading-none text-cardinal no-underline">
-              Cardinal Quarter Fellows Map
-            </a>
-          </div>
+        <div className={"flex flex-wrap items-end justify-between gap-x-8 gap-y-3 " + (embed ? "pt-2" : "pt-4")}>
+          {!embed && (
+            <div className="pb-3">
+              <a href="./" className="font-serif text-[26px] font-semibold leading-none text-cardinal no-underline">
+                Cardinal Quarter Fellows Map
+              </a>
+            </div>
+          )}
 
           {!useTabs && (
             <label className="flex items-center gap-2 pb-3 text-[15px]">

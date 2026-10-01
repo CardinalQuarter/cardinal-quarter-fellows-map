@@ -24,6 +24,7 @@ export default function App() {
   const [panel, setPanel] = useState<Panel>(initial.current.panel ?? "legend");
   const [selection, setSelection] = useState<Selection | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const embed = initial.current.embed ?? false;
 
   useEffect(() => {
     loadPeriods()
@@ -89,8 +90,8 @@ export default function App() {
 
   useEffect(() => {
     if (!periodSlug) return;
-    writeHash({ period: periodSlug, category, filters, text, panel, pin: pinParam }, periods[0]?.slug ?? "");
-  }, [periodSlug, category, filters, text, panel, pinParam, periods]);
+    writeHash({ period: periodSlug, category, filters, text, panel, pin: pinParam, embed }, periods[0]?.slug ?? "");
+  }, [periodSlug, category, filters, text, panel, pinParam, embed, periods]);
 
   // Colors cover every value of the category in the period, so they stay stable while filtering.
   const colors = useMemo(() => colorMap(loaded.map((f) => f[category])), [loaded, category]);
@@ -138,6 +139,7 @@ export default function App() {
   return (
     <div className="flex h-full flex-col">
       <Header
+        embed={embed}
         periods={periods}
         periodSlug={periodSlug}
         onPeriod={changePeriod}

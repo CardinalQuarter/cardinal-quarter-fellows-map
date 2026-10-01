@@ -12,6 +12,8 @@ export type ViewState = {
   text: string;
   panel: Panel;
   pin: string;
+  /** Embed mode hides the Stanford chrome for use inside an iframe on another Haas page. */
+  embed: boolean;
 };
 
 /** URL key for each filterable column. The Period column is "cohort" because "period" names the tab. */
@@ -34,6 +36,7 @@ export function readHash(): Partial<ViewState> {
   if (params.get("view") === "list") out.panel = "list";
   const pin = params.get("pin");
   if (pin) out.pin = pin;
+  if (params.get("embed") === "1") out.embed = true;
   const filters: Filters = {};
   for (const [key, value] of params) {
     const col = COLUMN_FOR_KEY.get(key);
@@ -55,6 +58,7 @@ export function writeHash(state: ViewState, defaultPeriod: string): void {
   if (state.text) params.set("q", state.text);
   if (state.panel === "list") params.set("view", "list");
   if (state.pin) params.set("pin", state.pin);
+  if (state.embed) params.set("embed", "1");
   const next = params.toString();
   if (next === location.search.replace(/^\?/, "")) return;
   history.replaceState(null, "", (next ? `?${next}` : location.pathname) + location.hash);
