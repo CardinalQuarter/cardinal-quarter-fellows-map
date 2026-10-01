@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "./components/Header";
 import { Legend } from "./components/Legend";
+import { FellowList } from "./components/FellowList";
 import { FilterChips } from "./components/FilterChips";
-import { MapView, type Pin } from "./components/MapView";
+import { MapView, type Pin, type Selection } from "./components/MapView";
 import { colorMap } from "./colors";
 import { loadFellows, loadPeriods } from "./data";
 import { applyFilters, toggleFilter } from "./filter";
-import { ALL_PERIODS, type Category, type Fellow, type Filters, type PeriodMeta } from "./types";
+import {
+  ALL_PERIODS, fellowKey, sameSpot,
+  type Category, type Fellow, type Filters, type Panel, type PeriodMeta,
+} from "./types";
 import { readHash, writeHash } from "./urlState";
 
 export default function App() {
@@ -17,6 +21,8 @@ export default function App() {
   const [category, setCategory] = useState<Category>(initial.current.category ?? "interest_area");
   const [filters, setFilters] = useState<Filters>(initial.current.filters ?? {});
   const [text, setText] = useState(initial.current.text ?? "");
+  const [panel, setPanel] = useState<Panel>(initial.current.panel ?? "legend");
+  const [selection, setSelection] = useState<Selection | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -49,7 +55,18 @@ export default function App() {
     Promise.all(
       wanted.map((p) => loadFellows(p.slug).then((rows) => rows.map((f) => ({ ...f, period: p.displayName })))),
     )
-      .then((lists) => { if (!cancelled) setFellows(lists.flat()); })
+      .then((lists) => {
+        if (cancelled) return;
+        const rows = lists.flat();
+        setFellows(rows);
+        // A shared link can open straight onto a fellow (by name) or an organization.
+        const pin = initial.current.pin;
+        if (pin) {
+          initial.current.pin = undefined;
+          const hit = rows.find((f) => f.name === pin) ?? rows.find((f) => f.partner_organization === pin);
+          if (hit) setSelection({ fellow: hit, fly: true });
+        }
+      })
       .catch((e) => setError(String(e)));
     return () => { cancelled = true; };
   }, [periodSlug, periods]);
@@ -60,13 +77,20 @@ export default function App() {
     if (c === "period" && periodSlug !== ALL_PERIODS) setPeriodSlug(ALL_PERIODS);
   };
 
-  useEffect(() => {
-    if (!periodSlug) return;
-    writeHash({ period: periodSlug, category, filters, text }, periods[0]?.slug ?? "");
-  }, [periodSlug, category, filters, text, periods]);
-
   const loaded = fellows ?? [];
   const visible = useMemo(() => applyFilters(loaded, filters, text), [loaded, filters, text]);
+
+  // The URL names the open pin by fellow when alone at the spot, else by organization.
+  const pinParam = useMemo(() => {
+    if (!selection) return "";
+    const here = visible.filter((f) => sameSpot(f, selection.fellow));
+    return here.length === 1 ? selection.fellow.name : selection.fellow.partner_organization;
+  }, [selection, visible]);
+
+  useEffect(() => {
+    if (!periodSlug) return;
+    writeHash({ period: periodSlug, category, filters, text, panel, pin: pinParam }, periods[0]?.slug ?? "");
+  }, [periodSlug, category, filters, text, panel, pinParam, periods]);
 
   // Colors cover every value of the category in the period, so they stay stable while filtering.
   const colors = useMemo(() => colorMap(loaded.map((f) => f[category])), [loaded, category]);
@@ -90,13 +114,22 @@ export default function App() {
     [visible, colors, category],
   );
 
+  const stats = useMemo(
+    () => ({
+      organizations: new Set(visible.map((f) => f.partner_organization)).size,
+      countries: new Set(visible.filter((f) => f.country).map((f) => f.country)).size,
+    }),
+    [visible],
+  );
+
   const title =
     periodSlug === ALL_PERIODS ? "All periods" : (periods.find((p) => p.slug === periodSlug)?.displayName ?? "");
 
-  const clearAll = () => {
-    setFilters({});
-    setText("");
-  };
+  // Any change to what is on the map closes the open pin, so a popup never describes a hidden fellow.
+  const changeFilters = (fn: (f: Filters) => Filters) => { setSelection(null); setFilters(fn); };
+  const changeText = (t: string) => { setSelection(null); setText(t); };
+  const changePeriod = (slug: string) => { setSelection(null); setPeriodSlug(slug); };
+  const clearAll = () => { setSelection(null); setFilters({}); setText(""); };
 
   if (error) {
     return <p className="p-6 text-digital-red">The fellow data could not be loaded. {error}</p>;
@@ -107,10 +140,10 @@ export default function App() {
       <Header
         periods={periods}
         periodSlug={periodSlug}
-        onPeriod={setPeriodSlug}
+        onPeriod={changePeriod}
         fellows={loaded}
-        onSearch={(hit) => setFilters((f) => toggleFilter(f, hit.column, hit.value))}
-        onText={setText}
+        onSearch={(hit) => changeFilters((f) => toggleFilter(f, hit.column, hit.value))}
+        onText={changeText}
       />
       <main className="flex min-h-0 flex-1 flex-col-reverse lg:flex-row">
         <Legend
@@ -118,23 +151,34 @@ export default function App() {
           loading={fellows === null}
           shown={visible.length}
           total={loaded.length}
+          organizations={stats.organizations}
+          countries={stats.countries}
+          panel={panel}
+          onPanel={setPanel}
           category={category}
           canGroupByPeriod={periods.length > 1}
           onCategory={chooseCategory}
           entries={entries}
           selected={filters[category] ?? []}
-          onToggle={(label) => setFilters((f) => toggleFilter(f, category, label))}
+          onToggle={(label) => changeFilters((f) => toggleFilter(f, category, label))}
           onClearAll={clearAll}
+          list={
+            <FellowList
+              pins={pins}
+              selectedKey={selection ? fellowKey(selection.fellow) : null}
+              onSelect={(fellow) => setSelection({ fellow, fly: true })}
+            />
+          }
         >
           <FilterChips
             filters={filters}
             text={text}
-            onRemove={(col, value) => setFilters((f) => toggleFilter(f, col, value))}
-            onClearText={() => setText("")}
+            onRemove={(col, value) => changeFilters((f) => toggleFilter(f, col, value))}
+            onClearText={() => changeText("")}
             onClearAll={clearAll}
           />
         </Legend>
-        <MapView pins={pins} />
+        <MapView pins={pins} selection={selection} onSelect={setSelection} />
       </main>
     </div>
   );

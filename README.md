@@ -62,7 +62,7 @@ npm run build                # type-check + production build into dist/
 | -------------------------- | ------------------------------------------------------ |
 | `scripts/build-data.ts`    | reads sheet/CSVs, geocodes, fetches logos, writes JSON |
 | `src/App.tsx`              | period, grouping, filter, and search state             |
-| `src/components/`          | Header, Legend, FilterChips, Search, MapView           |
+| `src/components/`          | Header, Legend, FellowList, FilterChips, Search, MapView |
 | `src/urlState.ts`          | view state in the URL query string                     |
 | `src/styles.css`           | Stanford Identity color and type tokens                |
 | `.github/workflows/`       | nightly and on-demand build and deploy                 |

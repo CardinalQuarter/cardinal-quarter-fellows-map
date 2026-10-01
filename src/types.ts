@@ -25,6 +25,8 @@ export const CATEGORIES = {
   affiliation: "Affiliation",
   school: "School",
   class_year: "Class Year",
+  country: "Country",
+  partner_organization: "Partner Organization",
   period: "Period",
 } as const;
 
@@ -63,6 +65,16 @@ export const SEARCH_LABELS: Partial<Record<keyof Fellow, string>> = {
 export type Filters = Partial<Record<keyof Fellow, string[]>>;
 
 export const ALL_PERIODS = "all";
+
+/** Which sidebar panel is showing: the color legend or the fellow list. */
+export type Panel = "legend" | "list";
+
+/** Stable identity for a fellow across re-renders (objects are recreated per period load). */
+export const fellowKey = (f: Fellow) => `${f.period}\u0000${f.name}\u0000${f.partner_organization}`;
+
+/** Fellows at exactly the same coordinates as `f` (the same org address, usually). */
+export const sameSpot = (a: Fellow, b: Fellow) =>
+  Math.abs(a.latitude - b.latitude) < 1e-6 && Math.abs(a.longitude - b.longitude) < 1e-6;
 
 /** Shown for a blank value in any grouping column so it can still be filtered on. */
 export const UNSPECIFIED = "Not specified";

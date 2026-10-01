@@ -1,7 +1,18 @@
-import { CATEGORIES, type Category, type Fellow, type Filters } from "./types";
+import { CATEGORIES, type Category, type Fellow, type Filters, type Panel } from "./types";
 
-/** View state that is worth sharing in a link: period, grouping, filters, search. */
-export type ViewState = { period: string; category: Category; filters: Filters; text: string };
+/**
+ * View state that is worth sharing in a link: period, grouping, filters, search,
+ * which sidebar panel is open, and an open pin (a fellow's name, or an
+ * organization's name when several fellows share its address).
+ */
+export type ViewState = {
+  period: string;
+  category: Category;
+  filters: Filters;
+  text: string;
+  panel: Panel;
+  pin: string;
+};
 
 /** URL key for each filterable column. The Period column is "cohort" because "period" names the tab. */
 const URL_KEYS: Partial<Record<keyof Fellow, string>> = {
@@ -20,6 +31,9 @@ export function readHash(): Partial<ViewState> {
   if (category && category in CATEGORIES) out.category = category as Category;
   const text = params.get("q");
   if (text) out.text = text;
+  if (params.get("view") === "list") out.panel = "list";
+  const pin = params.get("pin");
+  if (pin) out.pin = pin;
   const filters: Filters = {};
   for (const [key, value] of params) {
     const col = COLUMN_FOR_KEY.get(key);
@@ -39,6 +53,8 @@ export function writeHash(state: ViewState, defaultPeriod: string): void {
     if (key && vals?.length) params.set(key, vals.join("|"));
   }
   if (state.text) params.set("q", state.text);
+  if (state.panel === "list") params.set("view", "list");
+  if (state.pin) params.set("pin", state.pin);
   const next = params.toString();
   if (next === location.search.replace(/^\?/, "")) return;
   history.replaceState(null, "", (next ? `?${next}` : location.pathname) + location.hash);

@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import maplibregl, { type Map as MlMap, type MapMouseEvent, type StyleSpecification } from "maplibre-gl";
 import type { FeatureCollection } from "geojson";
-import type { Fellow } from "../types";
+import { sameSpot, type Fellow } from "../types";
 import { PALETTE } from "../colors";
 
 export type Pin = { fellow: Fellow; color: string };
+/** The open pin. `fly` moves the map there (list click, shared link); a map click leaves the view alone. */
+export type Selection = { fellow: Fellow; fly: boolean };
 
 /**
  * Basemap: OpenFreeMap "positron" (free, no key, no usage cap).
@@ -19,6 +21,9 @@ const LAYER = "fellows-circles";
 const MAX_ZOOM = 15;
 const CLUSTER_MAX_ZOOM = MAX_ZOOM - 1;
 const POPUP_MARGIN = 12;
+/** Below this width a popup is replaced by a bottom sheet, which reads far better on a phone. */
+const SHEET_QUERY = "(max-width: 767px)";
+const FLY_ZOOM = 12;
 
 /** Warm the positron basemap up a little: cream land, soft blue water, quieter roads. */
 const TINT: Record<string, Record<string, unknown>> = {
@@ -128,14 +133,14 @@ function FellowDetails({ f }: { f: Fellow }) {
 }
 
 /** One or many fellows at a spot, grouped by organization so the org header appears once. */
-function PopupList({ pins }: { pins: Pin[] }) {
+function PopupList({ pins, full = false }: { pins: Pin[]; full?: boolean }) {
   const groups = new Map<string, Fellow[]>();
   for (const p of pins) {
     const key = p.fellow.partner_organization;
     groups.set(key, [...(groups.get(key) ?? []), p.fellow]);
   }
   return (
-    <div className={"w-64 font-sans " + (pins.length > 1 ? "max-h-80 overflow-y-auto pr-1" : "")}>
+    <div className={full ? "font-sans" : "w-64 font-sans " + (pins.length > 1 ? "max-h-80 overflow-y-auto pr-1" : "")}>
       {pins.length > 1 && (
         <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-cool-grey">
           {pins.length} fellows at this location
@@ -201,11 +206,11 @@ function donut(props: Record<string, unknown>): HTMLElement {
   el.className = "cluster";
   el.setAttribute("aria-label", `${total} fellows`);
   el.innerHTML =
-    `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">` +
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">` +
     `<circle cx="${r}" cy="${r}" r="${r}" fill="#fff"/>` +
     arcs.join("") +
     `<circle cx="${r}" cy="${r}" r="${r0}" fill="#fff"/>` +
-    `<text x="${r}" y="${r}" text-anchor="middle" dominant-baseline="central" font-size="${total >= 100 ? 11 : 13}" font-weight="600" fill="#2e2d29">${total}</text>` +
+    `<text x="${r}" y="${r}" text-anchor="middle" dominant-baseline="central" font-size="${total >= 100 ? 11 : 13}" font-weight="600" font-family="'Source Sans 3','Helvetica Neue',Arial,sans-serif" fill="#2e2d29">${total}</text>` +
     `</svg>`;
   return el;
 }
@@ -231,15 +236,95 @@ function keepPopupInView(map: MlMap, popup: maplibregl.Popup) {
   });
 }
 
-export function MapView({ pins }: { pins: Pin[] }) {
+/**
+ * Compose the WebGL canvas and the HTML cluster markers into one PNG. The map alone
+ * would miss every cluster, since those are DOM elements rather than map layers.
+ */
+async function exportPng(map: MlMap, markers: Iterable<maplibregl.Marker>): Promise<Blob | null> {
+  const src = map.getCanvas();
+  const ratio = src.width / map.getContainer().clientWidth;
+  const out = document.createElement("canvas");
+  out.width = src.width;
+  out.height = src.height;
+  const ctx = out.getContext("2d");
+  if (!ctx) return null;
+  ctx.drawImage(src, 0, 0);
+  for (const m of markers) {
+    const svg = m.getElement().querySelector("svg");
+    if (!svg) continue;
+    const { x, y } = map.project(m.getLngLat());
+    const w = Number(svg.getAttribute("width")), h = Number(svg.getAttribute("height"));
+    const img = new Image();
+    const url = URL.createObjectURL(new Blob([svg.outerHTML], { type: "image/svg+xml" }));
+    const ok = await new Promise<boolean>((resolve) => { img.onload = () => resolve(true); img.onerror = () => resolve(false); img.src = url; });
+    if (ok) ctx.drawImage(img, (x - w / 2) * ratio, (y - h / 2) * ratio, w * ratio, h * ratio);
+    URL.revokeObjectURL(url);
+  }
+  // Attribution is a licence requirement for the basemap.
+  const credit = "© OpenFreeMap © OpenMapTiles © OpenStreetMap contributors";
+  ctx.font = `${11 * ratio}px "Source Sans 3", "Helvetica Neue", Arial, sans-serif`;
+  const tw = ctx.measureText(credit).width;
+  ctx.fillStyle = "rgba(255,255,255,.8)";
+  ctx.fillRect(out.width - tw - 12 * ratio, out.height - 18 * ratio, tw + 12 * ratio, 18 * ratio);
+  ctx.fillStyle = "#2e2d29";
+  ctx.fillText(credit, out.width - tw - 6 * ratio, out.height - 6 * ratio);
+  return new Promise((resolve) => out.toBlob(resolve, "image/png"));
+}
+
+/** A "download image" button styled like the zoom control, placed beneath it. */
+class ExportControl implements maplibregl.IControl {
+  private el?: HTMLElement;
+  constructor(private getMarkers: () => Iterable<maplibregl.Marker>) {}
+  onAdd(map: MlMap) {
+    const el = document.createElement("div");
+    el.className = "maplibregl-ctrl maplibregl-ctrl-group";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.title = "Download map as image";
+    btn.setAttribute("aria-label", btn.title);
+    btn.innerHTML =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e2d29" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      try {
+        const blob = await exportPng(map, this.getMarkers());
+        if (!blob) return;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `cardinal-quarter-map-${new Date().toISOString().slice(0, 10)}.png`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+    el.appendChild(btn);
+    this.el = el;
+    return el;
+  }
+  onRemove() {
+    this.el?.remove();
+  }
+}
+
+type Props = {
+  pins: Pin[];
+  selection: Selection | null;
+  onSelect: (s: Selection | null) => void;
+};
+
+export function MapView({ pins, selection, onSelect }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const pinsRef = useRef<Pin[]>(pins);
+  const onSelectRef = useRef(onSelect);
   const popupRoot = useRef<Root | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const markers = useRef<Map<number, maplibregl.Marker>>(new Map());
   const [ready, setReady] = useState(false);
+  const [sheet, setSheet] = useState<Pin[] | null>(null);
   pinsRef.current = pins;
+  onSelectRef.current = onSelect;
 
   useEffect(() => {
     if (!container.current) return;
@@ -251,23 +336,12 @@ export function MapView({ pins }: { pins: Pin[] }) {
       minZoom: 1,
       maxZoom: MAX_ZOOM,
       attributionControl: { compact: true },
+      // Lets the canvas be read back for the image download.
+      canvasContextAttributes: { preserveDrawingBuffer: true },
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    map.addControl(new ExportControl(() => markers.current.values()), "top-right");
     mapRef.current = map;
-
-    const openPopup = (hits: Pin[], lngLat: [number, number]) => {
-      const el = document.createElement("div");
-      popupRoot.current?.unmount();
-      popupRoot.current = createRoot(el);
-      popupRoot.current.render(<PopupList pins={hits} />);
-      popupRef.current?.remove();
-      const popup = new maplibregl.Popup({ offset: 12, maxWidth: "320px" })
-        .setLngLat(lngLat)
-        .setDOMContent(el)
-        .addTo(map);
-      popupRef.current = popup;
-      keepPopupInView(map, popup);
-    };
 
     // Cluster markers are HTML (donut SVG); refresh them whenever the view or data changes.
     const updateClusters = () => {
@@ -291,8 +365,8 @@ export function MapView({ pins }: { pins: Pin[] }) {
           const ne = bounds.getNorthEast(), sw = bounds.getSouthWest();
           if (Math.abs(ne.lng - sw.lng) < 1e-6 && Math.abs(ne.lat - sw.lat) < 1e-6) {
             // Everyone here shares one address; zooming would not separate them.
-            const hits = leaves.map((l) => pinsRef.current[(l.properties as { i: number }).i]).filter(Boolean);
-            openPopup(hits, coords);
+            const first = pinsRef.current[(leaves[0].properties as { i: number }).i];
+            if (first) onSelectRef.current({ fellow: first.fellow, fly: false });
           } else {
             map.fitBounds(bounds, { padding: 80, maxZoom: MAX_ZOOM, duration: 600 });
           }
@@ -333,19 +407,9 @@ export function MapView({ pins }: { pins: Pin[] }) {
       map.on("mouseenter", LAYER, () => (map.getCanvas().style.cursor = "pointer"));
       map.on("mouseleave", LAYER, () => (map.getCanvas().style.cursor = ""));
       map.on("click", LAYER, (e: MapMouseEvent) => {
-        // Every pin under the cursor: fellows at the same org share coordinates.
         const feats = map.queryRenderedFeatures(e.point, { layers: [LAYER] });
-        const seen = new Set<number>();
-        const hits: Pin[] = [];
-        for (const f of feats) {
-          const i = f.properties.i as number;
-          if (seen.has(i)) continue;
-          seen.add(i);
-          const pin = pinsRef.current[i];
-          if (pin) hits.push(pin);
-        }
-        if (hits.length === 0) return;
-        openPopup(hits, [hits[0].fellow.longitude, hits[0].fellow.latitude]);
+        const pin = feats.length ? pinsRef.current[feats[0].properties.i as number] : undefined;
+        if (pin) onSelectRef.current({ fellow: pin.fellow, fly: false });
       });
       map.on("data", (e) => {
         if ((e as { sourceId?: string }).sourceId === SOURCE && (e as { isSourceLoaded?: boolean }).isSourceLoaded) updateClusters();
@@ -364,6 +428,13 @@ export function MapView({ pins }: { pins: Pin[] }) {
     };
   }, []);
 
+  const closePopup = () => {
+    const old = popupRef.current;
+    popupRef.current = null;
+    old?.remove();
+    setSheet(null);
+  };
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
@@ -373,13 +444,81 @@ export function MapView({ pins }: { pins: Pin[] }) {
     markers.current.clear();
     src?.setData(toGeoJson(pins));
     // A popup for a fellow who was just filtered out would be misleading.
-    popupRef.current?.remove();
-    popupRef.current = null;
+    closePopup();
     if (pins.length === 0) return;
     const bounds = new maplibregl.LngLatBounds();
     for (const p of pins) bounds.extend([p.fellow.longitude, p.fellow.latitude]);
     map.fitBounds(bounds, { padding: 60, maxZoom: 11, duration: 600 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pins, ready]);
 
-  return <div ref={container} className="h-3/5 w-full lg:h-full lg:flex-1" />;
+  // Open (or close) the popup for the selected fellow, showing everyone at that address.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    if (!selection) { closePopup(); return; }
+    const hits = pins.filter((p) => sameSpot(p.fellow, selection.fellow));
+    if (hits.length === 0) { closePopup(); return; }
+    const lngLat: [number, number] = [selection.fellow.longitude, selection.fellow.latitude];
+    const mobile = window.matchMedia(SHEET_QUERY).matches;
+
+    const open = () => {
+      if (mobile) {
+        closePopup();
+        setSheet(hits);
+        return;
+      }
+      const el = document.createElement("div");
+      popupRoot.current?.unmount();
+      popupRoot.current = createRoot(el);
+      popupRoot.current.render(<PopupList pins={hits} />);
+      const popup = new maplibregl.Popup({ offset: 12, maxWidth: "320px" }).setLngLat(lngLat).setDOMContent(el);
+      // Closing with the × clears the selection; replacing the popup must not.
+      popup.on("close", () => { if (popupRef.current === popup) { popupRef.current = null; onSelectRef.current(null); } });
+      const old = popupRef.current;
+      popupRef.current = popup;
+      old?.remove();
+      popup.addTo(map);
+      keepPopupInView(map, popup);
+    };
+
+    if (selection.fly) {
+      map.once("moveend", open);
+      map.flyTo({
+        center: lngLat,
+        zoom: Math.max(map.getZoom(), FLY_ZOOM),
+        duration: 800,
+        // Keep the pin above a bottom sheet on phones.
+        padding: mobile ? { top: 0, bottom: Math.round(map.getContainer().clientHeight * 0.5), left: 0, right: 0 } : 0,
+      });
+      return () => { map.off("moveend", open); };
+    }
+    open();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selection, pins, ready]);
+
+  return (
+    <div className="relative h-3/5 w-full lg:h-full lg:flex-1">
+      <div ref={container} className="h-full w-full" />
+      {sheet && (
+        <div
+          role="dialog"
+          aria-label="Fellows at this location"
+          className="absolute inset-x-0 bottom-0 z-10 max-h-[60%] overflow-y-auto rounded-t-lg bg-white px-4 pb-4 pt-3 shadow-[0_-2px_12px_rgba(46,45,41,.22)]"
+        >
+          <div className="mb-2 flex justify-end">
+            <button
+              type="button"
+              aria-label="Close"
+              className="text-xl leading-none text-black-60 hover:text-black"
+              onClick={() => onSelectRef.current(null)}
+            >
+              ×
+            </button>
+          </div>
+          <PopupList pins={sheet} full />
+        </div>
+      )}
+    </div>
+  );
 }
