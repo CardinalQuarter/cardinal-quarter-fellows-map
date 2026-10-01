@@ -170,6 +170,7 @@ async function fetchText(url: string): Promise<string> {
 
 function parseCsv(text: string): string[][] {
   const { data, errors } = Papa.parse<string[]>(text.replace(/^﻿/, ""), {
+    delimiter: ",",
     skipEmptyLines: "greedy",
   });
   const fatal = errors.filter((e) => e.type !== "FieldMismatch");
