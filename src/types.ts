@@ -66,11 +66,8 @@ export type Filters = Partial<Record<keyof Fellow, string[]>>;
 
 export const ALL_PERIODS = "all";
 
-/** Which sidebar panel is showing: the color legend or the fellow list. */
+/** Which sidebar panel is showing: the color legend or the organization list. */
 export type Panel = "legend" | "list";
-
-/** Stable identity for a fellow across re-renders (objects are recreated per period load). */
-export const fellowKey = (f: Fellow) => `${f.period}\u0000${f.name}\u0000${f.partner_organization}`;
 
 /** Fellows at exactly the same coordinates as `f` (the same org address, usually). */
 export const sameSpot = (a: Fellow, b: Fellow) =>

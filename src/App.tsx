@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "./components/Header";
 import { Legend } from "./components/Legend";
-import { FellowList } from "./components/FellowList";
+import { OrgList } from "./components/OrgList";
 import { FilterChips } from "./components/FilterChips";
 import { MapView, type Pin, type Selection } from "./components/MapView";
 import { colorMap } from "./colors";
 import { loadFellows, loadPeriods } from "./data";
 import { applyFilters, toggleFilter } from "./filter";
 import {
-  ALL_PERIODS, fellowKey, sameSpot,
+  ALL_PERIODS, sameSpot,
   type Category, type Fellow, type Filters, type Panel, type PeriodMeta,
 } from "./types";
 import { readHash, writeHash } from "./urlState";
@@ -165,9 +165,9 @@ export default function App() {
           onToggle={(label) => changeFilters((f) => toggleFilter(f, category, label))}
           onClearAll={clearAll}
           list={
-            <FellowList
+            <OrgList
               pins={pins}
-              selectedKey={selection ? fellowKey(selection.fellow) : null}
+              selectedOrg={selection?.fellow.partner_organization ?? null}
               onSelect={(fellow) => setSelection({ fellow, fly: true })}
             />
           }

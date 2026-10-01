@@ -18,7 +18,7 @@ type Props = {
   selected: string[];
   onToggle: (label: string) => void;
   onClearAll: () => void;
-  /** The fellow list, shown in place of the legend when that panel is chosen. */
+  /** The organization list, shown in place of the legend when that panel is chosen. */
   list: React.ReactNode;
   children?: React.ReactNode;
 };
@@ -57,7 +57,7 @@ export function Legend({
             Legend
           </button>
           <button type="button" role="tab" aria-selected={panel === "list"} className={tabClass(panel === "list")} onClick={() => onPanel("list")}>
-            Fellows
+            Organizations
           </button>
         </div>
 
