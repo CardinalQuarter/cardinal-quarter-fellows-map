@@ -1,5 +1,10 @@
 [
   {
+    "slug": "period-1",
+    "displayName": "Period #1",
+    "count": 99
+  },
+  {
     "slug": "summer-2025",
     "displayName": "Summer 2025",
     "count": 48
