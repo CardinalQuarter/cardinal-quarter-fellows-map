@@ -136,6 +136,8 @@ const report = {
   orphans: new Map<string, number>(),
   duplicates: [] as string[],
   skipped: [] as string[],
+  swapped: [] as string[],
+  badCoords: [] as string[],
   geocoded: [] as string[],
   geocodeFailed: [] as string[],
   logosFetched: [] as string[],
@@ -320,7 +322,27 @@ function hasCoords(r: Row): boolean {
   return r.latitude !== "" && r.longitude !== "" && Number.isFinite(Number(r.latitude)) && Number.isFinite(Number(r.longitude));
 }
 
+const inRange = (lat: number, lng: number) => Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+
+/** Fix swapped Latitude/Longitude cells; blank out pairs that are not on Earth. */
+function checkCoords(r: Row): void {
+  if (!hasCoords(r)) return;
+  const lat = Number(r.latitude);
+  const lng = Number(r.longitude);
+  if (inRange(lat, lng)) return;
+  if (inRange(lng, lat)) {
+    r.latitude = String(lng);
+    r.longitude = String(lat);
+    report.swapped.push(`${r.where}: Latitude/Longitude were reversed (${lat}, ${lng}), swapped`);
+    return;
+  }
+  report.badCoords.push(`${r.where}: Latitude ${lat}, Longitude ${lng} is not a valid location, ignored`);
+  r.latitude = "";
+  r.longitude = "";
+}
+
 async function geocode(cache: Record<string, GeoEntry>, rows: Row[]): Promise<void> {
+  rows.forEach(checkCoords);
   const pending = rows.filter((r) => !hasCoords(r));
   const queries = new Map<string, Row[]>();
   for (const r of pending) {
@@ -499,6 +521,8 @@ function summary(): string {
   );
   section("Rows skipped", report.skipped);
   section("Duplicates resolved (last row wins)", report.duplicates);
+  section("Coordinates that were reversed and swapped", report.swapped);
+  section("Coordinates that were invalid and replaced by geocoding or skipped", report.badCoords);
   section("Addresses geocoded", report.geocoded);
   section("Addresses that could not be geocoded", report.geocodeFailed);
   section("Logos fetched", report.logosFetched);
