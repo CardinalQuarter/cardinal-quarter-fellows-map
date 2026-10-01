@@ -1,5 +1,40 @@
 [
   {
+    "slug": "summer-18",
+    "displayName": "Summer '18",
+    "count": 0
+  },
+  {
+    "slug": "summer-19",
+    "displayName": "Summer '19",
+    "count": 0
+  },
+  {
+    "slug": "summer-20",
+    "displayName": "Summer '20",
+    "count": 0
+  },
+  {
+    "slug": "summer-21",
+    "displayName": "Summer '21",
+    "count": 0
+  },
+  {
+    "slug": "summer-22",
+    "displayName": "Summer '22",
+    "count": 0
+  },
+  {
+    "slug": "summer-23",
+    "displayName": "Summer '23",
+    "count": 0
+  },
+  {
+    "slug": "summer-24",
+    "displayName": "Summer '24",
+    "count": 0
+  },
+  {
     "slug": "summer-25",
     "displayName": "Summer '25",
     "count": 25
@@ -8,5 +43,35 @@
     "slug": "summer-26",
     "displayName": "Summer '26",
     "count": 24
+  },
+  {
+    "slug": "summer-27",
+    "displayName": "Summer '27",
+    "count": 0
+  },
+  {
+    "slug": "summer-28",
+    "displayName": "Summer '28",
+    "count": 0
+  },
+  {
+    "slug": "summer-29",
+    "displayName": "Summer '29",
+    "count": 0
+  },
+  {
+    "slug": "summer-30",
+    "displayName": "Summer '30",
+    "count": 0
+  },
+  {
+    "slug": "summer-31",
+    "displayName": "Summer '31",
+    "count": 0
+  },
+  {
+    "slug": "summer-32",
+    "displayName": "Summer '32",
+    "count": 0
   }
 ]
