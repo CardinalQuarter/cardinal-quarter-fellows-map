@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+/* Stanford Identity palette (identity.stanford.edu) */
+@theme {
+  --color-cardinal: #8c1515;
+  --color-cardinal-dark: #820000;
+  --color-cardinal-light: #b83a4b;
+  --color-digital-red: #b1040e;
+  --color-digital-blue: #006cb8;
+  --color-black: #2e2d29;
+  --color-cool-grey: #53565a;
+  --color-stone: #7f7776;
+  --color-fog: #dad7cb;
+  --color-fog-light: #f4f4f4;
+  --color-black-10: #eaeaea;
+  --color-black-20: #d5d5d4;
+  --color-black-30: #c0c0bf;
+  --color-black-60: #767674;
+  --font-sans: "Source Sans 3", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+}
+
+html, body, #root { height: 100%; }
+body { margin: 0; font-family: var(--font-sans); color: #2e2d29; background: #fff; }
+
+.maplibregl-popup-content { padding: 14px 16px; border-radius: 4px; box-shadow: 0 2px 12px rgba(46,45,41,.22); font-family: var(--font-sans); }
+.maplibregl-popup-close-button { font-size: 18px; padding: 2px 8px; color: #767674; }
+.maplibregl-popup-close-button:hover { background: none; color: #2e2d29; }
+.maplibregl-ctrl-group { border-radius: 4px; box-shadow: 0 1px 4px rgba(46,45,41,.25); }
+.maplibregl-ctrl-attrib { font-family: var(--font-sans); font-size: 11px; }
+.cluster { cursor: pointer; filter: drop-shadow(0 1px 2px rgba(46,45,41,.35)); font-family: var(--font-sans); }
+.cluster svg text { pointer-events: none; }
+
+/* Native selects put the arrow flush against the edge; draw our own with room to breathe. */
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%232e2d29' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+}

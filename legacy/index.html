@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+
+    <link rel="stylesheet" type="text/css" href="styling.css" />
+
+    <script type="text/javascript" src="scripting.js"></script>
+
+    <!-- may not be needed anymore -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=REDACTED_GOOGLE_MAPS_KEY&callback=initMap"
+    ></script>
+
+    <title>Cardinal Quarter Fellows</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  </head>
+
+  <body onload="initPage()">
+    <section class="header">
+      <div class="col-lg-3 title">
+        <a class="text-decoration-none" href="">
+          <h1>Cardinal Quarter Fellows</h1>
+        </a>
+      </div>
+
+      <nav class="col-lg-9 navbar navbar-expand-md bg-body-tertiary">
+        <div class="container-fluid">
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+              <li class="nav-item dropdown">
+                <a
+                  aria-expanded="false"
+                  class="nav-link dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  href="#"
+                  role="button"
+                >
+                  Fellowship Period
+                </a>
+                <ul class="dropdown-menu" id="fellowship-dropdown-list"></ul>
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  href="#interest-area"
+                  id="interest-area-filter"
+                  onclick="showMapInterestArea()"
+                  >Interest Area</a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#affiliation"
+                  id="affiliation-filter"
+                  onclick="showMapAffiliation()"
+                  >Affiliation</a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#school"
+                  id="school-filter"
+                  onclick="showMapSchool()"
+                  >School</a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="#class-year"
+                  id="class-year-filter"
+                  onclick="showMapClassYear()"
+                  >Class Year</a
+                >
+              </li>
+            </ul>
+
+            <form class="d-flex" role="search" id="search-bar-form">
+              <div>
+                <input
+                  aria-label="Search"
+                  class="form-control me-2 search-bar"
+                  id="search-input"
+                  onclick="getSuggestionsArray()"
+                  oninput="getSuggestionsArray()"
+                  type="search"
+                  placeholder="Search"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+    <section class="content">
+      <div class="background-tan information-sidebar">
+        <div class="information-container">
+          <h2 id="current-year-header"></h2>
+          <h3 id="sort-by-header"></h3>
+          <table class="information-table" id="information-table"></table>
+        </div>
+      </div>
+
+      <div class="google-map-container">
+        <div id="map"></div>
+      </div>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+name: Build and deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    # Nightly rebuild picks up edits to the Google Sheet. 13:00 UTC = 6am Pacific.
+    - cron: "0 13 * * *"
+  workflow_dispatch: # "Run workflow" button in the Actions tab = publish now
+
+permissions:
+  contents: write # commits the data snapshot, geocode cache, and logos back
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build site
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          # Project page lives at https://<org>.github.io/<repo>/ until a custom
+          # domain is attached; then set the BASE_PATH repo variable to "/".
+          BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
+        run: npm run build
+      - name: Commit data snapshot
+        # Every published change to the data is a readable diff in git history.
+        # A push with GITHUB_TOKEN does not trigger this workflow again.
+        run: |
+          git add public/data public/logos data/geocache.json data/logocache.json
+          if git diff --cached --quiet; then
+            echo "Data unchanged"
+          else
+            git -c user.name=github-actions -c user.email=github-actions@github.com \
+              commit -m "Data snapshot $(date -u +%Y-%m-%d)"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

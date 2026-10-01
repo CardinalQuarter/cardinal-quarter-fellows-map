@@ -1,0 +1,385 @@
+import { useEffect, useRef, useState } from "react";
+import { createRoot, type Root } from "react-dom/client";
+import maplibregl, { type Map as MlMap, type MapMouseEvent, type StyleSpecification } from "maplibre-gl";
+import type { FeatureCollection } from "geojson";
+import type { Fellow } from "../types";
+import { PALETTE } from "../colors";
+
+export type Pin = { fellow: Fellow; color: string };
+
+/**
+ * Basemap: OpenFreeMap "positron" (free, no key, no usage cap).
+ * If Haas gets a Google Cloud billing account, this component is the only file
+ * that changes to swap in Google Maps.
+ */
+const STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
+const SOURCE = "fellows";
+const LAYER = "fellows-circles";
+/** Cluster right up to the last zoom so fellows at one address always show as a counted ring. */
+const MAX_ZOOM = 15;
+const CLUSTER_MAX_ZOOM = MAX_ZOOM - 1;
+const POPUP_MARGIN = 12;
+
+/** Warm the positron basemap up a little: cream land, soft blue water, quieter roads. */
+const TINT: Record<string, Record<string, unknown>> = {
+  background: { "background-color": "#f3f1ec" },
+  park: { "fill-color": "#e1e8dc" },
+  landcover_wood: { "fill-color": "#e3e8df" },
+  landuse_residential: { "fill-color": "#ece9e2" },
+  water: { "fill-color": "#c9d9e3" },
+  waterway: { "line-color": "#b7cbd8" },
+  building: { "fill-color": "#e7e3da", "fill-outline-color": "#d9d4c9" },
+  boundary_2: { "line-color": "#b9b4aa", "line-opacity": 0.8 },
+  boundary_3: { "line-color": "#c9c4ba" },
+  boundary_disputed: { "line-color": "#b9b4aa" },
+  highway_motorway_inner: { "line-color": "#ffffff" },
+  highway_major_inner: { "line-color": "#ffffff" },
+  highway_minor: { "line-color": "#e6e2da" },
+  highway_path: { "line-color": "#e6e2da" },
+  highway_major_casing: { "line-color": "#d5d0c6" },
+  highway_motorway_casing: { "line-color": "#d5d0c6" },
+  label_country_1: { "text-color": "#3b3a36", "text-halo-color": "#f3f1ec" },
+  label_country_2: { "text-color": "#3b3a36", "text-halo-color": "#f3f1ec" },
+  label_country_3: { "text-color": "#3b3a36", "text-halo-color": "#f3f1ec" },
+  label_state: { "text-color": "#767674", "text-halo-color": "#f3f1ec" },
+  label_city_capital: { "text-color": "#2e2d29", "text-halo-color": "#f3f1ec" },
+  label_city: { "text-color": "#2e2d29", "text-halo-color": "#f3f1ec" },
+  label_town: { "text-color": "#43423e", "text-halo-color": "#f3f1ec" },
+  label_village: { "text-color": "#585754", "text-halo-color": "#f3f1ec" },
+  label_other: { "text-color": "#585754", "text-halo-color": "#f3f1ec" },
+  water_name_point_label: { "text-color": "#6f8ba2", "text-halo-color": "#c9d9e3" },
+  water_name_line_label: { "text-color": "#6f8ba2", "text-halo-color": "#c9d9e3" },
+};
+
+function applyTint(map: MlMap) {
+  for (const [id, paint] of Object.entries(TINT)) {
+    if (!map.getLayer(id)) continue;
+    for (const [k, v] of Object.entries(paint)) map.setPaintProperty(id, k, v);
+  }
+}
+
+/** Rewrite every label layer to prefer English names, falling back to local. */
+function useEnglishLabels(map: MlMap) {
+  const style = map.getStyle() as StyleSpecification;
+  for (const layer of style.layers) {
+    if (layer.type !== "symbol") continue;
+    const field = layer.layout?.["text-field"];
+    if (!field) continue;
+    // Only label layers that render a place/feature name (not housenumber etc).
+    if (!/\{name|"name(:[a-z_]+)?"/.test(JSON.stringify(field))) continue;
+    map.setLayoutProperty(layer.id, "text-field", [
+      "coalesce",
+      ["get", "name:en"],
+      ["get", "name:latin"],
+      ["get", "name"],
+    ]);
+  }
+}
+
+function OrgHeader({ f }: { f: Fellow }) {
+  const where = [f.fellowship_loc, f.country].filter(Boolean).join(", ");
+  return (
+    <div className="mb-2 flex items-start gap-3">
+      {f.partner_logo && (
+        <img
+          src={f.partner_logo}
+          alt=""
+          width={40}
+          height={40}
+          loading="lazy"
+          className="h-10 w-10 shrink-0 rounded border border-black-20 bg-white object-contain p-0.5"
+          onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = "none")}
+        />
+      )}
+      <div className="min-w-0">
+        {f.partner_website ? (
+          <a
+            href={f.partner_website}
+            target="_blank"
+            rel="external noopener"
+            className="block font-semibold leading-tight text-digital-blue hover:underline"
+          >
+            {f.partner_organization}
+          </a>
+        ) : (
+          <span className="block font-semibold leading-tight">{f.partner_organization}</span>
+        )}
+        <span className="text-xs text-cool-grey">{where}</span>
+      </div>
+    </div>
+  );
+}
+
+function FellowDetails({ f }: { f: Fellow }) {
+  return (
+    <div>
+      <div className="font-semibold leading-tight">{f.name}</div>
+      <div className="text-[13px] text-cool-grey">
+        {[f.class_year && `Class of ${f.class_year}`, f.major].filter(Boolean).join(" · ")}
+      </div>
+      <dl className="m-0 mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
+        <dt className="text-cool-grey">Interest</dt><dd className="m-0">{f.interest_area}</dd>
+        <dt className="text-cool-grey">Program</dt><dd className="m-0">{f.fellowship}</dd>
+        {f.affiliation && <><dt className="text-cool-grey">Affiliation</dt><dd className="m-0">{f.affiliation}</dd></>}
+        {f.period && <><dt className="text-cool-grey">Period</dt><dd className="m-0">{f.period}</dd></>}
+      </dl>
+    </div>
+  );
+}
+
+/** One or many fellows at a spot, grouped by organization so the org header appears once. */
+function PopupList({ pins }: { pins: Pin[] }) {
+  const groups = new Map<string, Fellow[]>();
+  for (const p of pins) {
+    const key = p.fellow.partner_organization;
+    groups.set(key, [...(groups.get(key) ?? []), p.fellow]);
+  }
+  return (
+    <div className={"w-64 font-sans " + (pins.length > 1 ? "max-h-80 overflow-y-auto pr-1" : "")}>
+      {pins.length > 1 && (
+        <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-cool-grey">
+          {pins.length} fellows at this location
+        </div>
+      )}
+      {[...groups.entries()].map(([org, fellows], gi) => (
+        <div key={org} className={gi > 0 ? "mt-3 border-t border-black-20 pt-3" : ""}>
+          <OrgHeader f={fellows[0]} />
+          <div className="flex flex-col gap-2.5">
+            {fellows.map((f, i) => (
+              <div key={i} className={i > 0 ? "border-t border-dashed border-black-20 pt-2" : ""}>
+                <FellowDetails f={f} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function toGeoJson(pins: Pin[]): FeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: pins.map((p, i) => ({
+      type: "Feature",
+      id: i,
+      geometry: { type: "Point", coordinates: [p.fellow.longitude, p.fellow.latitude] },
+      properties: { color: p.color, i, ci: Math.max(0, PALETTE.indexOf(p.color)) },
+    })),
+  };
+}
+
+/** Per-palette-slot counts, so a cluster knows its category mix without fetching leaves. */
+const CLUSTER_PROPS = Object.fromEntries(
+  PALETTE.map((_, ci) => [`c${ci}`, ["+", ["case", ["==", ["get", "ci"], ci], 1, 0]]]),
+);
+
+/** A donut ring showing the cluster's category mix, with the count in the middle. */
+function donut(props: Record<string, unknown>): HTMLElement {
+  const total = props.point_count as number;
+  const counts = PALETTE.map((_, ci) => (props[`c${ci}`] as number) ?? 0);
+  const size = total >= 50 ? 44 : total >= 10 ? 38 : 32;
+  const r = size / 2;
+  const r0 = r - 5;
+  const arcs: string[] = [];
+  let offset = 0;
+  counts.forEach((n, ci) => {
+    if (!n) return;
+    const a0 = (offset / total) * 2 * Math.PI;
+    const a1 = ((offset + n) / total) * 2 * Math.PI;
+    offset += n;
+    if (n === total) {
+      arcs.push(`<circle cx="${r}" cy="${r}" r="${r - 2.5}" fill="none" stroke="${PALETTE[ci]}" stroke-width="5"/>`);
+      return;
+    }
+    const x0 = r + (r - 2.5) * Math.sin(a0), y0 = r - (r - 2.5) * Math.cos(a0);
+    const x1 = r + (r - 2.5) * Math.sin(a1), y1 = r - (r - 2.5) * Math.cos(a1);
+    const large = a1 - a0 > Math.PI ? 1 : 0;
+    arcs.push(`<path d="M ${x0} ${y0} A ${r - 2.5} ${r - 2.5} 0 ${large} 1 ${x1} ${y1}" fill="none" stroke="${PALETTE[ci]}" stroke-width="5"/>`);
+  });
+  const el = document.createElement("div");
+  el.className = "cluster";
+  el.setAttribute("aria-label", `${total} fellows`);
+  el.innerHTML =
+    `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">` +
+    `<circle cx="${r}" cy="${r}" r="${r}" fill="#fff"/>` +
+    arcs.join("") +
+    `<circle cx="${r}" cy="${r}" r="${r0}" fill="#fff"/>` +
+    `<text x="${r}" y="${r}" text-anchor="middle" dominant-baseline="central" font-size="${total >= 100 ? 11 : 13}" font-weight="600" fill="#2e2d29">${total}</text>` +
+    `</svg>`;
+  return el;
+}
+
+/** Nudge the map so an open popup sits fully inside the map, not clipped at an edge. */
+function keepPopupInView(map: MlMap, popup: maplibregl.Popup) {
+  requestAnimationFrame(() => {
+    const el = popup.getElement();
+    if (!el) return;
+    const box = el.getBoundingClientRect();
+    const view = map.getContainer().getBoundingClientRect();
+    let dx = 0, dy = 0;
+    if (box.left < view.left + POPUP_MARGIN) dx = box.left - (view.left + POPUP_MARGIN);
+    else if (box.right > view.right - POPUP_MARGIN) dx = box.right - (view.right - POPUP_MARGIN);
+    if (box.top < view.top + POPUP_MARGIN) dy = box.top - (view.top + POPUP_MARGIN);
+    else if (box.bottom > view.bottom - POPUP_MARGIN) dy = box.bottom - (view.bottom - POPUP_MARGIN);
+    // The zoom control sits top-right; slide the popup below it rather than behind it.
+    const ctrl = map.getContainer().querySelector(".maplibregl-ctrl-top-right")?.getBoundingClientRect();
+    if (ctrl && box.right - dx > ctrl.left - POPUP_MARGIN && box.top - dy < ctrl.bottom + POPUP_MARGIN) {
+      dy = box.top - (ctrl.bottom + POPUP_MARGIN);
+    }
+    if (dx || dy) map.panBy([dx, dy], { duration: 300 });
+  });
+}
+
+export function MapView({ pins }: { pins: Pin[] }) {
+  const container = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<MlMap | null>(null);
+  const pinsRef = useRef<Pin[]>(pins);
+  const popupRoot = useRef<Root | null>(null);
+  const popupRef = useRef<maplibregl.Popup | null>(null);
+  const markers = useRef<Map<number, maplibregl.Marker>>(new Map());
+  const [ready, setReady] = useState(false);
+  pinsRef.current = pins;
+
+  useEffect(() => {
+    if (!container.current) return;
+    const map = new maplibregl.Map({
+      container: container.current,
+      style: STYLE_URL,
+      center: [10, 20],
+      zoom: 1.4,
+      minZoom: 1,
+      maxZoom: MAX_ZOOM,
+      attributionControl: { compact: true },
+    });
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    mapRef.current = map;
+
+    const openPopup = (hits: Pin[], lngLat: [number, number]) => {
+      const el = document.createElement("div");
+      popupRoot.current?.unmount();
+      popupRoot.current = createRoot(el);
+      popupRoot.current.render(<PopupList pins={hits} />);
+      popupRef.current?.remove();
+      const popup = new maplibregl.Popup({ offset: 12, maxWidth: "320px" })
+        .setLngLat(lngLat)
+        .setDOMContent(el)
+        .addTo(map);
+      popupRef.current = popup;
+      keepPopupInView(map, popup);
+    };
+
+    // Cluster markers are HTML (donut SVG); refresh them whenever the view or data changes.
+    const updateClusters = () => {
+      const source = map.getSource(SOURCE) as maplibregl.GeoJSONSource | undefined;
+      if (!source) return;
+      const seen = new Set<number>();
+      for (const f of map.querySourceFeatures(SOURCE)) {
+        const props = f.properties as Record<string, unknown>;
+        if (!props.cluster) continue;
+        const id = props.cluster_id as number;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        if (markers.current.has(id)) continue;
+        const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
+        const el = donut(props);
+        el.addEventListener("click", async (ev) => {
+          ev.stopPropagation();
+          const leaves = await source.getClusterLeaves(id, Infinity, 0);
+          const bounds = new maplibregl.LngLatBounds();
+          for (const l of leaves) bounds.extend((l.geometry as GeoJSON.Point).coordinates as [number, number]);
+          const ne = bounds.getNorthEast(), sw = bounds.getSouthWest();
+          if (Math.abs(ne.lng - sw.lng) < 1e-6 && Math.abs(ne.lat - sw.lat) < 1e-6) {
+            // Everyone here shares one address; zooming would not separate them.
+            const hits = leaves.map((l) => pinsRef.current[(l.properties as { i: number }).i]).filter(Boolean);
+            openPopup(hits, coords);
+          } else {
+            map.fitBounds(bounds, { padding: 80, maxZoom: MAX_ZOOM, duration: 600 });
+          }
+        });
+        const marker = new maplibregl.Marker({ element: el }).setLngLat(coords).addTo(map);
+        marker.getElement().setAttribute("aria-label", `${props.point_count} fellows`);
+        markers.current.set(id, marker);
+      }
+      for (const [id, m] of markers.current) {
+        if (!seen.has(id)) { m.remove(); markers.current.delete(id); }
+      }
+    };
+
+    map.on("load", () => {
+      useEnglishLabels(map);
+      applyTint(map);
+      map.addSource(SOURCE, {
+        type: "geojson",
+        data: toGeoJson(pinsRef.current),
+        cluster: true,
+        clusterRadius: 40,
+        clusterMaxZoom: CLUSTER_MAX_ZOOM,
+        clusterProperties: CLUSTER_PROPS,
+      });
+      map.addLayer({
+        id: LAYER,
+        type: "circle",
+        source: SOURCE,
+        filter: ["!", ["has", "point_count"]],
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 5, 8, 8],
+          "circle-color": ["get", "color"],
+          "circle-opacity": 0.95,
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-width": 1.75,
+        },
+      });
+      map.on("mouseenter", LAYER, () => (map.getCanvas().style.cursor = "pointer"));
+      map.on("mouseleave", LAYER, () => (map.getCanvas().style.cursor = ""));
+      map.on("click", LAYER, (e: MapMouseEvent) => {
+        // Every pin under the cursor: fellows at the same org share coordinates.
+        const feats = map.queryRenderedFeatures(e.point, { layers: [LAYER] });
+        const seen = new Set<number>();
+        const hits: Pin[] = [];
+        for (const f of feats) {
+          const i = f.properties.i as number;
+          if (seen.has(i)) continue;
+          seen.add(i);
+          const pin = pinsRef.current[i];
+          if (pin) hits.push(pin);
+        }
+        if (hits.length === 0) return;
+        openPopup(hits, [hits[0].fellow.longitude, hits[0].fellow.latitude]);
+      });
+      map.on("data", (e) => {
+        if ((e as { sourceId?: string }).sourceId === SOURCE && (e as { isSourceLoaded?: boolean }).isSourceLoaded) updateClusters();
+      });
+      map.on("move", updateClusters);
+      map.on("moveend", updateClusters);
+      setReady(true);
+    });
+
+    return () => {
+      popupRoot.current?.unmount();
+      for (const m of markers.current.values()) m.remove();
+      markers.current.clear();
+      map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    const src = map.getSource(SOURCE) as maplibregl.GeoJSONSource | undefined;
+    // Cluster ids are reassigned on new data, so drop every cached marker.
+    for (const m of markers.current.values()) m.remove();
+    markers.current.clear();
+    src?.setData(toGeoJson(pins));
+    // A popup for a fellow who was just filtered out would be misleading.
+    popupRef.current?.remove();
+    popupRef.current = null;
+    if (pins.length === 0) return;
+    const bounds = new maplibregl.LngLatBounds();
+    for (const p of pins) bounds.extend([p.fellow.longitude, p.fellow.latitude]);
+    map.fitBounds(bounds, { padding: 60, maxZoom: 11, duration: 600 });
+  }, [pins, ready]);
+
+  return <div ref={container} className="h-3/5 w-full lg:h-full lg:flex-1" />;
+}
