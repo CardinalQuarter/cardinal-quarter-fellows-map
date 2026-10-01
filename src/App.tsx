@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "./components/Header";
 import { Legend } from "./components/Legend";
-import { OrgList } from "./components/OrgList";
 import { FilterChips } from "./components/FilterChips";
 import { MapView, type Pin, type Selection } from "./components/MapView";
 import { colorMap } from "./colors";
@@ -9,7 +8,7 @@ import { loadFellows, loadPeriods } from "./data";
 import { applyFilters, toggleFilter } from "./filter";
 import {
   ALL_PERIODS, sameSpot,
-  type Category, type Fellow, type Filters, type Panel, type PeriodMeta,
+  type Category, type Fellow, type Filters, type PeriodMeta,
 } from "./types";
 import { readHash, writeHash } from "./urlState";
 
@@ -21,7 +20,6 @@ export default function App() {
   const [category, setCategory] = useState<Category>(initial.current.category ?? "interest_area");
   const [filters, setFilters] = useState<Filters>(initial.current.filters ?? {});
   const [text, setText] = useState(initial.current.text ?? "");
-  const [panel, setPanel] = useState<Panel>(initial.current.panel ?? "legend");
   const [selection, setSelection] = useState<Selection | null>(null);
   const [error, setError] = useState<string | null>(null);
   const embed = initial.current.embed ?? false;
@@ -90,8 +88,8 @@ export default function App() {
 
   useEffect(() => {
     if (!periodSlug) return;
-    writeHash({ period: periodSlug, category, filters, text, panel, pin: pinParam, embed }, periods[0]?.slug ?? "");
-  }, [periodSlug, category, filters, text, panel, pinParam, embed, periods]);
+    writeHash({ period: periodSlug, category, filters, text, pin: pinParam, embed }, periods[0]?.slug ?? "");
+  }, [periodSlug, category, filters, text, pinParam, embed, periods]);
 
   // Colors cover every value of the category in the period, so they stay stable while filtering.
   const colors = useMemo(() => colorMap(loaded.map((f) => f[category])), [loaded, category]);
@@ -155,8 +153,6 @@ export default function App() {
           total={loaded.length}
           organizations={stats.organizations}
           countries={stats.countries}
-          panel={panel}
-          onPanel={setPanel}
           category={category}
           canGroupByPeriod={periods.length > 1}
           onCategory={chooseCategory}
@@ -164,13 +160,6 @@ export default function App() {
           selected={filters[category] ?? []}
           onToggle={(label) => changeFilters((f) => toggleFilter(f, category, label))}
           onClearAll={clearAll}
-          list={
-            <OrgList
-              pins={pins}
-              selectedOrg={selection?.fellow.partner_organization ?? null}
-              onSelect={(fellow) => setSelection({ fellow, fly: true })}
-            />
-          }
         >
           <FilterChips
             filters={filters}

@@ -66,9 +66,6 @@ export type Filters = Partial<Record<keyof Fellow, string[]>>;
 
 export const ALL_PERIODS = "all";
 
-/** Which sidebar panel is showing: the color legend or the organization list. */
-export type Panel = "legend" | "list";
-
 /** Fellows at exactly the same coordinates as `f` (the same org address, usually). */
 export const sameSpot = (a: Fellow, b: Fellow) =>
   Math.abs(a.latitude - b.latitude) < 1e-6 && Math.abs(a.longitude - b.longitude) < 1e-6;

@@ -1,8 +1,8 @@
-import { CATEGORIES, type Category, type Fellow, type Filters, type Panel } from "./types";
+import { CATEGORIES, type Category, type Fellow, type Filters } from "./types";
 
 /**
  * View state that is worth sharing in a link: period, grouping, filters, search,
- * which sidebar panel is open, and an open pin (a fellow's name, or an
+ * and an open pin (a fellow's name, or an
  * organization's name when several fellows share its address).
  */
 export type ViewState = {
@@ -10,7 +10,6 @@ export type ViewState = {
   category: Category;
   filters: Filters;
   text: string;
-  panel: Panel;
   pin: string;
   /** Embed mode hides the Stanford chrome for use inside an iframe on another Haas page. */
   embed: boolean;
@@ -33,7 +32,6 @@ export function readHash(): Partial<ViewState> {
   if (category && category in CATEGORIES) out.category = category as Category;
   const text = params.get("q");
   if (text) out.text = text;
-  if (params.get("view") === "list") out.panel = "list";
   const pin = params.get("pin");
   if (pin) out.pin = pin;
   if (params.get("embed") === "1") out.embed = true;
@@ -56,7 +54,6 @@ export function writeHash(state: ViewState, defaultPeriod: string): void {
     if (key && vals?.length) params.set(key, vals.join("|"));
   }
   if (state.text) params.set("q", state.text);
-  if (state.panel === "list") params.set("view", "list");
   if (state.pin) params.set("pin", state.pin);
   if (state.embed) params.set("embed", "1");
   const next = params.toString();
