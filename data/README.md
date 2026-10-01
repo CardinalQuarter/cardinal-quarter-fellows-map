@@ -48,17 +48,18 @@ sheet as *Anyone with the link: Viewer*.
 | Logo                     |          | Google Drive link or image URL; overrides the fetched logo    |
 
 Rows with no coordinates and an address that cannot be geocoded are skipped
-and reported. Accepted header spellings include the old export's names
+and reported. A blank value in Class Year, School, Affiliation or Interest
+Area shows on the site as "Not specified". Unrecognized or missing columns
+are listed in the build report; trailing empty columns are ignored. Accepted header spellings include the old export's names
 (`Fellowship location`, `Name of Partner Organization`, `Link to Logo`, ...);
 see `ALIASES` in `scripts/build-data.ts`.
 
 ## Local CSVs
 
-Every `data/csv/*.csv` is read as a source. If it has no Period column, the
-file name is the period (`Summer_2024.csv` → `Summer 2024`). Periods for local
-files are listed in `data/periods.json` with the same three fields as the
-`Periods` tab. The two CSVs there now are demo data (fictional students, real
-organizations); delete them before launch.
+Optional. Every `data/csv/*.csv` is read as a source. If it has no Period
+column, the file name is the period (`Summer_2024.csv` → `Summer 2024`).
+Periods for local files go in `data/periods.json` as a list of objects with
+the same fields as the `Periods` tab (`period`, `displayName`, `order`).
 
 ## Caches and snapshot (committed by the nightly build)
 

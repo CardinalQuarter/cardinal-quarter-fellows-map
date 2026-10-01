@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta id="myViewport" name="viewport" content="width=device-width, height=device-height, initial-scale=0.25, target-densitydpi=device-dpi"/>
+    <title>서울역사박물관</title>
+    <link rel="stylesheet" type="text/css" href="/www/share/css/new/common.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/resources/common/css/error.css"><!--20190708 sns css-->
+</head>
+<body>
+<!--[if lte IE 8]>
+<div class="ie_update">
+    <div class="msg_update">
+        <p>홈페이지의 이용을 위해 최신 브라우저를 설치해 주세요.</p>
+        <div class="btn_area large">
+            <a href="http://windows.microsoft.com/ko-KR/internet-explorer/download-ie" target="_blank" title="새창" class="btn basic">Internet Explorer 다운로드</a>
+            <a href="https://www.google.co.kr/chrome" target="_blank" title="새창" class="btn primary">구글 크롬 다운로드</a>
+        </div>
+    </div>
+</div>
+<![endif]-->
+
+<div id="wrap">
+    <div class="error_page">
+        <h4>요청하신 페이지를 찾을 수 없습니다.<br>
+            서비스 이용에 불편을 드려 죄송합니다.
+        </h4>
+        <p>
+            요청하신 페이지를 찾을 수 없습니다.<br>
+            찾으시려는 페이지는 주소를 잘못 입력하였거나<br>
+            페이지 주소의 변경 또는 삭제등의 이유로<br>
+            페이지를 찾을 수 없습니다. 입력하신 페이지의 주소와<br>
+            경로가 정확한지 한번 더 확인 후 이용하시기 바랍니다.
+        </p>
+        <a href="/www/NR_index.do" class="go_siteBtn">서울역사박물관 홈으로 가기</a>
+    </div>
+</div>
+</body>
+</html>

@@ -33,9 +33,8 @@ Student emails are used to deduplicate and are never published.
       `SHEET_ID` (a secret, so the sheet link is masked in the public build
       logs).
 - [ ] **Settings → Pages**: set Source to *GitHub Actions*.
-- [ ] Export old periods from Bluehost (`public_html/upload/*.csv`) into
-      `data/csv/` or paste them into a sheet tab; delete the demo CSVs and
-      `data/periods.json` entries.
+- [ ] Export old periods from Bluehost (`public_html/upload/*.csv`) and paste
+      them into a sheet tab listed in `Sources` (or drop them in `data/csv/`).
 - [ ] Point the `cardinalquarterfellows.cardinalservice.org` CNAME at GitHub
       Pages, add it under **Settings → Pages → Custom domain**, and add a repo
       variable `BASE_PATH` with value `/`.
@@ -48,8 +47,7 @@ Requires Node 24+.
 
 ```sh
 npm install
-npm run dev                  # builds data from data/csv/, starts Vite
-SHEET_ID=<id> npm run dev    # also pulls periods from the Google Sheet
+SHEET_ID=<id> npm run dev    # builds data from the Google Sheet, starts Vite
 npm run build                # type-check + production build into dist/
 ```
 
@@ -63,7 +61,7 @@ npm run build                # type-check + production build into dist/
 | `src/urlState.ts`          | view state in the URL query string                     |
 | `src/styles.css`           | Stanford Identity color and type tokens                |
 | `.github/workflows/`       | nightly and on-demand build and deploy                 |
-| `data/`                    | sheet contract, local CSVs, geocode and logo caches    |
+| `data/`                    | sheet contract and geocode/logo caches                 |
 | `public/data/`, `public/logos/` | published data and logos, committed by the build  |
 | `legacy/`                  | old PHP site                                           |
 

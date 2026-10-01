@@ -76,29 +76,38 @@ const ALIASES: Record<Field, string[]> = {
   fellowship: ["fellowshipopportunity", "fellowship", "opportunity", "program", "fellowshipname"],
   interest_area: ["interestarea", "interestareas"],
   partner_organization: ["organization", "nameofpartnerorganization", "partnerorganization", "organizationname", "partner"],
-  fellowship_loc: ["city", "fellowshiplocation", "location", "cityregion"],
-  country: ["country"],
-  partner_website: ["website", "communitypartnerwebsite", "partnerwebsite", "organizationwebsite", "url"],
+  fellowship_loc: ["city", "fellowshiplocation", "locationoffellowshipcitytown", "locationoffellowshipcity", "location", "cityregion", "citytown"],
+  country: ["country", "locationoffellowshipcountry"],
+  partner_website: ["website", "communitypartnerwebsite", "partnerwebsite", "partnerorganizationwebsite", "organizationwebsite", "organizationswebsite", "url"],
   latitude: ["latitude", "lat"],
   longitude: ["longitude", "lng", "long", "lon"],
-  partner_logo: ["logo", "linktologo", "logourl", "logoupload", "logoimage"],
+  partner_logo: ["logo", "linktologo", "logourl", "logoupload", "logoimage", "organizationslogo", "organizationlogo"],
 };
 
-/** Lowercase, drop parentheticals like "(optional)", keep letters and digits. */
+/** Lowercase, drop "(optional)"/"(required)" notes, keep letters and digits. */
 function normalizeHeader(h: string): string {
-  return h.toLowerCase().replace(/\([^)]*\)/g, "").replace(/[^a-z0-9]/g, "");
+  return h.toLowerCase().replace(/\((optional|required)\)/g, "").replace(/[^a-z0-9]/g, "");
 }
 
-function mapHeader(header: string[]): Partial<Record<Field, number>> {
+function mapHeader(header: string[], label: string): Partial<Record<Field, number>> {
   const map: Partial<Record<Field, number>> = {};
+  const unknown: string[] = [];
   header.forEach((h, i) => {
     const n = normalizeHeader(h);
-    for (const [field, aliases] of Object.entries(ALIASES) as [Field, string[]][]) {
-      if (map[field] === undefined && aliases.includes(n)) map[field] = i;
-    }
+    if (!n) return; // blank header: trailing empty sheet columns
+    const field = (Object.keys(ALIASES) as Field[]).find((f) => ALIASES[f].includes(n));
+    if (field === undefined) unknown.push(h.trim());
+    else if (map[field] === undefined) map[field] = i;
+    else unknown.push(`${h.trim()} (duplicate of ${ALIASES[field][0]})`);
   });
+  if (unknown.length) report.columns.push(`${label}: ignored column(s) ${unknown.map((u) => `"${u}"`).join(", ")}`);
+  const missing = (Object.keys(ALIASES) as Field[]).filter((f) => map[f] === undefined && !OPTIONAL.includes(f));
+  if (missing.length) report.columns.push(`${label}: no column for ${missing.join(", ")}`);
   return map;
 }
+
+/** Columns a source may leave out without a note in the report. */
+const OPTIONAL: Field[] = ["period", "latitude", "longitude", "partner_logo"];
 
 // ---------------------------------------------------------------------------
 // Types
@@ -133,6 +142,7 @@ type LogoEntry = { file: string; source: string; at: string } | { error: string;
 /** Everything worth telling a human about, printed and written to the job summary. */
 const report = {
   periods: [] as { period: string; displayName: string; count: number }[],
+  columns: [] as string[],
   orphans: new Map<string, number>(),
   duplicates: [] as string[],
   skipped: [] as string[],
@@ -264,7 +274,7 @@ async function loadSources(): Promise<Source[]> {
   if (SHEET_ID) {
     const rows = parseCsv(await fetchText(sheetCsvUrl(SOURCES_TAB)));
     const [header = [], ...body] = rows;
-    const iTab = Math.max(0, header.map(normalizeHeader).indexOf("tab"));
+    const iTab = Math.max(0, header.map(normalizeHeader).findIndex((h) => h === "tab" || h === "tabname"));
     for (const r of body) {
       const tab = (r[iTab] ?? "").trim();
       if (tab) sources.push({ label: `sheet tab "${tab}"`, load: () => fetchText(sheetCsvUrl(tab)).then(parseCsv) });
@@ -289,7 +299,7 @@ async function loadSources(): Promise<Source[]> {
 function rowsFromSource(rows: string[][], src: Source): Row[] {
   const [header, ...body] = rows;
   if (!header) return [];
-  const cols = mapHeader(header);
+  const cols = mapHeader(header, src.label);
   const required: Field[] = ["name"];
   for (const f of required) {
     if (cols[f] === undefined) throw new Error(`${src.label}: no "${ALIASES[f][0]}" column (headers: ${header.join(", ")})`);
@@ -519,6 +529,7 @@ function summary(): string {
     "Rows with a Period that is not in the Periods list (not published)",
     [...report.orphans].map(([p, n]) => `"${p}": ${n} row(s)`),
   );
+  section("Column notes", report.columns);
   section("Rows skipped", report.skipped);
   section("Duplicates resolved (last row wins)", report.duplicates);
   section("Coordinates that were reversed and swapped", report.swapped);

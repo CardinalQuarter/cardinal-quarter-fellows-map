@@ -63,3 +63,6 @@ export const SEARCH_LABELS: Partial<Record<keyof Fellow, string>> = {
 export type Filters = Partial<Record<keyof Fellow, string[]>>;
 
 export const ALL_PERIODS = "all";
+
+/** Shown for a blank value in any grouping column so it can still be filtered on. */
+export const UNSPECIFIED = "Not specified";

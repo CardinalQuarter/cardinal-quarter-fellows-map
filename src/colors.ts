@@ -1,3 +1,5 @@
+import { UNSPECIFIED } from "./types";
+
 /**
  * Category colors. Values are sorted and assigned in order from a palette of
  * well-separated hues, so the legend for any one view is maximally distinct and
@@ -27,9 +29,12 @@ export const PALETTE = [
   "#d35400", // burnt orange
 ];
 
+const UNSPECIFIED_COLOR = "#9a9a9a";
+
 export function colorMap(values: string[]): Map<string, string> {
-  const sorted = [...new Set(values)].sort((a, b) => a.localeCompare(b));
+  const sorted = [...new Set(values)].filter((v) => v !== UNSPECIFIED).sort((a, b) => a.localeCompare(b));
   const out = new Map<string, string>();
   sorted.forEach((v, i) => out.set(v, PALETTE[i % PALETTE.length]));
+  if (values.includes(UNSPECIFIED)) out.set(UNSPECIFIED, UNSPECIFIED_COLOR);
   return out;
 }

@@ -1,1 +1,181 @@
-{}
+{
+  "Costa Mesa, CA, United States": {
+    "lat": 33.6633,
+    "lng": -117.9033,
+    "label": "Costa Mesa, Orange County"
+  },
+  "Boston, MA, United States": {
+    "lat": 42.3588,
+    "lng": -71.0578,
+    "label": "Boston, Suffolk County"
+  },
+  "Redwood City, CA, United States": {
+    "lat": 37.4863,
+    "lng": -122.2325,
+    "label": "Redwood City, San Mateo County"
+  },
+  "Accra, Ghana": {
+    "lat": 5.5571,
+    "lng": -0.2012,
+    "label": "Accra, Korle-Klottey Municipal District"
+  },
+  "Harstad, Norway": {
+    "lat": 68.7999,
+    "lng": 16.544,
+    "label": "Harstad, Troms"
+  },
+  "Orange, United States": {
+    "lat": 33.7506,
+    "lng": -117.8722,
+    "label": "Orange County, California"
+  },
+  "Bend, OR, United States": {
+    "lat": 44.0582,
+    "lng": -121.3153,
+    "label": "Bend, Deschutes County"
+  },
+  "Berkeley, CA, United States": {
+    "lat": 37.8708,
+    "lng": -122.2729,
+    "label": "Berkeley, Alameda County"
+  },
+  "Richmond, CA, United States": {
+    "lat": 37.9358,
+    "lng": -122.3477,
+    "label": "Richmond, Contra Costa County"
+  },
+  "Stanford, CA, United States": {
+    "lat": 37.4265,
+    "lng": -122.1703,
+    "label": "Stanford, Palo Alto"
+  },
+  "Fairfield, CA, United States": {
+    "lat": 38.2494,
+    "lng": -122.04,
+    "label": "Fairfield, Solano County"
+  },
+  "Oakland, CA, United States": {
+    "lat": 37.8045,
+    "lng": -122.2714,
+    "label": "Oakland, Alameda County"
+  },
+  "Fresno, CA, United States": {
+    "lat": 36.7394,
+    "lng": -119.7848,
+    "label": "Fresno, Fresno County"
+  },
+  "Warszawa, Poland": {
+    "lat": 52.232,
+    "lng": 21.0067,
+    "label": "Warszawa, województwo mazowieckie"
+  },
+  "Los Angeles, CA, United States": {
+    "lat": 34.0537,
+    "lng": -118.2428,
+    "label": "Los Angeles, Los Angeles County"
+  },
+  "San Francisco, CA, United States": {
+    "lat": 37.7879,
+    "lng": -122.4075,
+    "label": "San Francisco, California"
+  },
+  "Remote, United States": {
+    "lat": 43.0059,
+    "lng": -123.8926,
+    "label": "Remote, Coos County"
+  },
+  "San Jose, CA, United States": {
+    "lat": 37.3362,
+    "lng": -121.8906,
+    "label": "San Jose, Santa Clara County"
+  },
+  "Imperial Beach, CA, United States": {
+    "lat": 32.5839,
+    "lng": -117.113,
+    "label": "Imperial Beach, San Diego County"
+  },
+  "West New York, NJ, United States": {
+    "lat": 40.7856,
+    "lng": -74.0093,
+    "label": "West New York, Hudson County"
+  },
+  "Washington, D.C., United States": {
+    "lat": 38.8951,
+    "lng": -77.0364,
+    "label": "Washington, District of Columbia"
+  },
+  "Sacramento, CA, United States": {
+    "lat": 38.5811,
+    "lng": -121.4939,
+    "label": "Sacramento, Sacramento County"
+  },
+  "Washington, D.C. and Belize City, United States/Belize": {
+    "error": "no match",
+    "at": "2026-10-01T01:11:35.099Z"
+  },
+  "Almaty, Kazakhstan": {
+    "lat": 43.2364,
+    "lng": 76.9457,
+    "label": "Алматы, Қазақстан"
+  },
+  "Vilnius, Lithuania": {
+    "lat": 54.687,
+    "lng": 25.2829,
+    "label": "Vilnius, Vilniaus miesto savivaldybė"
+  },
+  "Cape Town, South Africa": {
+    "lat": -33.9288,
+    "lng": 18.4172,
+    "label": "Cape Town, City of Cape Town"
+  },
+  "Brussels, Belgium": {
+    "lat": 50.8467,
+    "lng": 4.3525,
+    "label": "Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale"
+  },
+  "Chicago, IL, United States": {
+    "lat": 41.8756,
+    "lng": -87.6244,
+    "label": "Chicago, South Chicago Township"
+  },
+  "Paris, France": {
+    "lat": 48.8535,
+    "lng": 2.3484,
+    "label": "Paris, Île-de-France"
+  },
+  "Seoul, South Korea": {
+    "lat": 37.5667,
+    "lng": 126.9783,
+    "label": "서울특별시, 대한민국"
+  },
+  "Denver, CO, United States": {
+    "lat": 39.7392,
+    "lng": -104.9849,
+    "label": "Denver, Colorado"
+  },
+  "Colorado Springs, CO, United States": {
+    "lat": 38.834,
+    "lng": -104.8253,
+    "label": "Colorado Springs, El Paso County"
+  },
+  "Minneapolis, MN, United States": {
+    "lat": 44.9773,
+    "lng": -93.2655,
+    "label": "Minneapolis, Hennepin County"
+  },
+  "East Palo Alto, CA, United States": {
+    "lat": 37.4688,
+    "lng": -122.1411,
+    "label": "East Palo Alto, San Mateo County"
+  },
+  "New York City, NY, United States": {
+    "lat": 40.7127,
+    "lng": -74.006,
+    "label": "New York, United States"
+  },
+  "Tallinn, Estonia": {
+    "lat": 59.4372,
+    "lng": 24.7573,
+    "label": "Tallinn, Harju maakond"
+  }
+}
