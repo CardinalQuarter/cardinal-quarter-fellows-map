@@ -20,8 +20,13 @@ The previous PHP/MySQL site is kept in [`legacy/`](legacy/) for reference.
 3. The site rebuilds every night at 6am Pacific and commits the published
    data back to the repo, so every change is a readable diff. To publish
    sooner: repo **Actions** tab → *Build and deploy to GitHub Pages* →
-   **Run workflow**. The run's summary lists anything that needs attention
-   (unknown periods, duplicates, addresses or logos not found).
+   **Run workflow** (or `gh workflow run deploy.yml`). The run's summary
+   lists anything that needs attention (unknown periods, duplicates,
+   addresses or logos not found). Start a fresh run rather than re-running
+   an old one: a re-run builds the commit it originally checked out.
+   GitHub pauses scheduled workflows after 60 days without repo activity
+   and emails the owner first; the nightly snapshot commits count as
+   activity, so this only matters if the sheet goes untouched that long.
 
 Student emails are used to deduplicate and are never published.
 

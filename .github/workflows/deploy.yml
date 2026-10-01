@@ -37,15 +37,31 @@ jobs:
       - name: Commit data snapshot
         # Every published change to the data is a readable diff in git history.
         # A push with GITHUB_TOKEN does not trigger this workflow again.
+        # The snapshot is a nice-to-have: if the push cannot land (a re-run of
+        # an old attempt, a commit racing the build), the deploy still proceeds.
+        continue-on-error: true
         run: |
           git add public/data public/logos data/geocache.json data/logocache.json
           if git diff --cached --quiet; then
             echo "Data unchanged"
-          else
-            git -c user.name=github-actions -c user.email=github-actions@github.com \
-              commit -m "Data snapshot $(date -u +%Y-%m-%d)"
-            git push origin HEAD:${{ github.ref_name }}
+            exit 0
           fi
+          git -c user.name=github-actions -c user.email=github-actions@github.com \
+            commit -m "Data snapshot $(date -u +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            git fetch origin ${{ github.ref_name }}
+            # Already on the branch (e.g. a re-run of an attempt that pushed)?
+            if git diff --quiet HEAD origin/${{ github.ref_name }} -- \
+                 public/data public/logos data/geocache.json data/logocache.json; then
+              echo "Snapshot already on ${{ github.ref_name }}; nothing to push"
+              exit 0
+            fi
+            git rebase origin/${{ github.ref_name }} || { git rebase --abort; exit 1; }
+            git push origin HEAD:${{ github.ref_name }} && exit 0
+            echo "Push rejected (attempt $attempt), retrying"
+            sleep 5
+          done
+          exit 1
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
