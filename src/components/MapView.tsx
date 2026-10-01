@@ -263,14 +263,11 @@ async function exportPng(map: MlMap, markers: Iterable<maplibregl.Marker>): Prom
     if (ok) ctx.drawImage(img, (x - w / 2) * ratio, (y - h / 2) * ratio, w * ratio, h * ratio);
     URL.revokeObjectURL(url);
   }
-  // Attribution is a licence requirement for the basemap.
-  const credit = "© OpenFreeMap © OpenMapTiles © OpenStreetMap contributors";
-  ctx.font = `${11 * ratio}px "Source Sans 3", "Helvetica Neue", Arial, sans-serif`;
-  const tw = ctx.measureText(credit).width;
-  ctx.fillStyle = "rgba(255,255,255,.8)";
-  ctx.fillRect(out.width - tw - 12 * ratio, out.height - 18 * ratio, tw + 12 * ratio, 18 * ratio);
-  ctx.fillStyle = "#2e2d29";
-  ctx.fillText(credit, out.width - tw - 6 * ratio, out.height - 6 * ratio);
+  // Attribution is a licence requirement for the basemap; kept small and quiet, like a caption.
+  const credit = "© OpenStreetMap contributors · OpenMapTiles · OpenFreeMap";
+  ctx.font = `${9 * ratio}px "Source Sans 3", "Helvetica Neue", Arial, sans-serif`;
+  ctx.fillStyle = "rgba(46,45,41,.55)";
+  ctx.fillText(credit, 8 * ratio, out.height - 6 * ratio);
   return new Promise((resolve) => out.toBlob(resolve, "image/png"));
 }
 
