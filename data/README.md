@@ -8,6 +8,10 @@ source: the Google Form, a program leader's paste, an old export.
 
 ## Sheet tabs
 
+`sheet-template.xlsx` in this folder is a ready-made copy of the layout below
+(instructions tab, dropdowns, example rows). Import it into Google Sheets with
+*File → Import → Upload → Replace spreadsheet*, then delete the example rows.
+
 | tab        | columns                                   | purpose                                              |
 | ---------- | ----------------------------------------- | ---------------------------------------------------- |
 | `Periods`  | Period, Display Name, Order, Show         | which periods are published, their label and order   |
