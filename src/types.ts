@@ -19,6 +19,11 @@ export type Fellow = {
 
 export type PeriodMeta = { slug: string; displayName: string; count: number };
 
+/** One tab in the period nav: a single period, a group of periods, or the built-in "All periods". */
+export type ViewMeta = { slug: string; displayName: string; periods: string[]; show: boolean };
+
+export type Index = { periods: PeriodMeta[]; views: ViewMeta[] };
+
 /** The four legend groupings from the nav bar. */
 export const CATEGORIES = {
   interest_area: "Interest Area",
@@ -63,8 +68,6 @@ export const SEARCH_LABELS: Partial<Record<keyof Fellow, string>> = {
 
 /** Active filters: OR within a column, AND across columns. */
 export type Filters = Partial<Record<keyof Fellow, string[]>>;
-
-export const ALL_PERIODS = "all";
 
 /** Fellows at exactly the same coordinates as `f` (the same org address, usually). */
 export const sameSpot = (a: Fellow, b: Fellow) =>

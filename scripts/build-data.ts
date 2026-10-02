@@ -4,20 +4,33 @@
  *   SHEET_ID=<id> node scripts/build-data.ts
  *
  * Inputs (see data/README.md for the contract):
- *   - Google Sheet (when SHEET_ID is set): a "Periods" tab, a "Sources" tab,
+ *   - Google Sheet (when SHEET_ID is set): a "Periods" tab, an optional "Groups"
+ *     tab (named sets of periods shown as one tab), a "Sources" tab,
  *     and the student tabs the Sources tab lists.
  *   - Local CSVs: every data/csv/*.csv, with periods from data/periods.json.
  *
  * Student columns are matched by header name, in any order. Rows are grouped
  * by their Period column (CSV file name when the column is absent), kept
  * only when that period is listed, and deduplicated on email + period.
- * Missing coordinates are geocoded from City + Country (Nominatim, cached in
- * data/geocache.json). Missing logos are fetched from the organization's
- * website into public/logos/ (tracked in data/logocache.json).
  *
- * Output: public/data/<period>.json + index.json, pretty-printed so commits
+ * Locations: a row naming several places ("Washington, D.C. and Belize City",
+ * "United States/Belize") becomes one pin per place. "Remote"/"Virtual"/
+ * "Hybrid" is never geocoded as a place name: the pin goes to the
+ * organization's address when its website states one, else to the country.
+ * City + Country are geocoded with Nominatim, constrained to the country, and
+ * cached in data/geocache.json.
+ *
+ * Logos: a Logo cell (Google Drive link or any image URL) is downloaded into
+ * public/logos/ so the site never hotlinks. Blank logos are fetched from the
+ * organization's website (apple-touch-icon, web manifest, <link rel=icon>,
+ * well-known paths), checked to be real image bytes, and tracked in
+ * data/logocache.json.
+ *
+ * Output: public/data/<period>.json + index.json (periods and the nav of
+ * periods/groups, with hidden ones flagged), pretty-printed so commits
  * from the nightly workflow show readable diffs. Emails never reach output.
  */
+import { createHash } from "node:crypto";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import Papa from "papaparse";
@@ -27,16 +40,22 @@ const OUT_DIR = path.join(ROOT, "public", "data");
 const LOGO_DIR = path.join(ROOT, "public", "logos");
 const CSV_DIR = path.join(ROOT, "data", "csv");
 const LOCAL_PERIODS = path.join(ROOT, "data", "periods.json");
+const LOCAL_GROUPS = path.join(ROOT, "data", "groups.json");
 const GEOCACHE = path.join(ROOT, "data", "geocache.json");
 const LOGOCACHE = path.join(ROOT, "data", "logocache.json");
 
 const SHEET_ID = process.env.SHEET_ID?.trim();
 const PERIODS_TAB = process.env.PERIODS_TAB?.trim() || "Periods";
 const SOURCES_TAB = process.env.SOURCES_TAB?.trim() || "Sources";
+const GROUPS_TAB = process.env.GROUPS_TAB?.trim() || "Groups";
 const USER_AGENT = "cardinal-quarter-map build (https://github.com/CardinalQuarter/cardinal-quarter-map)";
+/** Some sites refuse anything that does not look like a browser; used only as a second try. */
+const BROWSER_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 const RETRY_FAILURES_AFTER_DAYS = 30;
 const FETCH_TIMEOUT_MS = 15_000;
 const MAX_LOGO_BYTES = 2_000_000;
+const NOMINATIM_GAP_MS = 1100; // usage policy: at most one request per second
 
 // ---------------------------------------------------------------------------
 // Columns
@@ -133,24 +152,47 @@ type Fellow = {
 /** A row after header matching, before geocoding/logos. */
 type Row = Record<Field, string> & { where: string };
 
-type Period = { period: string; displayName: string; order: number };
-type PeriodMeta = { slug: string; displayName: string; count: number };
+/**
+ * One pin. A row with several places becomes several placements that share
+ * `person`, so a fellow is counted once however many pins they have.
+ */
+type Placement = Row & {
+  person: string;
+  /** Place name to geocode (blank for remote rows with no place given). */
+  city: string;
+  remote: boolean;
+};
 
-type GeoEntry = { lat: number; lng: number; label?: string } | { error: string; at: string };
+type Period = { period: string; displayName: string; order: number; show: boolean };
+/** A named set of periods shown as one tab ("Last 5 years"); `periods` holds the Period values as written. */
+type Group = { group: string; displayName: string; periods: string[]; order: number; show: boolean };
+type PeriodMeta = { slug: string; displayName: string; count: number };
+/** One entry in the site's period nav: a period, a group, or the built-in "All periods". */
+type ViewMeta = { slug: string; displayName: string; periods: string[]; show: boolean };
+type Index = { periods: PeriodMeta[]; views: ViewMeta[] };
+
+type GeoHit = { lat: number; lng: number; label?: string; code?: string; kind?: string; importance?: number };
+type GeoEntry = GeoHit | { error: string; at: string };
 type LogoEntry = { file: string; source: string; at: string } | { error: string; at: string };
 
 /** Everything worth telling a human about, printed and written to the job summary. */
 const report = {
-  periods: [] as { period: string; displayName: string; count: number }[],
+  periods: [] as { period: string; displayName: string; count: number; show: boolean }[],
+  groups: [] as { displayName: string; periods: string[]; count: number; show: boolean }[],
+  groupNotes: [] as string[],
   columns: [] as string[],
   orphans: new Map<string, number>(),
   duplicates: [] as string[],
   skipped: [] as string[],
   swapped: [] as string[],
   badCoords: [] as string[],
+  multi: [] as string[],
   geocoded: [] as string[],
+  remotePlaced: [] as string[],
+  countryFallback: [] as string[],
   geocodeFailed: [] as string[],
   logosFetched: [] as string[],
+  logoLinkFailed: [] as string[],
   logoFailed: [] as string[],
 };
 
@@ -165,13 +207,20 @@ function sheetCsvUrl(tab: string): string {
   );
 }
 
-async function fetchWithTimeout(url: string, init: RequestInit = {}): Promise<Response> {
+async function fetchWithTimeout(url: string, init: RequestInit = {}, ua = USER_AGENT): Promise<Response> {
   return fetch(url, {
     ...init,
-    headers: { "user-agent": USER_AGENT, ...(init.headers ?? {}) },
+    headers: { "user-agent": ua, ...(init.headers ?? {}) },
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     redirect: "follow",
   });
+}
+
+/** Fetch with the honest User-Agent, then as a browser when the site refuses bots. */
+async function fetchPolitely(url: string, init: RequestInit = {}): Promise<Response> {
+  const res = await fetchWithTimeout(url, init);
+  if ([401, 403, 406, 429, 503].includes(res.status)) return fetchWithTimeout(url, init, BROWSER_UA);
+  return res;
 }
 
 async function fetchText(url: string): Promise<string> {
@@ -213,14 +262,19 @@ function isStale(at: string): boolean {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const now = () => new Date().toISOString();
 
-/** Turn any Google Drive share link into a directly embeddable image URL. */
-function normalizeLogoUrl(url: string): string {
-  const m =
-    url.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/) ??
-    url.match(/[?&]id=([a-zA-Z0-9_-]{10,})/) ??
-    url.match(/googleusercontent\.com\/d\/([a-zA-Z0-9_-]{10,})/);
-  return m ? `https://lh3.googleusercontent.com/d/${m[1]}=w200` : url;
+/** Return the cached entry, or compute and cache it; failures are retried once stale. */
+async function cached<T extends { error?: string; at?: string } | object>(
+  cache: Record<string, T>,
+  key: string,
+  compute: () => Promise<T>,
+): Promise<T> {
+  const hit = cache[key];
+  if (hit && !("error" in hit && isStale((hit as { at: string }).at))) return hit;
+  const entry = await compute();
+  cache[key] = entry;
+  return entry;
 }
 
 function normalizeWebsite(url: string): string {
@@ -229,24 +283,77 @@ function normalizeWebsite(url: string): string {
   return /^https?:\/\//i.test(u) ? u : `https://${u}`;
 }
 
+function domainOf(website: string): string {
+  try {
+    return new URL(website).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+const decodeEntities = (s: string) =>
+  s.replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").replace(/&#39;|&rsquo;/g, "'").replace(/&quot;/g, '"');
+
 // ---------------------------------------------------------------------------
 // Sources
 // ---------------------------------------------------------------------------
 
+/** A Show cell: blank means shown; no / hide / false / 0 means hidden. */
+function parseShow(v: string | undefined): boolean {
+  const s = (v ?? "").trim().toLowerCase();
+  return !["no", "n", "false", "0", "hide", "hidden", "off"].includes(s);
+}
+
+/** Column lookup that accepts a few spellings per column. */
+function columns(header: string[], wanted: Record<string, string[]>): Record<string, number> {
+  const cols = header.map(normalizeHeader);
+  const out: Record<string, number> = {};
+  for (const [name, spellings] of Object.entries(wanted)) out[name] = cols.findIndex((c) => spellings.includes(c));
+  return out;
+}
+
+const cell = (r: string[], i: number) => (i >= 0 ? (r[i] ?? "").trim() : "");
+
 function parsePeriods(rows: string[][], label: string): Period[] {
   const [header = [], ...body] = rows;
-  const cols = header.map(normalizeHeader);
-  const iPeriod = cols.indexOf("period");
-  const iName = cols.indexOf("displayname");
-  const iOrder = cols.indexOf("order");
-  if (iPeriod < 0) throw new Error(`${label}: needs a "Period" column`);
+  const c = columns(header, {
+    period: ["period"],
+    name: ["displayname", "label", "name"],
+    order: ["order", "sort"],
+    show: ["show", "visible", "shown", "display"],
+  });
+  if (c.period < 0) throw new Error(`${label}: needs a "Period" column`);
   return body
     .map((r, i) => ({
-      period: (r[iPeriod] ?? "").trim(),
-      displayName: (r[iName] ?? "").trim() || (r[iPeriod] ?? "").trim(),
-      order: Number(r[iOrder]) || i + 1,
+      period: cell(r, c.period),
+      displayName: cell(r, c.name) || cell(r, c.period),
+      order: Number(cell(r, c.order)) || i + 1,
+      show: parseShow(cell(r, c.show)),
     }))
     .filter((p) => p.period);
+}
+
+/** Group rows list periods separated by commas, semicolons or line breaks; `all` and `latest N` are keywords. */
+function parseGroups(rows: string[][], label: string): Group[] {
+  const [header = [], ...body] = rows;
+  const c = columns(header, {
+    group: ["group", "name", "groupname"],
+    periods: ["periods", "period", "includes", "members"],
+    name: ["displayname", "label"],
+    order: ["order", "sort"],
+    show: ["show", "visible", "shown", "display"],
+  });
+  if (c.group < 0 || c.periods < 0) throw new Error(`${label}: needs "Group" and "Periods" columns`);
+  return body
+    .map((r, i) => ({
+      group: cell(r, c.group),
+      displayName: cell(r, c.name) || cell(r, c.group),
+      periods: cell(r, c.periods).split(/[,;\n]+/).map((p) => p.trim()).filter(Boolean),
+      // Groups without an Order come after periods without one.
+      order: Number(cell(r, c.order)) || 1000 + i + 1,
+      show: parseShow(cell(r, c.show)),
+    }))
+    .filter((g) => g.group);
 }
 
 async function loadPeriods(): Promise<Period[]> {
@@ -255,7 +362,7 @@ async function loadPeriods(): Promise<Period[]> {
   const local = await readJson<Partial<Period>[]>(LOCAL_PERIODS, []);
   local.forEach((p, i) => {
     if (!p.period) return;
-    periods.push({ period: p.period, displayName: p.displayName ?? p.period, order: p.order ?? i + 1 });
+    periods.push({ period: p.period, displayName: p.displayName ?? p.period, order: p.order ?? i + 1, show: p.show ?? true });
   });
   const seen = new Set<string>();
   return periods.filter((p) => {
@@ -265,6 +372,96 @@ async function loadPeriods(): Promise<Period[]> {
     seen.add(slug);
     return true;
   });
+}
+
+/** The Groups tab is optional: a sheet without one builds as before. */
+async function fetchOptionalTab(tab: string): Promise<string[][] | null> {
+  try {
+    const text = await fetchText(sheetCsvUrl(tab));
+    // A missing tab comes back as a gviz error page rather than CSV.
+    if (/^\s*</.test(text) || text.includes("/*O_o*/")) return null;
+    return parseCsv(text);
+  } catch (err) {
+    if (/^4\d\d /.test((err as Error).message)) return null;
+    throw err;
+  }
+}
+
+async function loadGroups(): Promise<Group[]> {
+  const groups: Group[] = [];
+  if (SHEET_ID) {
+    const rows = await fetchOptionalTab(GROUPS_TAB);
+    if (rows) groups.push(...parseGroups(rows, GROUPS_TAB));
+  }
+  const local = await readJson<Partial<Group>[]>(LOCAL_GROUPS, []);
+  local.forEach((g, i) => {
+    if (!g.group) return;
+    groups.push({
+      group: g.group,
+      displayName: g.displayName ?? g.group,
+      periods: g.periods ?? [],
+      order: g.order ?? 1000 + i + 1,
+      show: g.show ?? true,
+    });
+  });
+  const seen = new Set<string>();
+  return groups.filter((g) => {
+    const slug = slugify(g.group);
+    if (!slug) return false;
+    if (seen.has(slug)) return false;
+    seen.add(slug);
+    return true;
+  });
+}
+
+/**
+ * Turn periods and groups into the nav the site shows: one list sorted by Order
+ * (periods before groups on ties), each entry naming the period files it loads.
+ * "All periods" is added unless a group already covers every period.
+ */
+function resolveViews(periods: Period[], groups: Group[]): ViewMeta[] {
+  const ordered = [...periods].sort((a, b) => a.order - b.order);
+  const bySlug = new Map(ordered.map((p) => [slugify(p.period), p]));
+  const all = ordered.map((p) => slugify(p.period));
+  type Item = ViewMeta & { order: number; rank: number };
+  const items: Item[] = ordered.map((p, i) => ({
+    slug: slugify(p.period), displayName: p.displayName, periods: [slugify(p.period)], show: p.show, order: p.order, rank: i,
+  }));
+  let coversAll = false;
+  groups.forEach((g, i) => {
+    const slug = slugify(g.group);
+    if (bySlug.has(slug)) {
+      report.groupNotes.push(`Group "${g.group}" has the same name as a period; rename the group (not published)`);
+      return;
+    }
+    const members: string[] = [];
+    for (const name of g.periods) {
+      const m = /^(all|\*|everything)$/i.exec(name) ? { n: all.length } : /^(?:latest|last|newest|recent|most recent)\s+(\d+)$/i.exec(name);
+      if (m) {
+        const n = "n" in m ? m.n : Number(m[1]);
+        members.push(...all.slice(0, n));
+        continue;
+      }
+      const s = slugify(name);
+      if (!bySlug.has(s)) {
+        report.groupNotes.push(`Group "${g.group}": period "${name}" is not in the Periods list; ignored`);
+        continue;
+      }
+      members.push(s);
+    }
+    const unique = all.filter((s) => members.includes(s)); // period order, no repeats
+    if (unique.length === 0) {
+      report.groupNotes.push(`Group "${g.group}" has no valid periods (not published)`);
+      return;
+    }
+    if (unique.length === all.length) coversAll = true;
+    items.push({ slug, displayName: g.displayName, periods: unique, show: g.show, order: g.order, rank: periods.length + i });
+  });
+  if (all.length > 1 && !coversAll) {
+    items.push({ slug: "all", displayName: "All periods", periods: all, show: true, order: Infinity, rank: items.length });
+  }
+  items.sort((a, b) => a.order - b.order || a.rank - b.rank);
+  return items.map(({ order: _o, rank: _r, ...v }) => v);
 }
 
 type Source = { label: string; load: () => Promise<string[][]>; defaultPeriod?: string };
@@ -309,7 +506,7 @@ function rowsFromSource(rows: string[][], src: Source): Row[] {
   }
   const out: Row[] = [];
   body.forEach((raw, i) => {
-    const get = (f: Field) => (cols[f] === undefined ? "" : (raw[cols[f]!] ?? "").trim());
+    const get = (f: Field) => (cols[f] === undefined ? "" : (raw[cols[f]!] ?? "").replace(/\s+/g, " ").trim());
     const name = get("name");
     if (!name) return; // blank row
     const where = `${src.label} line ${i + 2} (${name})`;
@@ -318,8 +515,106 @@ function rowsFromSource(rows: string[][], src: Source): Row[] {
     row.period ||= src.defaultPeriod ?? "";
     row.email = row.email.toLowerCase();
     row.partner_website = normalizeWebsite(row.partner_website);
-    row.partner_logo = row.partner_logo ? normalizeLogoUrl(row.partner_logo) : "";
     out.push(row);
+  });
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Places: remote detection, several places per row, country names
+// ---------------------------------------------------------------------------
+
+/** Words meaning "no fixed place". Matched as whole words anywhere in the City cell. */
+const REMOTE_WORDS = /\b(remote(ly)?|virtual(ly)?|online|hybrid|work(ing)? from home|from home|wfh|telecommut\w*)\b/gi;
+/** Cells meaning "nothing entered". */
+const BLANK_VALUES = /^(n\/?a|none|null|tbd|tba|unknown|not applicable|-+|\?+)$/i;
+/** Separators between several places in one cell. Commas are not separators ("Stanford, CA"). */
+const PLACE_SEPARATOR = /\s*(?:\/|;|\||\s\+\s|,?\s+(?:and|&)\s+)\s*/i;
+
+const COUNTRY_ALIASES: Record<string, string> = {
+  us: "United States",
+  usa: "United States",
+  "u.s.": "United States",
+  "u.s.a.": "United States",
+  "united states of america": "United States",
+  america: "United States",
+  uk: "United Kingdom",
+  "u.k.": "United Kingdom",
+  "great britain": "United Kingdom",
+  britain: "United Kingdom",
+  "south korea": "South Korea",
+  "republic of korea": "South Korea",
+  korea: "South Korea",
+  uae: "United Arab Emirates",
+  "czech republic": "Czechia",
+};
+
+function normalizeCountry(c: string): string {
+  const t = c.replace(/\s+/g, " ").trim();
+  if (!t || BLANK_VALUES.test(t)) return "";
+  return COUNTRY_ALIASES[t.toLowerCase()] ?? t;
+}
+
+function splitPlaces(cell: string): string[] {
+  return cell
+    .split(PLACE_SEPARATOR)
+    .map((s) => s.trim())
+    .filter((s) => s && !BLANK_VALUES.test(s));
+}
+
+/** "Remote (based in Nashville)" → { remote: true, city: "Nashville" }; "Remote" → { remote: true, city: "" }. */
+function parsePlace(raw: string): { remote: boolean; city: string } {
+  let s = raw.trim();
+  if (!s || BLANK_VALUES.test(s)) return { remote: false, city: "" };
+  const remote = REMOTE_WORDS.test(s);
+  REMOTE_WORDS.lastIndex = 0;
+  if (!remote) return { remote: false, city: s };
+  s = s
+    .replace(REMOTE_WORDS, " ")
+    .replace(/[()[\]]/g, " ")
+    .replace(/\b(based|located|headquartered)\s+(in|out of|at)\b/gi, " ")
+    .replace(/\b(from|in|at|for|with|position|role|work|internship)\b/gi, " ")
+    .replace(/[\s\-–—:,/]+/g, " ")
+    .trim();
+  if (BLANK_VALUES.test(s) || s.length < 2) s = "";
+  return { remote: true, city: s };
+}
+
+/**
+ * Expand each row into one placement per place. Cities and countries are
+ * paired by position; a single country applies to every city and a single
+ * city to every country.
+ */
+function placements(rows: Row[]): Placement[] {
+  const out: Placement[] = [];
+  rows.forEach((r, i) => {
+    const person = `${slugify(r.period)}|${i}`;
+    const cities = splitPlaces(r.fellowship_loc);
+    const countries = splitPlaces(r.country).map(normalizeCountry);
+    const n = Math.max(cities.length, countries.length, 1);
+    const pairs: { city: string; country: string }[] = [];
+    for (let k = 0; k < n; k++) {
+      const city = cities.length === 1 ? cities[0] : (cities[k] ?? "");
+      const country = countries.length === 1 ? countries[0] : (countries[k] ?? countries[countries.length - 1] ?? "");
+      pairs.push({ city, country });
+    }
+    if (n > 1) {
+      report.multi.push(`${r.where}: ${n} places (${pairs.map((p) => [p.city, p.country].filter(Boolean).join(", ")).join("; ")})`);
+    }
+    pairs.forEach((p, k) => {
+      const parsed = parsePlace(p.city);
+      out.push({
+        ...r,
+        person,
+        city: parsed.city,
+        remote: parsed.remote,
+        fellowship_loc: p.city,
+        country: p.country,
+        // A Latitude/Longitude override describes one place: the first.
+        latitude: k === 0 ? r.latitude : "",
+        longitude: k === 0 ? r.longitude : "",
+      });
+    });
   });
   return out;
 }
@@ -336,9 +631,20 @@ const inRange = (lat: number, lng: number) => Math.abs(lat) <= 90 && Math.abs(ln
 
 /** Fix swapped Latitude/Longitude cells; blank out pairs that are not on Earth. */
 function checkCoords(r: Row): void {
-  if (!hasCoords(r)) return;
+  if (!hasCoords(r)) {
+    if (r.latitude || r.longitude) report.badCoords.push(`${r.where}: Latitude "${r.latitude}", Longitude "${r.longitude}" is not a number pair, ignored`);
+    r.latitude = "";
+    r.longitude = "";
+    return;
+  }
   const lat = Number(r.latitude);
   const lng = Number(r.longitude);
+  if (lat === 0 && lng === 0) {
+    report.badCoords.push(`${r.where}: Latitude/Longitude 0, 0 (in the Atlantic), ignored`);
+    r.latitude = "";
+    r.longitude = "";
+    return;
+  }
   if (inRange(lat, lng)) return;
   if (inRange(lng, lat)) {
     r.latitude = String(lng);
@@ -351,47 +657,225 @@ function checkCoords(r: Row): void {
   r.longitude = "";
 }
 
-async function geocode(cache: Record<string, GeoEntry>, rows: Row[]): Promise<void> {
-  rows.forEach(checkCoords);
-  const pending = rows.filter((r) => !hasCoords(r));
-  const queries = new Map<string, Row[]>();
-  for (const r of pending) {
-    const q = [r.fellowship_loc, r.country].filter(Boolean).join(", ");
-    if (!q) continue;
-    queries.set(q, [...(queries.get(q) ?? []), r]);
-  }
-  let calls = 0;
-  for (const [q, group] of queries) {
-    let entry = cache[q];
-    if (!entry || ("error" in entry && isStale(entry.at))) {
-      if (calls++ > 0) await sleep(1100); // Nominatim usage policy: max 1 request/second
-      entry = await lookup(q);
-      cache[q] = entry;
-      if ("error" in entry) report.geocodeFailed.push(`${q}: ${entry.error}`);
-      else report.geocoded.push(`${q} → ${entry.lat}, ${entry.lng}${entry.label ? ` (${entry.label})` : ""}`);
-    }
-    if ("lat" in entry) {
-      for (const r of group) {
-        r.latitude = String(entry.lat);
-        r.longitude = String(entry.lng);
-      }
-    }
+let lastNominatim = 0;
+
+async function nominatim(params: Record<string, string>): Promise<GeoEntry> {
+  const wait = lastNominatim + NOMINATIM_GAP_MS - Date.now();
+  if (wait > 0) await sleep(wait);
+  lastNominatim = Date.now();
+  const url = new URL("https://nominatim.openstreetmap.org/search");
+  url.search = new URLSearchParams({
+    format: "jsonv2",
+    limit: "1",
+    addressdetails: "1",
+    "accept-language": "en",
+    ...params,
+  }).toString();
+  try {
+    const res = await fetchWithTimeout(url.href);
+    if (!res.ok) return { error: `HTTP ${res.status}`, at: now() };
+    const hits = (await res.json()) as {
+      lat: string;
+      lon: string;
+      display_name?: string;
+      category?: string;
+      type?: string;
+      importance?: number;
+      address?: { country_code?: string };
+    }[];
+    const hit = hits[0];
+    if (!hit) return { error: "no match", at: now() };
+    const entry: GeoHit = {
+      lat: Number(Number(hit.lat).toFixed(4)),
+      lng: Number(Number(hit.lon).toFixed(4)),
+      label: hit.display_name?.split(",").slice(0, 2).join(",").trim(),
+    };
+    if (hit.address?.country_code) entry.code = hit.address.country_code;
+    if (hit.category) entry.kind = [hit.category, hit.type].filter(Boolean).join("/");
+    if (typeof hit.importance === "number") entry.importance = Number(hit.importance.toFixed(3));
+    return entry;
+  } catch (err) {
+    return { error: (err as Error).message, at: now() };
   }
 }
 
-async function lookup(q: string): Promise<GeoEntry> {
-  const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`;
-  try {
-    const res = await fetchWithTimeout(url);
-    if (!res.ok) return { error: `HTTP ${res.status}`, at: new Date().toISOString() };
-    const hits = (await res.json()) as { lat: string; lon: string; display_name?: string }[];
-    const hit = hits[0];
-    if (!hit) return { error: "no match", at: new Date().toISOString() };
-    const lat = Number(Number(hit.lat).toFixed(4));
-    const lng = Number(Number(hit.lon).toFixed(4));
-    return { lat, lng, label: hit.display_name?.split(",").slice(0, 2).join(",") };
-  } catch (err) {
-    return { error: (err as Error).message, at: new Date().toISOString() };
+type GeoCache = Record<string, GeoEntry>;
+
+/** The country itself: its centre (last-resort pin) and ISO code (to constrain city searches). */
+async function countryInfo(cache: GeoCache, country: string): Promise<GeoEntry> {
+  if (!country) return { error: "no country", at: now() };
+  const entry = await cached(cache, `country:${country}`, () => nominatim({ q: country, featureType: "country" }));
+  if ("lat" in entry && !entry.code) {
+    // Entry from before codes were stored: look it up again.
+    delete cache[`country:${country}`];
+    return cached(cache, `country:${country}`, () => nominatim({ q: country, featureType: "country" }));
+  }
+  return entry;
+}
+
+/**
+ * A hit that is a place (city, town, region, campus), not the first post office
+ * or shop whose name happens to contain the words. Places rank high in
+ * Nominatim's importance; a street-level feature is close to zero.
+ */
+function isPlace(hit: GeoHit): boolean {
+  if (/^(place|boundary)\//.test(hit.kind ?? "")) return true;
+  return (hit.importance ?? 0) >= 0.2;
+}
+
+/** Geocode a place name inside a country, trying progressively simpler spellings. */
+async function placeCity(cache: GeoCache, city: string, country: string, code: string | undefined): Promise<GeoEntry> {
+  const variants = [city];
+  const withComma = city.replace(/^(.*\S)\s+([A-Z]{2}|D\.?C\.?)$/, "$1, $2"); // "San Jose CA" → "San Jose, CA"
+  if (withComma !== city) variants.push(withComma);
+  const simpler = withComma.replace(/\(.*?\)/g, " ").replace(/\b(area|region|metro|greater|downtown)\b/gi, " ").replace(/\s+/g, " ").trim();
+  if (simpler && !variants.includes(simpler)) variants.push(simpler);
+  const firstPart = simpler.split(",")[0].trim();
+  if (firstPart && !variants.includes(firstPart)) variants.push(firstPart);
+  const cc = code ? { countrycodes: code } : {};
+  let last: GeoEntry = { error: "no match", at: now() };
+  for (const v of variants) {
+    const q = [v, country].filter(Boolean).join(", ");
+    last = await cached(cache, q, async () => {
+      const hit = await nominatim({ q, ...cc });
+      if ("error" in hit || isPlace(hit)) return hit;
+      const settlement = await nominatim({ q, ...cc, featureType: "settlement" });
+      if ("lat" in settlement) return settlement;
+      return { error: `only matched ${hit.label} (${hit.kind})`, at: now() };
+    });
+    if ("lat" in last) return last;
+  }
+  return last;
+}
+
+/**
+ * The organization's own address, from its website: schema.org JSON-LD
+ * PostalAddress first, then the most repeated "City, ST 12345" in the page.
+ */
+function addressFromHtml(html: string): { city: string; region: string; country: string } | null {
+  const scripts = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) ?? [];
+  for (const tag of scripts) {
+    const body = tag.replace(/^<script[^>]*>/i, "").replace(/<\/script>$/i, "").trim();
+    let json: unknown;
+    try {
+      json = JSON.parse(body);
+    } catch {
+      continue;
+    }
+    const found = findPostalAddress(json, 0);
+    if (found) return found;
+  }
+  const text = decodeEntities(html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " "));
+  const counts = new Map<string, number>();
+  for (const m of text.matchAll(/([A-Z][A-Za-z.'’ -]{1,40}?),\s*([A-Z]{2})\s+\d{5}(?:-\d{4})?\b/g)) {
+    const city = m[1]
+      .replace(/^.*\b(St|Street|Ave|Avenue|Blvd|Boulevard|Rd|Road|Dr|Drive|Way|Ln|Lane|Suite|Ste|Floor|Fl|Pl|Place|Ct|Court|Hwy|Pkwy|Parkway|Box)\.?\s+/i, "")
+      .replace(/^.*#\s*\w+\s+/, "")
+      .trim();
+    if (!city || city.length > 40) continue;
+    const key = `${city}|${m[2]}`;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  const best = [...counts].sort((a, b) => b[1] - a[1])[0];
+  if (!best) return null;
+  const [city, region] = best[0].split("|");
+  return { city, region, country: "United States" };
+}
+
+function findPostalAddress(node: unknown, depth: number): { city: string; region: string; country: string } | null {
+  if (depth > 6 || !node || typeof node !== "object") return null;
+  if (Array.isArray(node)) {
+    for (const n of node) {
+      const f = findPostalAddress(n, depth + 1);
+      if (f) return f;
+    }
+    return null;
+  }
+  const o = node as Record<string, unknown>;
+  const locality = o.addressLocality;
+  if (typeof locality === "string" && locality.trim()) {
+    const country = o.addressCountry;
+    return {
+      city: locality.trim(),
+      region: typeof o.addressRegion === "string" ? o.addressRegion.trim() : "",
+      country:
+        typeof country === "string"
+          ? normalizeCountry(country)
+          : country && typeof country === "object" && typeof (country as { name?: unknown }).name === "string"
+            ? normalizeCountry((country as { name: string }).name)
+            : "",
+    };
+  }
+  for (const key of ["address", "location", "@graph", "mainEntity", "publisher", "organization", "parentOrganization"]) {
+    if (key in o) {
+      const f = findPostalAddress(o[key], depth + 1);
+      if (f) return f;
+    }
+  }
+  return null;
+}
+
+/** Pin for a remote placement: the organization's address, found on its website. */
+async function placeOrganization(cache: GeoCache, p: Placement): Promise<GeoEntry> {
+  const domain = domainOf(p.partner_website);
+  if (!domain) return { error: "no website", at: now() };
+  return cached(cache, `org:${domain}`, async () => {
+    const page = await getPage(p.partner_website);
+    if (!page.html) return { error: `site returned ${page.status}`, at: now() };
+    const addr = addressFromHtml(page.html);
+    if (!addr) return { error: "no address on website", at: now() };
+    const country = addr.country || p.country;
+    const info = country ? await countryInfo(cache, country) : null;
+    const code = info && "code" in info ? info.code : undefined;
+    const q = [addr.city, addr.region, country].filter(Boolean).join(", ");
+    const hit = await nominatim({ q, ...(code ? { countrycodes: code } : {}) });
+    if ("error" in hit) return hit;
+    return { ...hit, label: [addr.city, addr.region].filter(Boolean).join(", ") };
+  });
+}
+
+async function geocode(cache: GeoCache, rows: Placement[]): Promise<void> {
+  rows.forEach(checkCoords);
+  for (const r of rows) {
+    if (hasCoords(r)) continue;
+    const place = r.city ? `${r.city}${r.country ? `, ${r.country}` : ""}` : r.country;
+    const info = r.country ? await countryInfo(cache, r.country) : null;
+    const code = info && "code" in info ? info.code : undefined;
+    const pin = (hit: GeoHit) => {
+      r.latitude = String(hit.lat);
+      r.longitude = String(hit.lng);
+    };
+
+    if (r.city) {
+      const hit = await placeCity(cache, r.city, r.country, code);
+      if ("lat" in hit) {
+        pin(hit);
+        report.geocoded.push(`${place} → ${hit.lat}, ${hit.lng}${hit.label ? ` (${hit.label})` : ""}`);
+        continue;
+      }
+    }
+
+    let why = r.city ? `"${r.city}" not found` : "no city";
+    if (r.remote && !r.city) {
+      const org = r.partner_organization || domainOf(r.partner_website) || "the organization";
+      const hit = await placeOrganization(cache, r);
+      // The address on the website must be in the fellow's stated country: a
+      // South African organization's New York fundraising office is not the pin.
+      if ("lat" in hit && (!code || !hit.code || hit.code === code)) {
+        pin(hit);
+        r.fellowship_loc = `${r.fellowship_loc} (${hit.label})`;
+        report.remotePlaced.push(`${r.where}: ${org} is at ${hit.label}`);
+        continue;
+      }
+      why = "lat" in hit ? `remote; the address on ${org}'s website is in another country (${hit.label})` : `remote; no address found for ${org}`;
+    }
+
+    if (info && "lat" in info) {
+      pin(info);
+      report.countryFallback.push(`${r.where}: ${why}; pinned at the centre of ${r.country}`);
+      continue;
+    }
+    report.geocodeFailed.push(`${r.where}: ${place ? `"${place}"` : "no city or country"} could not be placed`);
   }
 }
 
@@ -399,40 +883,68 @@ async function lookup(q: string): Promise<GeoEntry> {
 // Logos
 // ---------------------------------------------------------------------------
 
-const IMAGE_EXT: Record<string, string> = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
-  "image/gif": "gif",
-  "image/webp": "webp",
-  "image/svg+xml": "svg",
-  "image/x-icon": "ico",
-  "image/vnd.microsoft.icon": "ico",
-  "image/avif": "avif",
-};
+type Page = { html: string; url: string; status: string };
+const pages = new Map<string, Promise<Page>>();
 
-function domainOf(website: string): string {
-  try {
-    return new URL(website).hostname.replace(/^www\./, "").toLowerCase();
-  } catch {
-    return "";
+/** Fetch an organization's home page once per domain, shared by logo and address lookups. */
+function getPage(website: string): Promise<Page> {
+  const domain = domainOf(website) || website;
+  let p = pages.get(domain);
+  if (!p) {
+    p = (async () => {
+      try {
+        const res = await fetchPolitely(website, { headers: { accept: "text/html,*/*;q=0.5" } });
+        const html = res.ok ? await res.text() : "";
+        return { html, url: res.url || website, status: `HTTP ${res.status}` };
+      } catch (err) {
+        return { html: "", url: website, status: (err as Error).message };
+      }
+    })();
+    pages.set(domain, p);
   }
+  return p;
+}
+
+/** File extension from the bytes themselves; servers lie about content-type and 200 their 404 pages. */
+function sniffImage(b: Uint8Array): string {
+  if (b.length < 12) return "";
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return "png";
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "jpg";
+  if (b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x38) return "gif";
+  if (b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return "webp";
+  if (b[0] === 0 && b[1] === 0 && b[2] === 1 && b[3] === 0) return "ico";
+  if (b[4] === 0x66 && b[5] === 0x74 && b[6] === 0x79 && b[7] === 0x70) {
+    const brand = String.fromCharCode(b[8], b[9], b[10], b[11]);
+    if (/avi[fs]/.test(brand)) return "avif";
+  }
+  const head = new TextDecoder().decode(b.subarray(0, 2048)).trimStart();
+  if (/^(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*(<!DOCTYPE[^>]*>\s*)?<svg[\s>]/i.test(head)) return "svg";
+  return "";
+}
+
+type Candidate = { url: string; source: string };
+
+function attr(tag: string, name: string): string {
+  return tag.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, "i"))?.slice(1).find((v) => v !== undefined) ?? "";
 }
 
 /**
- * Candidate icon URLs from a page, best first: apple-touch-icon, then <link
- * rel="icon"> largest first (PNG/SVG before ICO), then /favicon.ico.
- * og:image is deliberately not used: it is almost always a photo or banner.
+ * Candidate icon URLs from a page, best first: apple-touch-icon, web manifest
+ * icons, <link rel="icon"> largest first (PNG/SVG before ICO), then the
+ * well-known paths. og:image is deliberately not used: it is almost always a
+ * photo or banner.
  */
-function iconCandidates(html: string, pageUrl: string): { url: string; source: string }[] {
+async function iconCandidates(page: Page): Promise<Candidate[]> {
   const resolve = (u: string) => {
     try {
-      return new URL(u.replace(/&amp;/g, "&"), pageUrl).href;
+      const href = new URL(decodeEntities(u.trim()), page.url);
+      return /^https?:$/.test(href.protocol) ? href.href : "";
     } catch {
       return "";
     }
   };
-  const attr = (tag: string, name: string) => tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, "i"))?.[1] ?? "";
-  const links = (html.match(/<link\b[^>]*>/gi) ?? []).map((t) => ({
+  const head = page.html.slice(0, 200_000);
+  const links = (head.match(/<link\b[^>]*>/gi) ?? []).map((t) => ({
     rel: attr(t, "rel").toLowerCase(),
     url: resolve(attr(t, "href")),
     size: Number(attr(t, "sizes").match(/\d+/)?.[0] ?? 0),
@@ -443,72 +955,167 @@ function iconCandidates(html: string, pageUrl: string): { url: string; source: s
       .filter((l) => l.url && re.test(l.rel))
       .sort((a, b) => rank(b) - rank(a))
       .map((l) => ({ url: l.url, source }));
+
+  const manifest: Candidate[] = [];
+  const manifestUrl = links.find((l) => l.url && /(^|\s)manifest(\s|$)/.test(l.rel))?.url;
+  if (manifestUrl) {
+    try {
+      const res = await fetchPolitely(manifestUrl, { headers: { accept: "application/manifest+json,application/json,*/*" } });
+      if (res.ok) {
+        const m = (await res.json()) as { icons?: { src?: string; sizes?: string; purpose?: string }[] };
+        const icons = (m.icons ?? [])
+          .filter((i) => i.src && !/monochrome/.test(i.purpose ?? ""))
+          .map((i) => ({ url: resolve(new URL(i.src!, manifestUrl).href), size: Number(i.sizes?.match(/\d+/)?.[0] ?? 0) }))
+          .filter((i) => i.url)
+          .sort((a, b) => b.size - a.size);
+        manifest.push(...icons.map((i) => ({ url: i.url, source: "web manifest" })));
+      }
+    } catch {
+      /* no manifest, fine */
+    }
+  }
+
+  const tile = (head.match(/<meta\b[^>]*>/gi) ?? [])
+    .filter((t) => /msapplication-tileimage/i.test(attr(t, "name")))
+    .map((t) => ({ url: resolve(attr(t, "content")), source: "msapplication-TileImage" }))
+    .filter((c) => c.url);
+
   const out = [
     ...pick(/apple-touch-icon/, "apple-touch-icon"),
+    ...manifest,
+    ...tile,
     ...pick(/(^|\s)(shortcut )?icon(\s|$)/, "icon"),
+    { url: resolve("/apple-touch-icon.png"), source: "/apple-touch-icon.png" },
+    { url: resolve("/apple-touch-icon-precomposed.png"), source: "/apple-touch-icon-precomposed.png" },
     { url: resolve("/favicon.ico"), source: "favicon.ico" },
   ];
-  return out.filter((c, i) => out.findIndex((o) => o.url === c.url) === i);
+  return out.filter((c) => c.url && out.findIndex((o) => o.url === c.url) === out.indexOf(c));
 }
 
-async function download(url: string): Promise<{ bytes: Uint8Array; ext: string } | null> {
-  const res = await fetchWithTimeout(url, { headers: { accept: "image/*" } });
+async function downloadImage(url: string): Promise<{ bytes: Uint8Array; ext: string } | null> {
+  let res: Response;
+  try {
+    res = await fetchPolitely(url, { headers: { accept: "image/*,*/*;q=0.5" } });
+  } catch (err) {
+    if (!/timeout|aborted/i.test((err as Error).message)) throw err;
+    res = await fetchPolitely(url, { headers: { accept: "image/*,*/*;q=0.5" } }); // one retry on timeout
+  }
   if (!res.ok) return null;
-  const type = (res.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
-  const ext = IMAGE_EXT[type] ?? (url.match(/\.(png|jpe?g|gif|webp|svg|ico|avif)(\?|$)/i)?.[1]?.toLowerCase().replace("jpeg", "jpg") ?? "");
-  if (!ext) return null;
+  const len = Number(res.headers.get("content-length") ?? 0);
+  if (len > MAX_LOGO_BYTES) return null;
   const bytes = new Uint8Array(await res.arrayBuffer());
   if (bytes.length === 0 || bytes.length > MAX_LOGO_BYTES) return null;
-  return { bytes, ext };
+  const ext = sniffImage(bytes);
+  return ext ? { bytes, ext } : null;
 }
 
-async function fetchLogo(website: string): Promise<LogoEntry> {
-  const domain = domainOf(website);
-  const at = new Date().toISOString();
-  let html = "";
-  let pageUrl = website;
-  let status = "";
-  try {
-    const page = await fetchWithTimeout(website, { headers: { accept: "text/html" } });
-    status = `HTTP ${page.status}`;
-    if (page.ok) {
-      html = await page.text();
-      pageUrl = page.url || website;
-    }
-  } catch (err) {
-    status = (err as Error).message;
+/** Google Drive share links in every form the Form and Drive UI produce. */
+function driveId(url: string): string {
+  if (!/google\.com|googleusercontent\.com/i.test(url)) return "";
+  return (
+    url.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/)?.[1] ??
+    url.match(/[?&]id=([a-zA-Z0-9_-]{10,})/)?.[1] ??
+    url.match(/googleusercontent\.com\/d\/([a-zA-Z0-9_-]{10,})/)?.[1] ??
+    ""
+  );
+}
+
+/** URLs to try for a Logo cell, best first. */
+function logoSources(link: string): string[] {
+  const id = driveId(link);
+  if (id) {
+    return [
+      `https://drive.google.com/uc?export=download&id=${id}`,
+      `https://lh3.googleusercontent.com/d/${id}=w400`,
+      `https://drive.usercontent.google.com/download?id=${id}&export=download`,
+    ];
   }
-  for (const c of iconCandidates(html, pageUrl)) {
+  if (/^https?:\/\//i.test(link)) return [link];
+  if (/^[\w.-]+\.[a-z]{2,}\/\S*\.(png|jpe?g|gif|webp|svg|ico|avif)(\?\S*)?$/i.test(link)) return [`https://${link}`];
+  return [];
+}
+
+async function saveLogo(bytes: Uint8Array, base: string, ext: string): Promise<string> {
+  const file = `${base}.${ext}`;
+  await writeFile(path.join(LOGO_DIR, file), bytes);
+  return file;
+}
+
+/** Download the image a Logo cell points at. */
+async function fetchLinkedLogo(link: string, base: string): Promise<LogoEntry> {
+  const at = now();
+  const sources = logoSources(link);
+  if (!sources.length) return { error: "not a link", at };
+  let reason = "";
+  for (const url of sources) {
     try {
-      const img = await download(c.url);
+      const img = await downloadImage(url);
+      if (img) return { file: await saveLogo(img.bytes, base, img.ext), source: driveId(link) ? "Google Drive" : "Logo link", at };
+      reason = "not an image";
+    } catch (err) {
+      reason = (err as Error).message;
+    }
+  }
+  if (driveId(link)) reason = "Google Drive file is not shared with \"Anyone with the link\" (or is not an image)";
+  return { error: reason, at };
+}
+
+/** Find and download an icon from the organization's website. */
+async function fetchSiteLogo(website: string): Promise<LogoEntry> {
+  const at = now();
+  const domain = domainOf(website);
+  const page = await getPage(website);
+  for (const c of await iconCandidates(page)) {
+    try {
+      const img = await downloadImage(c.url);
       if (!img) continue;
-      const file = `${domain}.${img.ext}`;
-      await writeFile(path.join(LOGO_DIR, file), img.bytes);
-      return { file, source: c.source, at };
+      return { file: await saveLogo(img.bytes, domain, img.ext), source: c.source, at };
     } catch {
       /* try the next candidate */
     }
   }
-  return { error: html ? "no usable icon" : `site returned ${status}`, at };
+  return { error: page.html ? "no usable icon" : `site returned ${page.status}`, at };
 }
 
-async function logos(cache: Record<string, LogoEntry>, rows: Row[]): Promise<void> {
+async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promise<void> {
   await mkdir(LOGO_DIR, { recursive: true });
-  const byDomain = new Map<string, Row[]>();
+
+  // 1. Logo cells: one download per distinct link.
+  const byLink = new Map<string, Placement[]>();
+  for (const r of rows) if (r.partner_logo) byLink.set(r.partner_logo, [...(byLink.get(r.partner_logo) ?? []), r]);
+  for (const [link, group] of byLink) {
+    const first = group[0];
+    const base =
+      domainOf(first.partner_website) ||
+      slugify(first.partner_organization) ||
+      createHash("sha1").update(link).digest("hex").slice(0, 12);
+    const fresh = !cache[link] || ("error" in cache[link] && isStale(cache[link].at));
+    const entry = await cached(cache, link, () => fetchLinkedLogo(link, base));
+    if ("file" in entry) {
+      if (fresh) report.logosFetched.push(`${first.partner_organization || base} ← ${entry.source}`);
+      for (const r of group) r.partner_logo = `logos/${entry.file}`;
+    } else {
+      report.logoLinkFailed.push(`${first.where}: Logo "${link}": ${entry.error}`);
+      for (const r of group) r.partner_logo = "";
+    }
+  }
+
+  // 2. Everyone else: one icon per organization domain.
+  const byDomain = new Map<string, Placement[]>();
   for (const r of rows) {
     if (r.partner_logo || !r.partner_website) continue;
     const d = domainOf(r.partner_website);
     if (d) byDomain.set(d, [...(byDomain.get(d) ?? []), r]);
   }
   for (const [domain, group] of byDomain) {
-    let entry = cache[domain];
-    if (!entry || ("error" in entry && isStale(entry.at))) {
-      entry = await fetchLogo(group[0].partner_website);
-      cache[domain] = entry;
-      if ("error" in entry) report.logoFailed.push(`${domain}: ${entry.error}`);
-      else report.logosFetched.push(`${domain} ← ${entry.source}`);
+    const fresh = !cache[domain] || ("error" in cache[domain] && isStale(cache[domain].at));
+    const entry = await cached(cache, domain, () => fetchSiteLogo(group[0].partner_website));
+    if ("file" in entry) {
+      if (fresh) report.logosFetched.push(`${domain} ← ${entry.source}`);
+      for (const r of group) r.partner_logo = `logos/${entry.file}`;
+    } else {
+      report.logoFailed.push(`${domain}: ${entry.error}`);
     }
-    if ("file" in entry) for (const r of group) r.partner_logo = `logos/${entry.file}`;
   }
 }
 
@@ -518,8 +1125,14 @@ async function logos(cache: Record<string, LogoEntry>, rows: Row[]): Promise<voi
 
 function summary(): string {
   const lines: string[] = ["## Cardinal Quarter Map data build", ""];
-  lines.push("| Period | Fellows |", "| --- | ---: |");
-  for (const p of report.periods) lines.push(`| ${p.displayName} | ${p.count} |`);
+  lines.push("| Period | Fellows | Shown |", "| --- | ---: | --- |");
+  for (const p of report.periods) lines.push(`| ${p.displayName} | ${p.count} | ${p.show ? "yes" : "hidden"} |`);
+  if (report.groups.length) {
+    lines.push("", "| Group | Periods | Fellows | Shown |", "| --- | --- | ---: | --- |");
+    for (const g of report.groups) {
+      lines.push(`| ${g.displayName} | ${g.periods.join(", ")} | ${g.count} | ${g.show ? "yes" : "hidden"} |`);
+    }
+  }
   const section = (title: string, items: string[]) => {
     if (!items.length) return;
     lines.push("", `### ${title} (${items.length})`, "");
@@ -529,14 +1142,19 @@ function summary(): string {
     "Rows with a Period that is not in the Periods list (not published)",
     [...report.orphans].map(([p, n]) => `"${p}": ${n} row(s)`),
   );
+  section("Group notes", report.groupNotes);
   section("Column notes", report.columns);
   section("Rows skipped", report.skipped);
   section("Duplicates resolved (last row wins)", report.duplicates);
   section("Coordinates that were reversed and swapped", report.swapped);
   section("Coordinates that were invalid and replaced by geocoding or skipped", report.badCoords);
+  section("Rows with several places (one pin each)", report.multi);
   section("Addresses geocoded", report.geocoded);
+  section("Remote fellows pinned at the organization's address (from its website)", report.remotePlaced);
+  section("Pinned at the centre of the country (add Latitude/Longitude or a city to place precisely)", report.countryFallback);
   section("Addresses that could not be geocoded", report.geocodeFailed);
   section("Logos fetched", report.logosFetched);
+  section("Logo links that could not be downloaded (website icon used instead)", report.logoLinkFailed);
   section("Logos not found (fellow shown without one)", report.logoFailed);
   return lines.join("\n") + "\n";
 }
@@ -547,6 +1165,7 @@ async function main() {
   const periods = await loadPeriods();
   if (periods.length === 0) throw new Error("No periods. Add a Periods tab to the sheet or entries to data/periods.json.");
   const bySlug = new Map(periods.map((p) => [slugify(p.period), p]));
+  const groups = await loadGroups();
 
   const sources = await loadSources();
   if (sources.length === 0) throw new Error("No sources. Add a Sources tab to the sheet or CSVs to data/csv/.");
@@ -570,10 +1189,10 @@ async function main() {
     if (prev) report.duplicates.push(`${prev.where} replaced by ${r.where}`);
     kept.set(key, r);
   }
-  const live = [...kept.values()];
+  const live = placements([...kept.values()]);
 
   await mkdir(path.dirname(GEOCACHE), { recursive: true });
-  const geocache = await readJson<Record<string, GeoEntry>>(GEOCACHE, {});
+  const geocache = await readJson<GeoCache>(GEOCACHE, {});
   await geocode(geocache, live);
   await writeJson(GEOCACHE, geocache);
 
@@ -581,17 +1200,19 @@ async function main() {
   await logos(logocache, live);
   await writeJson(LOGOCACHE, logocache);
 
-  const index: PeriodMeta[] = [];
+  const index: Index = { periods: [], views: [] };
+  const peopleByPeriod = new Map<string, number>();
   for (const [slug, p] of [...bySlug].sort((a, b) => a[1].order - b[1].order)) {
     const fellows: Fellow[] = [];
+    const people = new Set<string>();
+    const unplaced = new Set<string>();
     for (const r of live) {
       if (slugify(r.period) !== slug) continue;
       if (!hasCoords(r)) {
-        report.skipped.push(`${r.where}: no coordinates and address could not be geocoded`);
+        unplaced.add(r.where);
         continue;
       }
-      const latitude = Number(r.latitude);
-      const longitude = Number(r.longitude);
+      people.add(r.person);
       fellows.push({
         name: r.name,
         class_year: r.class_year,
@@ -601,19 +1222,29 @@ async function main() {
         partner_organization: r.partner_organization,
         country: r.country,
         fellowship_loc: r.fellowship_loc,
-        latitude,
-        longitude,
+        latitude: Number(r.latitude),
+        longitude: Number(r.longitude),
         affiliation: r.affiliation,
         partner_website: r.partner_website,
         partner_logo: r.partner_logo,
         interest_area: r.interest_area,
       });
     }
-    fellows.sort((a, b) => a.name.localeCompare(b.name));
+    for (const where of unplaced) report.skipped.push(`${where}: no coordinates and the location could not be placed`);
+    fellows.sort((a, b) => a.name.localeCompare(b.name) || a.fellowship_loc.localeCompare(b.fellowship_loc));
     await writeJson(path.join(OUT_DIR, `${slug}.json`), fellows);
-    index.push({ slug, displayName: p.displayName, count: fellows.length });
-    report.periods.push({ period: p.period, displayName: p.displayName, count: fellows.length });
+    index.periods.push({ slug, displayName: p.displayName, count: people.size });
+    peopleByPeriod.set(slug, people.size);
+    report.periods.push({ period: p.period, displayName: p.displayName, count: people.size, show: p.show });
   }
+  index.views = resolveViews(periods, groups);
+  for (const v of index.views) {
+    if (v.periods.length === 1 && bySlug.has(v.slug)) continue;
+    const labels = v.periods.map((s) => bySlug.get(s)?.displayName ?? s);
+    const count = v.periods.reduce((n, s) => n + (peopleByPeriod.get(s) ?? 0), 0);
+    report.groups.push({ displayName: v.displayName, periods: labels, count, show: v.show });
+  }
+  if (!index.views.some((v) => v.show)) throw new Error("Every period and group is hidden (Show = No); show at least one.");
   await writeJson(path.join(OUT_DIR, "index.json"), index);
 
   const text = summary();

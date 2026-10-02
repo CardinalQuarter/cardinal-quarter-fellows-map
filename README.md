@@ -13,6 +13,8 @@ The previous PHP/MySQL site is kept in [`legacy/`](legacy/) for reference.
 1. Rows land in the Google Sheet: from the Google Form, from program leaders
    pasting their students in, or from old exports. Any tab listed in the
    sheet's `Sources` tab is read; rows are grouped by their Period column.
+   The `Periods` tab decides which periods are published and shown; an
+   optional `Groups` tab adds combined tabs such as "Last 5 years".
    Contract and form spec: [`data/README.md`](data/README.md).
 2. The build fills in what is missing: coordinates are geocoded from City and
    Country, logos are fetched from the organization website. Results are

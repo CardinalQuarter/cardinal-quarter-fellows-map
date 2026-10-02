@@ -4,18 +4,17 @@ import { Legend } from "./components/Legend";
 import { FilterChips } from "./components/FilterChips";
 import { MapView, type Pin, type Selection } from "./components/MapView";
 import { colorMap } from "./colors";
-import { loadFellows, loadPeriods } from "./data";
+import { loadFellows, loadIndex } from "./data";
 import { applyFilters, toggleFilter } from "./filter";
-import {
-  ALL_PERIODS, sameSpot,
-  type Category, type Fellow, type Filters, type PeriodMeta,
-} from "./types";
+import { sameSpot, type Category, type Fellow, type Filters, type Index, type ViewMeta } from "./types";
 import { readHash, writeHash } from "./urlState";
+
+const EMPTY_INDEX: Index = { periods: [], views: [] };
 
 export default function App() {
   const initial = useRef(readHash());
-  const [periods, setPeriods] = useState<PeriodMeta[]>([]);
-  const [periodSlug, setPeriodSlug] = useState<string>("");
+  const [index, setIndex] = useState<Index>(EMPTY_INDEX);
+  const [viewSlug, setViewSlug] = useState<string>("");
   const [fellows, setFellows] = useState<Fellow[] | null>(null);
   const [category, setCategory] = useState<Category>(initial.current.category ?? "interest_area");
   const [filters, setFilters] = useState<Filters>(initial.current.filters ?? {});
@@ -24,23 +23,29 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const embed = initial.current.embed ?? false;
 
+  const { periods, views } = index;
+  // Tabs show only views marked Show in the sheet; a link may still open a hidden one.
+  const tabs = useMemo(() => views.filter((v) => v.show), [views]);
+  const defaultSlug = tabs[0]?.slug ?? "";
+  const view: ViewMeta | undefined = views.find((v) => v.slug === viewSlug);
+  const multi = (view?.periods.length ?? 0) > 1;
+
   useEffect(() => {
-    loadPeriods()
-      .then((list) => {
-        setPeriods(list);
+    loadIndex()
+      .then((idx) => {
+        setIndex(idx);
         const wanted = initial.current.period;
-        const valid = wanted === ALL_PERIODS || list.some((p) => p.slug === wanted);
-        setPeriodSlug(valid && wanted ? wanted : (list[0]?.slug ?? ""));
+        const valid = idx.views.some((v) => v.slug === wanted);
+        setViewSlug(valid && wanted ? wanted : (idx.views.find((v) => v.show)?.slug ?? ""));
       })
       .catch((e) => setError(String(e)));
   }, []);
 
-  // Load the selected period(s). Filters persist across periods so years can be compared;
-  // only a Period filter is dropped when leaving "All periods", where it has no meaning.
+  // Load the view's period(s). Filters persist across views so years can be compared;
+  // only a Period filter is dropped when entering a single-period view, where it has no meaning.
   useEffect(() => {
-    if (!periodSlug) return;
-    const all = periodSlug === ALL_PERIODS;
-    if (!all) {
+    if (!view) return;
+    if (view.periods.length === 1) {
       setFilters((f) => {
         if (!f.period) return f;
         const next = { ...f };
@@ -49,7 +54,7 @@ export default function App() {
       });
       setCategory((c) => (c === "period" ? "interest_area" : c));
     }
-    const wanted = all ? periods : periods.filter((p) => p.slug === periodSlug);
+    const wanted = view.periods.map((slug) => periods.find((p) => p.slug === slug)).filter((p) => p !== undefined);
     let cancelled = false;
     Promise.all(
       wanted.map((p) => loadFellows(p.slug).then((rows) => rows.map((f) => ({ ...f, period: p.displayName })))),
@@ -68,12 +73,17 @@ export default function App() {
       })
       .catch((e) => setError(String(e)));
     return () => { cancelled = true; };
-  }, [periodSlug, periods]);
+  }, [view, periods]);
 
-  // Grouping by Period only makes sense across periods, so choosing it switches to All periods.
+  // Grouping by Period only makes sense across periods, so choosing it in a
+  // single-period view switches to the widest view available (a visible one if possible).
+  const widest = useMemo(() => {
+    const pick = (list: ViewMeta[]) => list.reduce<ViewMeta | undefined>((best, v) => (v.periods.length > (best?.periods.length ?? 1) ? v : best), undefined);
+    return pick(tabs) ?? pick(views);
+  }, [tabs, views]);
   const chooseCategory = (c: Category) => {
     setCategory(c);
-    if (c === "period" && periodSlug !== ALL_PERIODS) setPeriodSlug(ALL_PERIODS);
+    if (c === "period" && !multi && widest) setViewSlug(widest.slug);
   };
 
   const loaded = fellows ?? [];
@@ -87,11 +97,11 @@ export default function App() {
   }, [selection, visible]);
 
   useEffect(() => {
-    if (!periodSlug) return;
-    writeHash({ period: periodSlug, category, filters, text, pin: pinParam, embed }, periods[0]?.slug ?? "");
-  }, [periodSlug, category, filters, text, pinParam, embed, periods]);
+    if (!viewSlug) return;
+    writeHash({ period: viewSlug, category, filters, text, pin: pinParam, embed }, defaultSlug);
+  }, [viewSlug, category, filters, text, pinParam, embed, defaultSlug]);
 
-  // Colors cover every value of the category in the period, so they stay stable while filtering.
+  // Colors cover every value of the category in the view, so they stay stable while filtering.
   const colors = useMemo(() => colorMap(loaded.map((f) => f[category])), [loaded, category]);
 
   // Facet counts ignore this category's own filter so users can see what adding a value would give.
@@ -113,21 +123,22 @@ export default function App() {
     [visible, colors, category],
   );
 
+  // A fellow with several places has one pin per place; count people, not pins.
+  const people = (list: Fellow[]) => new Set(list.map((f) => `${f.period}|${f.name}`)).size;
   const stats = useMemo(
     () => ({
+      shown: people(visible),
+      total: people(loaded),
       organizations: new Set(visible.map((f) => f.partner_organization)).size,
       countries: new Set(visible.filter((f) => f.country).map((f) => f.country)).size,
     }),
     [visible],
   );
 
-  const title =
-    periodSlug === ALL_PERIODS ? "All periods" : (periods.find((p) => p.slug === periodSlug)?.displayName ?? "");
-
   // Any change to what is on the map closes the open pin, so a popup never describes a hidden fellow.
   const changeFilters = (fn: (f: Filters) => Filters) => { setSelection(null); setFilters(fn); };
   const changeText = (t: string) => { setSelection(null); setText(t); };
-  const changePeriod = (slug: string) => { setSelection(null); setPeriodSlug(slug); };
+  const changeView = (slug: string) => { setSelection(null); setViewSlug(slug); };
   const clearAll = () => { setSelection(null); setFilters({}); setText(""); };
 
   if (error) {
@@ -138,23 +149,23 @@ export default function App() {
     <div className="flex h-full flex-col">
       <Header
         embed={embed}
-        periods={periods}
-        periodSlug={periodSlug}
-        onPeriod={changePeriod}
+        tabs={tabs}
+        viewSlug={viewSlug}
+        onView={changeView}
         fellows={loaded}
         onSearch={(hit) => changeFilters((f) => toggleFilter(f, hit.column, hit.value))}
         onText={changeText}
       />
       <main className="flex min-h-0 flex-1 flex-col-reverse lg:flex-row">
         <Legend
-          title={title}
+          title={view?.displayName ?? ""}
           loading={fellows === null}
-          shown={visible.length}
-          total={loaded.length}
+          shown={stats.shown}
+          total={stats.total}
           organizations={stats.organizations}
           countries={stats.countries}
           category={category}
-          canGroupByPeriod={periods.length > 1}
+          canGroupByPeriod={widest !== undefined}
           onCategory={chooseCategory}
           entries={entries}
           selected={filters[category] ?? []}

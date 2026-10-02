@@ -1,4 +1,4 @@
-import { CATEGORIES, UNSPECIFIED, type Category, type Fellow, type PeriodMeta } from "./types";
+import { CATEGORIES, UNSPECIFIED, type Category, type Fellow, type Index } from "./types";
 
 const GROUPABLE = (Object.keys(CATEGORIES) as Category[]).filter((c) => c !== "period");
 
@@ -10,7 +10,7 @@ async function getJson<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export const loadPeriods = () => getJson<PeriodMeta[]>("index.json");
+export const loadIndex = () => getJson<Index>("index.json");
 export const loadFellows = async (slug: string) =>
   (await getJson<Fellow[]>(`${slug}.json`)).map((f) => {
     const out = { ...f };
