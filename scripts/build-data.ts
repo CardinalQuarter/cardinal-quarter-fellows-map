@@ -338,7 +338,7 @@ function parseGroups(rows: string[][], label: string): Group[] {
   const [header = [], ...body] = rows;
   const c = columns(header, {
     group: ["group", "name", "groupname"],
-    periods: ["periods", "period", "includes", "members"],
+    periods: ["periods", "includes", "members"],
     name: ["displayname", "label"],
     order: ["order", "sort"],
     show: ["show", "visible", "shown", "display"],
@@ -391,7 +391,11 @@ async function loadGroups(): Promise<Group[]> {
   const groups: Group[] = [];
   if (SHEET_ID) {
     const rows = await fetchOptionalTab(GROUPS_TAB);
-    if (rows) groups.push(...parseGroups(rows, GROUPS_TAB));
+    // An unknown tab name makes the gviz endpoint return the first tab, so a
+    // tab without Group and Periods headers means "no Groups tab".
+    const c = rows && columns(rows[0] ?? [], { group: ["group", "name", "groupname"], periods: ["periods", "includes", "members"] });
+    if (rows && c && c.group >= 0 && c.periods >= 0) groups.push(...parseGroups(rows, GROUPS_TAB));
+    else console.log(`No "${GROUPS_TAB}" tab (or no Group/Periods headers); building without groups`);
   }
   const local = await readJson<Partial<Group>[]>(LOCAL_GROUPS, []);
   local.forEach((g, i) => {
