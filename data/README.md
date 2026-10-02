@@ -1,6 +1,6 @@
 # Data contract
 
-The map is built from one Google Sheet (repo variable `SHEET_ID`) plus any
+The map is built from one Google Sheet (repo secret `SHEET_ID`) plus any
 CSVs in `data/csv/`. Columns are matched by header name, in any order; extra
 columns are ignored. Rows are grouped by their **Period** value, not by which
 tab they live in, so the sheet can grow year over year and take rows from any

@@ -31,7 +31,7 @@
  * from the nightly workflow show readable diffs. Emails never reach output.
  */
 import { createHash } from "node:crypto";
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import Papa from "papaparse";
 
@@ -48,7 +48,8 @@ const SHEET_ID = process.env.SHEET_ID?.trim();
 const PERIODS_TAB = process.env.PERIODS_TAB?.trim() || "Periods";
 const SOURCES_TAB = process.env.SOURCES_TAB?.trim() || "Sources";
 const GROUPS_TAB = process.env.GROUPS_TAB?.trim() || "Groups";
-const USER_AGENT = "cardinal-quarter-map build (https://github.com/CardinalQuarter/cardinal-quarter-map)";
+// Nominatim's usage policy asks for a way to reach the operator: the repo running the build.
+const USER_AGENT = `cardinal-quarter-map build (https://github.com/${process.env.GITHUB_REPOSITORY || "CardinalQuarter/cardinal-quarter-map"})`;
 /** Some sites refuse anything that does not look like a browser; used only as a second try. */
 const BROWSER_UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
@@ -1250,6 +1251,12 @@ async function main() {
   }
   if (!index.views.some((v) => v.show)) throw new Error("Every period and group is hidden (Show = No); show at least one.");
   await writeJson(path.join(OUT_DIR, "index.json"), index);
+
+  // A period removed from the sheet must not stay reachable by URL.
+  const keep = new Set([...bySlug.keys()].map((s) => `${s}.json`).concat("index.json"));
+  for (const f of await readdir(OUT_DIR)) {
+    if (f.endsWith(".json") && !keep.has(f)) await unlink(path.join(OUT_DIR, f));
+  }
 
   const text = summary();
   console.log("\n" + text);

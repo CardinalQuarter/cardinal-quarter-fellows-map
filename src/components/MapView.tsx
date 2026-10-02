@@ -373,7 +373,8 @@ export function MapView({ pins, selection, onSelect }: Props) {
       style: STYLE_URL,
       center: [10, 20],
       zoom: 1.4,
-      minZoom: 1,
+      // Below 0 so a phone can fit pins spread across several continents.
+      minZoom: -1,
       maxZoom: MAX_ZOOM,
       attributionControl: { compact: true },
       // Lets the canvas be read back for the image download.
@@ -504,7 +505,10 @@ export function MapView({ pins, selection, onSelect }: Props) {
     if (pins.length === 0) return;
     const bounds = new maplibregl.LngLatBounds();
     for (const p of pins) bounds.extend([p.fellow.longitude, p.fellow.latitude]);
-    map.fitBounds(bounds, { padding: 60, maxZoom: 11, duration: 600 });
+    const { clientWidth: w, clientHeight: h } = map.getContainer();
+    const pad = Math.round(Math.min(60, w * 0.08, h * 0.08));
+    // The right edge also clears the zoom and download buttons.
+    map.fitBounds(bounds, { padding: { top: pad, bottom: pad, left: pad, right: pad + 40 }, maxZoom: 11, duration: 600 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pins, ready]);
 
