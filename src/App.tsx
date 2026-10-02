@@ -6,7 +6,7 @@ import { MapView, type Pin, type Selection } from "./components/MapView";
 import { colorMap } from "./colors";
 import { loadFellows, loadIndex } from "./data";
 import { applyFilters, toggleFilter } from "./filter";
-import { sameSpot, type Category, type Fellow, type Filters, type Index, type ViewMeta } from "./types";
+import { countPeople, sameSpot, type Category, type Fellow, type Filters, type Index, type ViewMeta } from "./types";
 import { readHash, writeHash } from "./urlState";
 
 const EMPTY_INDEX: Index = { periods: [], views: [] };
@@ -124,11 +124,10 @@ export default function App() {
   );
 
   // A fellow with several places has one pin per place; count people, not pins.
-  const people = (list: Fellow[]) => new Set(list.map((f) => `${f.period}|${f.name}`)).size;
   const stats = useMemo(
     () => ({
-      shown: people(visible),
-      total: people(loaded),
+      shown: countPeople(visible),
+      total: countPeople(loaded),
       organizations: new Set(visible.map((f) => f.partner_organization)).size,
       countries: new Set(visible.filter((f) => f.country).map((f) => f.country)).size,
     }),

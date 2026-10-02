@@ -28,11 +28,12 @@
  *
  * Output: public/data/<period>.json + index.json (periods and the nav of
  * periods/groups, with hidden ones flagged), pretty-printed so commits
- * from the nightly workflow show readable diffs. Emails never reach output.
+ * from the manual deployment workflow show readable diffs. Emails never reach output.
  */
 import { createHash } from "node:crypto";
 import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import Papa from "papaparse";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -94,7 +95,7 @@ const ALIASES: Record<Field, string[]> = {
   school: ["school"],
   affiliation: ["affiliation", "sponsoringoffice", "office"],
   fellowship: ["fellowshipopportunity", "fellowship", "opportunity", "program", "fellowshipname"],
-  interest_area: ["interestarea", "interestareas"],
+  interest_area: ["interestarea", "interestareas", "fellowshipinterestarea"],
   partner_organization: ["organization", "nameofpartnerorganization", "partnerorganization", "organizationname", "partner"],
   fellowship_loc: ["city", "fellowshiplocation", "locationoffellowshipcitytown", "locationoffellowshipcity", "location", "cityregion", "citytown"],
   country: ["country", "locationoffellowshipcountry"],
@@ -134,6 +135,7 @@ const OPTIONAL: Field[] = ["period", "latitude", "longitude", "partner_logo"];
 // ---------------------------------------------------------------------------
 
 type Fellow = {
+  id: string;
   name: string;
   class_year: string;
   major: string;
@@ -471,15 +473,26 @@ function resolveViews(periods: Period[], groups: Group[]): ViewMeta[] {
 
 type Source = { label: string; load: () => Promise<string[][]>; defaultPeriod?: string };
 
+/** A source-wide period is useful for historical tabs without a Period column. */
+export function parseSources(rows: string[][]): { tab: string; defaultPeriod?: string }[] {
+  const [header = [], ...body] = rows;
+  const c = columns(header, {
+    tab: ["tab", "tabname"],
+    period: ["period", "defaultperiod"],
+  });
+  if (c.tab < 0) throw new Error(`${SOURCES_TAB}: needs a "Tab" column`);
+  return body.map((r) => ({
+    tab: cell(r, c.tab),
+    defaultPeriod: cell(r, c.period) || undefined,
+  })).filter((s) => s.tab);
+}
+
 async function loadSources(): Promise<Source[]> {
   const sources: Source[] = [];
   if (SHEET_ID) {
     const rows = parseCsv(await fetchText(sheetCsvUrl(SOURCES_TAB)));
-    const [header = [], ...body] = rows;
-    const iTab = Math.max(0, header.map(normalizeHeader).findIndex((h) => h === "tab" || h === "tabname"));
-    for (const r of body) {
-      const tab = (r[iTab] ?? "").trim();
-      if (tab) sources.push({ label: `sheet tab "${tab}"`, load: () => fetchText(sheetCsvUrl(tab)).then(parseCsv) });
+    for (const { tab, defaultPeriod } of parseSources(rows)) {
+      sources.push({ label: `sheet tab "${tab}"`, defaultPeriod, load: () => fetchText(sheetCsvUrl(tab)).then(parseCsv) });
     }
   }
   let files: string[] = [];
@@ -498,7 +511,7 @@ async function loadSources(): Promise<Source[]> {
   return sources;
 }
 
-function rowsFromSource(rows: string[][], src: Source): Row[] {
+export function rowsFromSource(rows: string[][], src: Source): Row[] {
   const [header, ...body] = rows;
   if (!header) return [];
   const cols = mapHeader(header, src.label);
@@ -507,7 +520,7 @@ function rowsFromSource(rows: string[][], src: Source): Row[] {
     if (cols[f] === undefined) throw new Error(`${src.label}: no "${ALIASES[f][0]}" column (headers: ${header.join(", ")})`);
   }
   if (cols.period === undefined && !src.defaultPeriod) {
-    throw new Error(`${src.label}: no "Period" column`);
+    throw new Error(`${src.label}: no "Period" column. Add one to the student tab or set a Default Period for this tab in Sources.`);
   }
   const out: Row[] = [];
   body.forEach((raw, i) => {
@@ -1219,6 +1232,7 @@ async function main() {
       }
       people.add(r.person);
       fellows.push({
+        id: r.person,
         name: r.name,
         class_year: r.class_year,
         major: r.major,
@@ -1263,7 +1277,9 @@ async function main() {
   if (process.env.GITHUB_STEP_SUMMARY) await writeFile(process.env.GITHUB_STEP_SUMMARY, text, { flag: "a" });
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

@@ -1,12 +1,7 @@
 name: Build and deploy to GitHub Pages
 
 on:
-  push:
-    branches: [master]
-  schedule:
-    # Nightly rebuild picks up edits to the Google Sheet. 13:00 UTC = 6am Pacific.
-    - cron: "0 13 * * *"
-  workflow_dispatch: # "Run workflow" button in the Actions tab = publish now
+  workflow_dispatch: # Manual deploy only: Actions → Run workflow
 
 permissions:
   contents: write # commits the data snapshot, geocode cache, and logos back
@@ -36,7 +31,6 @@ jobs:
         run: npm run build
       - name: Commit data snapshot
         # Every published change to the data is a readable diff in git history.
-        # A push with GITHUB_TOKEN does not trigger this workflow again.
         # The snapshot is a nice-to-have: if the push cannot land (a re-run of
         # an old attempt, a commit racing the build), the deploy still proceeds.
         continue-on-error: true

@@ -4,6 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
+    "test": "node --test scripts/*.test.ts",
     "data": "node scripts/build-data.ts",
     "dev": "npm run data && vite",
     "build": "npm run data && tsc --noEmit && vite build",

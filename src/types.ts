@@ -1,4 +1,6 @@
 export type Fellow = {
+  /** One identifier per person and period, shared by all of their map pins. */
+  id?: string;
   name: string;
   class_year: string;
   major: string;
@@ -75,3 +77,7 @@ export const sameSpot = (a: Fellow, b: Fellow) =>
 
 /** Shown for a blank value in any grouping column so it can still be filtered on. */
 export const UNSPECIFIED = "Not specified";
+
+/** New snapshots distinguish same-name students; older snapshots remain usable. */
+export const countPeople = (fellows: Fellow[]) =>
+  new Set(fellows.map((f) => f.id ?? `${f.period}|${f.name}`)).size;

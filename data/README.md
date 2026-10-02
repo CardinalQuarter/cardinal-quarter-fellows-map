@@ -4,19 +4,34 @@ The map is built from one Google Sheet (repo secret `SHEET_ID`) plus any
 CSVs in `data/csv/`. Columns are matched by header name, in any order; extra
 columns are ignored. Rows are grouped by their **Period** value, not by which
 tab they live in, so the sheet can grow year over year and take rows from any
-source: the Google Form, a program leader's paste, an old export.
+source: the Google Form, staff pasting student rows, an old export.
 
 ## Sheet tabs
 
 `sheet-template.xlsx` in this folder is a ready-made copy of the layout below
-(instructions tab, dropdowns, example rows). Import it into Google Sheets with
-*File → Import → Upload → Replace spreadsheet*, then delete the example rows.
+(instructions tab, dropdowns, example period/group rows, and blank `Students`
+and `Legacy Students` tabs). Open it in Excel and copy the needed tabs or ranges into the real sheet.
+Keep row 1 as the headers and replace or delete the example period/group rows.
+For a new sheet, you can also import it into Google Sheets with
+*File → Import → Upload → Replace spreadsheet*.
+
+`Sources` initially lists `Legacy Students` followed by `Students`, both with
+Default Period = Summer 2026. Keep the real data in your existing student tabs;
+copy the updated `Sources` and `Read Me` tabs over without replacing those
+student tabs with the blank template layouts. If using a Google Form, link it to the
+real sheet and add its exact response-tab name (usually `Form Responses 1`) to
+`Sources`. Remove any entry for a student tab you do not use.
+Every listed tab must exist. The blank `Students` tab keeps the column layout
+and dropdowns useful for staff entry or historical imports; it has no sample
+student or program-leader tab. The blank `Legacy Students` layout has the same
+columns and dropdowns. When copying only cell values from Excel,
+recreate dropdown validation in Google Sheets as described below.
 
 | tab        | columns                                   | purpose                                              |
 | ---------- | ----------------------------------------- | ---------------------------------------------------- |
 | `Periods`  | Period, Display Name, Order, Show         | which periods are published, their label and order   |
 | `Groups`   | Group, Periods, Display Name, Order, Show | optional: tabs that combine periods ("Last 5 years") |
-| `Sources`  | Tab                                       | which other tabs to read                             |
+| `Sources`  | Tab, Default Period (optional)            | which other tabs to read; fallback period for each  |
 | any listed | student columns below                     | fellows; one row each                                |
 
 `Periods` example:
@@ -58,11 +73,76 @@ every student tab (*Data → Data validation → Dropdown from a range*, pointin
 at the Period column of `Periods`), and use the same for Country, School and
 Interest Area if you want fixed lists.
 
+## Official Haas sheet setup
+
+The official sheet's `Legacy Students` tab contains real data. Its headers
+are supported, including `Fellowship Interest Area`. The `Students` tab uses
+the same supported headers. A `Period` column can appear in any position;
+tabs without one use their Default Period from `Sources`.
+
+For an initial Summer 2026 import, set `Sources!A1:B3` to:
+
+| Tab             | Default Period |
+| --------------- | -------------- |
+| Legacy Students | Summer 2026    |
+| Students        | Summer 2026    |
+
+The current legacy setup assigns those rows to Summer 2026. If a record turns
+out to belong to another period, set that row's Period and add the period to
+`Periods`. Default Period applies when a row has no Period column or its Period
+cell is blank. A filled row-level Period always wins. Do not infer fellowship
+period from Class Year, which is graduation year.
+
+Keep `Summer 2026` in `Periods`. Remove the unused Summer 2025 and Summer 2024
+example rows until you have data for them. Remove example rows in `Groups`
+unless those groups are intentional; keep the headers. Setting Show = No
+hides a navigation tab but still publishes its data.
+
+Before collecting another year's students, add a `Period` column to `Students`
+(any position is fine), fill it for every existing row, and clear that tab's
+Default Period in `Sources`. Require Period on new rows/the Google Form.
+This prevents changing a default from moving older students into a new year.
+Add the form's exact response-tab name to `Sources` if it writes into a
+separate tab; place it after the legacy tab so newer submissions win when
+email and period match. No student headers need renaming.
+
+Follow [Update the sheet ID](#update-the-sheet-id) below to connect the
+deployment to this sheet. Review each manual run's summary for duplicates,
+placement issues and logo-download failures.
+
+Review the build summary before publishing. The importer resolves duplicate
+email/period rows, keeps same-name students distinct, swaps reversed
+coordinate pairs, and tries geocoding missing or invalid coordinates.
+Correct unresolved placements in the sheet. Logo links must be shared for
+downloads to succeed; otherwise the importer tries the organization's
+website icon.
+
+## Update the sheet ID
+
+1. Open the Google Sheet and copy the ID between `/d/` and `/edit` in its URL.
+   For the current official Haas sheet, the ID is
+   `1ngwejcpBQKfF4c0U4obhw-dCN0J6GmJFw9oSd4Q7dQQ`.
+2. In the GitHub repository that deploys the site, open **Settings → Secrets
+   and variables → Actions → Repository secrets**. Edit `SHEET_ID`, or choose
+   **New repository secret** if it does not exist. Paste only the ID, not the
+   full URL, then save. If these controls are unavailable, ask the repository
+   owner to update the secret. GitHub does not display an existing secret's value.
+3. Share the sheet as **Anyone with the link: Viewer**. Check that every tab
+   named in `Sources` exists and every used Period is listed in `Periods`.
+4. Push the app changes, then open **Actions → Build and deploy to GitHub
+   Pages → Run workflow**, select `master`, and start a new run. Saving a
+   secret or editing the sheet does not deploy automatically. Review the run
+   summary and check the live map after it succeeds.
+
+Set `SHEET_ID` in the repository that runs the deployment. Changing the
+secret requires no app code edit. Use these same steps whenever the sheet
+is copied or replaced with a different spreadsheet ID.
+
 ## Student columns
 
 | header                   | required | notes                                                         |
 | ------------------------ | :------: | ------------------------------------------------------------- |
-| Period                   | yes      | must match a `Periods` row, e.g. `Summer 2026`                |
+| Period                   | conditional | required unless `Sources` provides a Default Period; filled values must match `Periods` |
 | Name                     | yes      |                                                               |
 | Stanford Email           |          | dedup key with Period, last row wins; never published         |
 | Class Year               |          |                                                               |
@@ -109,7 +189,12 @@ the same fields as the `Periods` tab (`period`, `displayName`, `order`,
 `show`); groups go in `data/groups.json` (`group`, `periods`, `displayName`,
 `order`, `show`).
 
-## Caches and snapshot (committed by the nightly build)
+## Caches and snapshot (committed by each manual build)
+
+Sheet edits and repository pushes do not update the live map automatically.
+Publish from the repo's **Actions** tab → **Build and deploy to GitHub Pages**
+→ **Run workflow** → select `master` → **Run workflow**. Review the run summary
+for data issues, fix them in the sheet, and start a new run to publish again.
 
 - `data/geocache.json`: City, Country → coordinates (Nominatim), plus
   `country:` entries (centre and code) and `org:` entries (address found on a
@@ -142,5 +227,7 @@ column headers above, so keep them as written.
 | Logo                     | file upload, optional, images only              |
 
 Each cycle: add the new class year, change the Period option, add a `Periods`
-row (with Show = No until the first students are in, if you prefer). Program leaders entering students in bulk paste rows into any tab listed
-in `Sources`, with the same headers.
+row (with Show = No until the first students are in, if you prefer). Staff
+entering students in bulk paste rows into `Students` or any tab listed in
+`Sources`, with the same headers. Manually run the deployment workflow when
+the changes are ready to publish.
