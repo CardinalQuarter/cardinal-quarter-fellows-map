@@ -177,5 +177,113 @@
     "lat": 59.4372,
     "lng": 24.7573,
     "label": "Tallinn, Harju maakond"
+  },
+  "country:United States": {
+    "lat": 39.7837,
+    "lng": -100.4459,
+    "label": "United States",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 1
+  },
+  "country:Ghana": {
+    "lat": 8.03,
+    "lng": -1.08,
+    "label": "Ghana",
+    "code": "gh",
+    "kind": "boundary/administrative",
+    "importance": 0.767
+  },
+  "country:Norway": {
+    "lat": 61.1529,
+    "lng": 8.7877,
+    "label": "Norway",
+    "code": "no",
+    "kind": "boundary/administrative",
+    "importance": 0.878
+  },
+  "country:Poland": {
+    "lat": 52.2159,
+    "lng": 19.1344,
+    "label": "Poland",
+    "code": "pl",
+    "kind": "boundary/administrative",
+    "importance": 0.916
+  },
+  "org:givingconnection.org": {
+    "error": "no address on website",
+    "at": "2026-10-02T03:25:04.068Z"
+  },
+  "country:Belize": {
+    "lat": 17.1205,
+    "lng": -88.6859,
+    "label": "Belize",
+    "code": "bz",
+    "kind": "boundary/administrative",
+    "importance": 0.704
+  },
+  "Belize City, Belize": {
+    "lat": 17.5003,
+    "lng": -88.1989,
+    "label": "Belize City, Belize District",
+    "code": "bz",
+    "kind": "boundary/administrative",
+    "importance": 0.518
+  },
+  "country:Kazakhstan": {
+    "lat": 48.1013,
+    "lng": 66.7781,
+    "label": "Kazakhstan",
+    "code": "kz",
+    "kind": "boundary/administrative",
+    "importance": 0.82
+  },
+  "country:Lithuania": {
+    "lat": 55.35,
+    "lng": 23.75,
+    "label": "Lithuania",
+    "code": "lt",
+    "kind": "boundary/administrative",
+    "importance": 0.814
+  },
+  "country:South Africa": {
+    "lat": -28.8166,
+    "lng": 24.9916,
+    "label": "South Africa",
+    "code": "za",
+    "kind": "boundary/administrative",
+    "importance": 0.842
+  },
+  "country:Belgium": {
+    "lat": 50.6403,
+    "lng": 4.6667,
+    "label": "Belgium",
+    "code": "be",
+    "kind": "boundary/administrative",
+    "importance": 0.884
+  },
+  "country:France": {
+    "lat": 46.6034,
+    "lng": 1.8883,
+    "label": "France",
+    "code": "fr",
+    "kind": "boundary/administrative",
+    "importance": 0.978
+  },
+  "country:South Korea": {
+    "lat": 36.6384,
+    "lng": 127.6961,
+    "label": "South Korea",
+    "code": "kr",
+    "kind": "boundary/administrative",
+    "importance": 0.868
+  },
+  "country:Estonia": {
+    "lat": 58.7524,
+    "lng": 25.3319,
+    "label": "Estonia",
+    "code": "ee",
+    "kind": "boundary/administrative",
+    "importance": 0.815
   }
 }
