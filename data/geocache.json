@@ -285,5 +285,93 @@
     "code": "ee",
     "kind": "boundary/administrative",
     "importance": 0.815
+  },
+  "country:Herzegovina": {
+    "lat": 44.3053,
+    "lng": 17.5961,
+    "label": "Bosnia and Herzegovina",
+    "code": "ba",
+    "kind": "boundary/administrative",
+    "importance": 0.795
+  },
+  "Sarajevo, Herzegovina": {
+    "lat": 43.8571,
+    "lng": 18.4126,
+    "label": "Sarajevo, Mjesna zajednica Trg oslobođenja-Centar",
+    "code": "ba",
+    "kind": "boundary/administrative",
+    "importance": 0.708
+  },
+  "country:Peru": {
+    "lat": -6.87,
+    "lng": -75.0459,
+    "label": "Peru",
+    "code": "pe",
+    "kind": "boundary/administrative",
+    "importance": 0.819
+  },
+  "Lobitos, Peru": {
+    "lat": -4.4064,
+    "lng": -81.204,
+    "label": "Lobitos, Province of Talara",
+    "code": "pe",
+    "kind": "boundary/administrative",
+    "importance": 0.308
+  },
+  "Moore, OK, United States": {
+    "lat": 35.3383,
+    "lng": -97.4867,
+    "label": "Moore, Cleveland County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.502
+  },
+  "Menlo Park, CA, United States": {
+    "lat": 37.452,
+    "lng": -122.178,
+    "label": "Menlo Park, San Mateo County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.546
+  },
+  "New York, NY, United States": {
+    "lat": 40.7127,
+    "lng": -74.006,
+    "label": "New York, United States",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.882
+  },
+  "Cambridge, MA, United States": {
+    "lat": 42.3656,
+    "lng": -71.104,
+    "label": "Cambridge, Middlesex County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.672
+  },
+  "country:Switzerland": {
+    "lat": 46.7986,
+    "lng": 8.232,
+    "label": "Switzerland",
+    "code": "ch",
+    "kind": "boundary/administrative",
+    "importance": 0.893
+  },
+  "Geneva, Switzerland": {
+    "lat": 46.2018,
+    "lng": 6.1466,
+    "label": "Geneva, Switzerland",
+    "code": "ch",
+    "kind": "boundary/administrative",
+    "importance": 0.752
+  },
+  "Inian Islands, United States": {
+    "lat": 58.2516,
+    "lng": -136.324,
+    "label": "Inian Islands, Unorganized Borough",
+    "code": "us",
+    "kind": "place/archipelago",
+    "importance": 0
   }
 }
