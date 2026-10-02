@@ -1,41 +1,55 @@
 {
   "periods": [
     {
-      "slug": "summer-25",
-      "displayName": "Summer '25",
-      "count": 25
+      "slug": "summer-2026",
+      "displayName": "Summer 2026",
+      "count": 0
     },
     {
-      "slug": "summer-26",
-      "displayName": "Summer '26",
-      "count": 25
+      "slug": "summer-2025",
+      "displayName": "Summer 2025",
+      "count": 0
+    },
+    {
+      "slug": "summer-2024",
+      "displayName": "Summer 2024",
+      "count": 0
     }
   ],
   "views": [
     {
-      "slug": "summer-25",
-      "displayName": "Summer '25",
+      "slug": "summer-2026",
+      "displayName": "Summer 2026",
       "periods": [
-        "summer-25"
+        "summer-2026"
       ],
       "show": true
     },
     {
-      "slug": "summer-26",
-      "displayName": "Summer '26",
+      "slug": "summer-2025",
+      "displayName": "Summer 2025",
       "periods": [
-        "summer-26"
+        "summer-2025"
       ],
       "show": true
     },
     {
-      "slug": "all",
-      "displayName": "All periods",
+      "slug": "summer-2024",
+      "displayName": "Summer 2024",
       "periods": [
-        "summer-25",
-        "summer-26"
+        "summer-2024"
       ],
       "show": true
+    },
+    {
+      "slug": "last-5-years",
+      "displayName": "Last 5 years",
+      "periods": [
+        "summer-2026",
+        "summer-2025",
+        "summer-2024"
+      ],
+      "show": false
     }
   ]
 }
