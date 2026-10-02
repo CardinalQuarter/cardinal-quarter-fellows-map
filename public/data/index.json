@@ -1,16 +1,6 @@
 {
   "periods": [
     {
-      "slug": "summer-23",
-      "displayName": "Summer '23",
-      "count": 0
-    },
-    {
-      "slug": "summer-24",
-      "displayName": "Summer '24",
-      "count": 0
-    },
-    {
       "slug": "summer-25",
       "displayName": "Summer '25",
       "count": 25
@@ -22,22 +12,6 @@
     }
   ],
   "views": [
-    {
-      "slug": "summer-23",
-      "displayName": "Summer '23",
-      "periods": [
-        "summer-23"
-      ],
-      "show": true
-    },
-    {
-      "slug": "summer-24",
-      "displayName": "Summer '24",
-      "periods": [
-        "summer-24"
-      ],
-      "show": true
-    },
     {
       "slug": "summer-25",
       "displayName": "Summer '25",
@@ -58,8 +32,6 @@
       "slug": "all",
       "displayName": "All periods",
       "periods": [
-        "summer-23",
-        "summer-24",
         "summer-25",
         "summer-26"
       ],
