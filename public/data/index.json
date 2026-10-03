@@ -4,16 +4,6 @@
       "slug": "summer-2026",
       "displayName": "Summer 2026",
       "count": 622
-    },
-    {
-      "slug": "summer-2025",
-      "displayName": "Summer 2025",
-      "count": 0
-    },
-    {
-      "slug": "summer-2024",
-      "displayName": "Summer 2024",
-      "count": 0
     }
   ],
   "views": [
@@ -26,28 +16,10 @@
       "show": true
     },
     {
-      "slug": "summer-2025",
-      "displayName": "Summer 2025",
-      "periods": [
-        "summer-2025"
-      ],
-      "show": true
-    },
-    {
-      "slug": "summer-2024",
-      "displayName": "Summer 2024",
-      "periods": [
-        "summer-2024"
-      ],
-      "show": true
-    },
-    {
       "slug": "last-5-years",
       "displayName": "Last 5 years",
       "periods": [
-        "summer-2026",
-        "summer-2025",
-        "summer-2024"
+        "summer-2026"
       ],
       "show": false
     }
