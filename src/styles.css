@@ -29,7 +29,7 @@ body { margin: 0; font-family: var(--font-sans); color: #2e2d29; background: #ff
 .maplibregl-popup-close-button:hover { background: none; color: #2e2d29; }
 .maplibregl-ctrl-group { border-radius: 4px; box-shadow: 0 1px 4px rgba(46,45,41,.25); }
 .maplibregl-ctrl-attrib { font-family: var(--font-sans); font-size: 11px; }
-.cluster { cursor: pointer; filter: drop-shadow(0 1px 2px rgba(46,45,41,.35)); font-family: var(--font-sans); }
+.cluster { cursor: pointer; min-width: 44px; min-height: 44px; display: grid; place-items: center; filter: drop-shadow(0 1px 2px rgba(46,45,41,.35)); font-family: var(--font-sans); }
 .cluster svg text { pointer-events: none; }
 
 /* Native selects put the arrow flush against the edge; draw our own with room to breathe. */

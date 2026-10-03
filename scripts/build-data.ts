@@ -35,6 +35,7 @@ import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import Papa from "papaparse";
+import { sheetReviewSection } from "./build-report.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const OUT_DIR = path.join(ROOT, "public", "data");
@@ -161,6 +162,7 @@ type Row = Record<Field, string> & { where: string };
  */
 type Placement = Row & {
   person: string;
+  placeIndex: number;
   /** Place name to geocode (blank for remote rows with no place given). */
   city: string;
   remote: boolean;
@@ -180,6 +182,8 @@ type LogoEntry = { file: string; source: string; at: string } | { error: string;
 
 /** Everything worth telling a human about, printed and written to the job summary. */
 const report = {
+  cacheHits: 0,
+  cacheMisses: 0,
   periods: [] as { period: string; displayName: string; count: number; show: boolean }[],
   groups: [] as { displayName: string; periods: string[]; count: number; show: boolean }[],
   groupNotes: [] as string[],
@@ -191,6 +195,7 @@ const report = {
   badCoords: [] as string[],
   multi: [] as string[],
   geocoded: [] as string[],
+  suggestedCoords: [] as string[],
   remotePlaced: [] as string[],
   countryFallback: [] as string[],
   geocodeFailed: [] as string[],
@@ -274,7 +279,11 @@ async function cached<T extends { error?: string; at?: string } | object>(
   compute: () => Promise<T>,
 ): Promise<T> {
   const hit = cache[key];
-  if (hit && !("error" in hit && isStale((hit as { at: string }).at))) return hit;
+  if (hit && !("error" in hit && isStale((hit as { at: string }).at))) {
+    report.cacheHits++;
+    return hit;
+  }
+  report.cacheMisses++;
   const entry = await compute();
   cache[key] = entry;
   return entry;
@@ -580,6 +589,14 @@ function splitPlaces(cell: string): string[] {
     .filter((s) => s && !BLANK_VALUES.test(s));
 }
 
+/** These country names contain a conjunction, not multiple placements. */
+export function splitCountries(value: string): string[] {
+  const compounds = ["Bosnia and Herzegovina", "Trinidad and Tobago", "Antigua and Barbuda", "Saint Kitts and Nevis", "Saint Vincent and the Grenadines", "Sao Tome and Principe", "São Tomé and Príncipe", "Turks and Caicos Islands"];
+  let protectedValue = value;
+  compounds.forEach((name, i) => { protectedValue = protectedValue.replace(new RegExp(name, "gi"), `COUNTRYTOKEN${i}END`); });
+  return splitPlaces(protectedValue).map((part) => normalizeCountry(part.replace(/COUNTRYTOKEN(\d+)END/g, (_, i) => compounds[Number(i)])));
+}
+
 /** "Remote (based in Nashville)" → { remote: true, city: "Nashville" }; "Remote" → { remote: true, city: "" }. */
 function parsePlace(raw: string): { remote: boolean; city: string } {
   let s = raw.trim();
@@ -608,7 +625,7 @@ function placements(rows: Row[]): Placement[] {
   rows.forEach((r, i) => {
     const person = `${slugify(r.period)}|${i}`;
     const cities = splitPlaces(r.fellowship_loc);
-    const countries = splitPlaces(r.country).map(normalizeCountry);
+    const countries = splitCountries(r.country);
     const n = Math.max(cities.length, countries.length, 1);
     const pairs: { city: string; country: string }[] = [];
     for (let k = 0; k < n; k++) {
@@ -624,6 +641,7 @@ function placements(rows: Row[]): Placement[] {
       out.push({
         ...r,
         person,
+        placeIndex: k,
         city: parsed.city,
         remote: parsed.remote,
         fellowship_loc: p.city,
@@ -869,6 +887,7 @@ async function geocode(cache: GeoCache, rows: Placement[]): Promise<void> {
       if ("lat" in hit) {
         pin(hit);
         report.geocoded.push(`${place} → ${hit.lat}, ${hit.lng}${hit.label ? ` (${hit.label})` : ""}`);
+        if (r.placeIndex === 0) report.suggestedCoords.push(`${r.where}: ${place}; Latitude ${hit.lat}, Longitude ${hit.lng}`);
         continue;
       }
     }
@@ -1143,6 +1162,7 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
 
 function summary(): string {
   const lines: string[] = ["## Cardinal Quarter Map data build", ""];
+  lines.push(`Lookup cache: ${report.cacheHits} hit(s); ${report.cacheMisses} new or retried entry/entries.`, "");
   lines.push("| Period | Fellows | Shown |", "| --- | ---: | --- |");
   for (const p of report.periods) lines.push(`| ${p.displayName} | ${p.count} | ${p.show ? "yes" : "hidden"} |`);
   if (report.groups.length) {
@@ -1174,6 +1194,15 @@ function summary(): string {
   section("Logos fetched", report.logosFetched);
   section("Logo links that could not be downloaded (website icon used instead)", report.logoLinkFailed);
   section("Logos not found (fellow shown without one)", report.logoFailed);
+  lines.push("", sheetReviewSection({
+    unknownPeriods: [...report.orphans].map(([p,n]) => `"${p}": ${n} row(s)`),
+    groups: report.groupNotes, columns: report.columns, skipped: report.skipped,
+    duplicates: report.duplicates, swapped: report.swapped,
+    invalidCoords: report.badCoords, suggestedCoords: report.suggestedCoords,
+    remote: report.remotePlaced, countryFallback: report.countryFallback,
+    failedGeocodes: report.geocodeFailed, failedLogoLinks: report.logoLinkFailed,
+    failedLogos: report.logoFailed,
+  }));
   return lines.join("\n") + "\n";
 }
 

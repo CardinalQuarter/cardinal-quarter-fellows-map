@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseSources, rowsFromSource } from "./build-data.ts";
+import { parseSources, rowsFromSource, splitCountries } from "./build-data.ts";
 import { countPeople, type Fellow } from "../src/types.ts";
+import { CLUSTER_PALETTE, PALETTE, UNSPECIFIED_COLOR, clusterColorIndex } from "../src/colors.ts";
+import { sheetReviewSection, type SheetReview } from "./build-report.ts";
 
 const legacyHeaders = ["Affiliation", "Fellowship/Opportunity", "Name", "Stanford Email", "Class Year", "Major", "School", "Name of Partner Organization", "Location of Fellowship (City/Town)", "Location of Fellowship (Country)", "Latitude", "Longitude", "Partner Organization Website", "Organization's Logo", "Fellowship Interest Area"];
 const student = ["Haas Center", "Fellowship", "Test Student", "STUDENT@example.edu", "2027", "Biology", "Humanities & Sciences", "Partner", "Boston", "United States", "42.36", "-71.06", "https://example.org", "", "Health"];
@@ -45,4 +47,28 @@ test("same-name students count separately while multiple pins count once", () =>
   const fellow = {name:"Shared Name",period:"Summer 2026"} as Fellow;
   assert.equal(countPeople([{...fellow,id:"summer-2026|1"},{...fellow,id:"summer-2026|2"},{...fellow,id:"summer-2026|1"}]),2);
   assert.equal(countPeople([fellow,{...fellow,period:"Summer 2025"}]),2);
+});
+
+test("compound country names stay intact in single and multi-country placements", () => {
+  assert.deepEqual(splitCountries("Bosnia and Herzegovina"), ["Bosnia and Herzegovina"]);
+  assert.deepEqual(splitCountries("United States and Bosnia and Herzegovina"), ["United States", "Bosnia and Herzegovina"]);
+  assert.deepEqual(splitCountries("United States/Belize"), ["United States", "Belize"]);
+  assert.deepEqual(splitCountries("Trinidad and Tobago"), ["Trinidad and Tobago"]);
+});
+
+test("cluster rings preserve gray for unspecified values", () => {
+  assert.equal(CLUSTER_PALETTE[clusterColorIndex(UNSPECIFIED_COLOR)], UNSPECIFIED_COLOR);
+  for (const color of PALETTE) assert.equal(CLUSTER_PALETTE[clusterColorIndex(color)], color);
+});
+
+test("sheet checklist includes automatic corrections and optional coordinates", () => {
+  const review: SheetReview = {unknownPeriods:[],groups:[],columns:[],skipped:[],duplicates:[],swapped:[],invalidCoords:[],suggestedCoords:[],remote:[],countryFallback:[],failedGeocodes:[],failedLogoLinks:[],failedLogos:[]};
+  assert.match(sheetReviewSection(review), /No sheet corrections/);
+  review.swapped = ['Students line 2 (Test): reversed', 'Students line 2 (Test): reversed'];
+  review.suggestedCoords = ['Students line 3 (Other): Latitude 42, Longitude -71'];
+  const output = sheetReviewSection(review);
+  assert.match(output, /build already swapped/);
+  assert.match(output, /Latitude 42, Longitude -71/);
+  assert.equal(output.match(/- \[ \] Students line 2/g)?.length, 1);
+  assert.doesNotMatch(output, /No sheet corrections/);
 });

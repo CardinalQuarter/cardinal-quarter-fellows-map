@@ -3,7 +3,7 @@ import { createRoot, type Root } from "react-dom/client";
 import maplibregl, { type Map as MlMap, type MapMouseEvent, type StyleSpecification } from "maplibre-gl";
 import type { FeatureCollection } from "geojson";
 import { sameSpot, type Fellow } from "../types";
-import { PALETTE } from "../colors";
+import { CLUSTER_PALETTE, clusterColorIndex } from "../colors";
 
 export type Pin = { fellow: Fellow; color: string };
 /** The open pin. `fly` moves the map there (list click, shared link); a map click leaves the view alone. */
@@ -172,20 +172,20 @@ function toGeoJson(pins: Pin[]): FeatureCollection {
       type: "Feature",
       id: i,
       geometry: { type: "Point", coordinates: [p.fellow.longitude, p.fellow.latitude] },
-      properties: { color: p.color, i, ci: Math.max(0, PALETTE.indexOf(p.color)) },
+      properties: { color: p.color, i, ci: clusterColorIndex(p.color) },
     })),
   };
 }
 
 /** Per-palette-slot counts, so a cluster knows its category mix without fetching leaves. */
 const CLUSTER_PROPS = Object.fromEntries(
-  PALETTE.map((_, ci) => [`c${ci}`, ["+", ["case", ["==", ["get", "ci"], ci], 1, 0]]]),
+  CLUSTER_PALETTE.map((_, ci) => [`c${ci}`, ["+", ["case", ["==", ["get", "ci"], ci], 1, 0]]]),
 );
 
 /** A donut ring showing the cluster's category mix, with the count in the middle. */
 function donut(props: Record<string, unknown>): HTMLElement {
   const total = props.point_count as number;
-  const counts = PALETTE.map((_, ci) => (props[`c${ci}`] as number) ?? 0);
+  const counts = CLUSTER_PALETTE.map((_, ci) => (props[`c${ci}`] as number) ?? 0);
   const size = total >= 50 ? 44 : total >= 10 ? 38 : 32;
   const r = size / 2;
   const r0 = r - 5;
@@ -197,13 +197,13 @@ function donut(props: Record<string, unknown>): HTMLElement {
     const a1 = ((offset + n) / total) * 2 * Math.PI;
     offset += n;
     if (n === total) {
-      arcs.push(`<circle cx="${r}" cy="${r}" r="${r - 2.5}" fill="none" stroke="${PALETTE[ci]}" stroke-width="5"/>`);
+      arcs.push(`<circle cx="${r}" cy="${r}" r="${r - 2.5}" fill="none" stroke="${CLUSTER_PALETTE[ci]}" stroke-width="5"/>`);
       return;
     }
     const x0 = r + (r - 2.5) * Math.sin(a0), y0 = r - (r - 2.5) * Math.cos(a0);
     const x1 = r + (r - 2.5) * Math.sin(a1), y1 = r - (r - 2.5) * Math.cos(a1);
     const large = a1 - a0 > Math.PI ? 1 : 0;
-    arcs.push(`<path d="M ${x0} ${y0} A ${r - 2.5} ${r - 2.5} 0 ${large} 1 ${x1} ${y1}" fill="none" stroke="${PALETTE[ci]}" stroke-width="5"/>`);
+    arcs.push(`<path d="M ${x0} ${y0} A ${r - 2.5} ${r - 2.5} 0 ${large} 1 ${x1} ${y1}" fill="none" stroke="${CLUSTER_PALETTE[ci]}" stroke-width="5"/>`);
   });
   const el = document.createElement("div");
   el.className = "cluster";
@@ -383,6 +383,9 @@ export function MapView({ pins, selection, onSelect }: Props) {
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     map.addControl(new ExportControl(() => markers.current.values()), "top-right");
     mapRef.current = map;
+    // The sidebar and phone layout can resize the container without a window resize.
+    const resizeObserver = new ResizeObserver(() => map.resize());
+    resizeObserver.observe(container.current);
 
     // Cluster markers are HTML (donut SVG); refresh them whenever the view or data changes.
     const updateClusters = () => {
@@ -409,7 +412,9 @@ export function MapView({ pins, selection, onSelect }: Props) {
             const first = pinsRef.current[(leaves[0].properties as { i: number }).i];
             if (first) onSelectRef.current({ fellow: first.fellow, fly: false });
           } else {
-            map.fitBounds(bounds, { padding: 80, maxZoom: MAX_ZOOM, duration: 600 });
+            const {clientWidth, clientHeight} = map.getContainer();
+            const padding = Math.round(Math.min(80, clientWidth * 0.15, clientHeight * 0.15));
+            map.fitBounds(bounds, { padding, maxZoom: MAX_ZOOM, duration: 600 });
           }
         });
         const marker = new maplibregl.Marker({ element: el }).setLngLat(coords).addTo(map);
@@ -475,6 +480,7 @@ export function MapView({ pins, selection, onSelect }: Props) {
     });
 
     return () => {
+      resizeObserver.disconnect();
       popupRoot.current?.unmount();
       for (const m of markers.current.values()) m.remove();
       markers.current.clear();

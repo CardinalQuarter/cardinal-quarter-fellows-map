@@ -191,10 +191,23 @@ the same fields as the `Periods` tab (`period`, `displayName`, `order`,
 
 ## Caches and snapshot (committed by each manual build)
 
+Successful coordinate lookups and downloaded logos are reused on later builds;
+failed lookups are also cached, with retries after 30 days. Builds still read
+the complete sheet and regenerate the JSON, but network lookups are needed
+only for new/changed locations and logo URLs/domains, or expired failures.
+When moving the site to another repository, include these cache files and
+`public/logos/` so the next build does not repeat the initial downloads.
+
 Sheet edits and repository pushes do not update the live map automatically.
 Publish from the repo's **Actions** tab → **Build and deploy to GitHub Pages**
 → **Run workflow** → select `master` → **Run workflow**. Review the run summary
 for data issues, fix them in the sheet, and start a new run to publish again.
+
+The report ends with **Things to address in the sheet**, a checklist of source
+rows and suggested fixes. It includes duplicate records, group/header issues,
+reversed or incomplete coordinates, optional coordinates supplied by geocoding,
+approximate placements, and failed logo links even when a fallback worked.
+These input issues remain in the report until corrected in the sheet.
 
 - `data/geocache.json`: City, Country → coordinates (Nominatim), plus
   `country:` entries (centre and code) and `org:` entries (address found on a

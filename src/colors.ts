@@ -1,4 +1,4 @@
-import { UNSPECIFIED } from "./types";
+import { UNSPECIFIED } from "./types.ts";
 
 /**
  * Category colors. Values are sorted and assigned in order from a palette of
@@ -29,7 +29,13 @@ export const PALETTE = [
   "#d35400", // burnt orange
 ];
 
-const UNSPECIFIED_COLOR = "#9a9a9a";
+export const UNSPECIFIED_COLOR = "#9a9a9a";
+export const CLUSTER_PALETTE = [...PALETTE, UNSPECIFIED_COLOR];
+
+export const clusterColorIndex = (color: string) => {
+  const index = CLUSTER_PALETTE.indexOf(color);
+  return index < 0 ? CLUSTER_PALETTE.length - 1 : index;
+};
 
 export function colorMap(values: string[]): Map<string, string> {
   const sorted = [...new Set(values)].filter((v) => v !== UNSPECIFIED).sort((a, b) => a.localeCompare(b));
