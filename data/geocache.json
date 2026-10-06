@@ -373,5 +373,513 @@
     "code": "us",
     "kind": "place/archipelago",
     "importance": 0
+  },
+  "country:Spain": {
+    "lat": 39.3261,
+    "lng": -4.838,
+    "label": "Spain",
+    "code": "es",
+    "kind": "boundary/administrative",
+    "importance": 0.93
+  },
+  "Porqueres, Spain": {
+    "lat": 42.1227,
+    "lng": 2.7255,
+    "label": "Porqueres, Pla de l'Estany",
+    "code": "es",
+    "kind": "boundary/administrative",
+    "importance": 0.506
+  },
+  "Riverside, CA, United States": {
+    "lat": 33.9825,
+    "lng": -117.3742,
+    "label": "Riverside, Riverside County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.617
+  },
+  "country:Uruguay": {
+    "lat": -32.8756,
+    "lng": -56.0202,
+    "label": "Uruguay",
+    "code": "uy",
+    "kind": "boundary/administrative",
+    "importance": 0.793
+  },
+  "Washington, D.C., Uruguay": {
+    "error": "no match",
+    "at": "2026-10-06T23:42:58.121Z"
+  },
+  "Washington,, D.C., Uruguay": {
+    "error": "no match",
+    "at": "2026-10-06T23:42:59.446Z"
+  },
+  "Washington, Uruguay": {
+    "error": "only matched Washington, Ciudad Vieja (highway/pedestrian)",
+    "at": "2026-10-06T23:43:01.601Z"
+  },
+  "Rapid City, SD, United States": {
+    "lat": 44.0806,
+    "lng": -103.228,
+    "label": "Rapid City, Pennington County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.554
+  },
+  "country:Tanzania": {
+    "lat": -6.5247,
+    "lng": 35.7878,
+    "label": "Tanzania",
+    "code": "tz",
+    "kind": "boundary/administrative",
+    "importance": 0.764
+  },
+  "Dar Es Salaam, Tanzania": {
+    "lat": -6.8161,
+    "lng": 39.2804,
+    "label": "Dar es Salaam, Coastal Zone",
+    "code": "tz",
+    "kind": "boundary/administrative",
+    "importance": 0.609
+  },
+  "country:United Kingdom": {
+    "lat": 54.7024,
+    "lng": -3.2766,
+    "label": "United Kingdom",
+    "code": "gb",
+    "kind": "boundary/administrative",
+    "importance": 0.939
+  },
+  "London, United Kingdom": {
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "label": "Greater London, England",
+    "code": "gb",
+    "kind": "boundary/administrative",
+    "importance": 0.892
+  },
+  "Santa Clara, CA, United States": {
+    "lat": 37.2333,
+    "lng": -121.6846,
+    "label": "Santa Clara County, California",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.609
+  },
+  "San Mateo, CA, United States": {
+    "lat": 37.4969,
+    "lng": -122.3331,
+    "label": "San Mateo County, California",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.6
+  },
+  "Oxnard, California, United States": {
+    "lat": 34.1976,
+    "lng": -119.1804,
+    "label": "Oxnard, Ventura County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.566
+  },
+  "country:Herzevognia": {
+    "error": "no match",
+    "at": "2026-10-06T23:43:11.561Z"
+  },
+  "Sarajevo, Herzevognia": {
+    "error": "no match",
+    "at": "2026-10-06T23:43:12.596Z"
+  },
+  "Auburn, Alabama, United States": {
+    "lat": 32.6099,
+    "lng": -85.4808,
+    "label": "Auburn, Lee County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.565
+  },
+  "country:Herzegovena": {
+    "lat": 44.3053,
+    "lng": 17.5961,
+    "label": "Bosnia and Herzegovina",
+    "code": "ba",
+    "kind": "boundary/administrative",
+    "importance": 0.795
+  },
+  "Sarajevo, Herzegovena": {
+    "error": "no match",
+    "at": "2026-10-06T23:43:15.587Z"
+  },
+  "country:India": {
+    "lat": 22.3511,
+    "lng": 78.6677,
+    "label": "India",
+    "code": "in",
+    "kind": "boundary/administrative",
+    "importance": 0.891
+  },
+  "Mumbai, India": {
+    "lat": 19.055,
+    "lng": 72.8692,
+    "label": "Mumbai, Mumbai Suburban District",
+    "code": "in",
+    "kind": "place/city",
+    "importance": 0.715
+  },
+  "Seattle, WA, United States": {
+    "lat": 47.6038,
+    "lng": -122.3301,
+    "label": "Seattle, King County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.734
+  },
+  "Ashton, ID, United States": {
+    "lat": 44.0716,
+    "lng": -111.4483,
+    "label": "Ashton, Fremont County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.39
+  },
+  "country:China": {
+    "lat": 34.5412,
+    "lng": 108.9237,
+    "label": "China",
+    "code": "cn",
+    "kind": "boundary/administrative",
+    "importance": 0.904
+  },
+  "Shanghai, China": {
+    "lat": 31.2313,
+    "lng": 121.47,
+    "label": "Shanghai, China",
+    "code": "cn",
+    "kind": "boundary/administrative",
+    "importance": 0.753
+  },
+  "Santa Monica, CA, United States": {
+    "lat": 34.0195,
+    "lng": -118.4912,
+    "label": "Santa Monica, Los Angeles County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.661
+  },
+  "Yosemite, CA, United States": {
+    "lat": 37.8393,
+    "lng": -119.5165,
+    "label": "Yosemite National Park, California",
+    "code": "us",
+    "kind": "leisure/nature_reserve",
+    "importance": 0.586
+  },
+  "country:Mexico": {
+    "lat": 23.6585,
+    "lng": -102.0077,
+    "label": "Mexico",
+    "code": "mx",
+    "kind": "boundary/administrative",
+    "importance": 0.894
+  },
+  "Guadalajara, Mexico": {
+    "lat": 20.672,
+    "lng": -103.3384,
+    "label": "Guadalajara, Región Centro",
+    "code": "mx",
+    "kind": "place/city",
+    "importance": 0.671
+  },
+  "Palo Alto, CA, United States": {
+    "lat": 37.4443,
+    "lng": -122.1598,
+    "label": "Palo Alto, Santa Clara County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.617
+  },
+  "Shiprock, NM, United States": {
+    "lat": 36.7859,
+    "lng": -108.6845,
+    "label": "Shiprock, San Juan County",
+    "code": "us",
+    "kind": "place/locality",
+    "importance": 0.411
+  },
+  "Roswell, GA, United States": {
+    "lat": 34.0233,
+    "lng": -84.36,
+    "label": "Roswell, Fulton County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.535
+  },
+  "Bakersfield, CA, United States": {
+    "lat": 35.3739,
+    "lng": -119.0195,
+    "label": "Bakersfield, Kern County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.626
+  },
+  "New Orleans, LA, United States": {
+    "lat": 29.9575,
+    "lng": -90.0629,
+    "label": "New Orleans, Orleans Parish",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.724
+  },
+  "Holland, MI, United States": {
+    "lat": 42.7876,
+    "lng": -86.1091,
+    "label": "Holland, Ottawa County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.525
+  },
+  "Houston, TX, United States": {
+    "lat": 29.7589,
+    "lng": -95.3677,
+    "label": "Houston, Harris County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.737
+  },
+  "Middletown, CT, United States": {
+    "lat": 41.5623,
+    "lng": -72.6509,
+    "label": "Middletown, Lower Connecticut River Valley Planning Region",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.546
+  },
+  "Baltimore, MD, United States": {
+    "lat": 39.2909,
+    "lng": -76.6108,
+    "label": "Baltimore, Maryland",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.716
+  },
+  "Waco, TX, United States": {
+    "lat": 31.5545,
+    "lng": -97.1326,
+    "label": "Waco, McLennan County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.618
+  },
+  "Diamond Bar, CA, United States": {
+    "lat": 34.0286,
+    "lng": -117.8103,
+    "label": "Diamond Bar, Los Angeles County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.521
+  },
+  "Anaheim, CA, United States": {
+    "lat": 33.8348,
+    "lng": -117.9117,
+    "label": "Anaheim, Orange County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.644
+  },
+  "Dulce, NM, United States": {
+    "lat": 36.9257,
+    "lng": -107.0042,
+    "label": "Dulce, Rio Arriba County",
+    "code": "us",
+    "kind": "boundary/census",
+    "importance": 0.378
+  },
+  "Glendale, AZ, United States": {
+    "lat": 33.5387,
+    "lng": -112.186,
+    "label": "Glendale, Maricopa County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.586
+  },
+  "country:Swaziland": {
+    "lat": -26.5625,
+    "lng": 31.3991,
+    "label": "Eswatini",
+    "code": "sz",
+    "kind": "boundary/administrative",
+    "importance": 0.684
+  },
+  "Malkerns, Hhohho, Swaziland": {
+    "error": "no match",
+    "at": "2026-10-06T23:43:44.480Z"
+  },
+  "Malkerns, Swaziland": {
+    "lat": -26.5319,
+    "lng": 31.189,
+    "label": "Malkerns, Inkhundla Lobamba Lomdzala",
+    "code": "sz",
+    "kind": "place/town",
+    "importance": 0.16
+  },
+  "Chone, Punjab, India": {
+    "error": "no match",
+    "at": "2026-10-06T23:43:46.588Z"
+  },
+  "Chone, India": {
+    "error": "only matched Kora Chone Kang II, Chungthang (natural/peak)",
+    "at": "2026-10-06T23:43:48.761Z"
+  },
+  "country:Colombia": {
+    "lat": 4.0999,
+    "lng": -72.9088,
+    "label": "Colombia",
+    "code": "co",
+    "kind": "boundary/administrative",
+    "importance": 0.833
+  },
+  "Cartagena, Colombia": {
+    "lat": 10.4266,
+    "lng": -75.5442,
+    "label": "Cartagena, Dique",
+    "code": "co",
+    "kind": "boundary/administrative",
+    "importance": 0.613
+  },
+  "country:Kenya": {
+    "lat": 1.442,
+    "lng": 38.4314,
+    "label": "Kenya",
+    "code": "ke",
+    "kind": "boundary/administrative",
+    "importance": 0.783
+  },
+  "Nairobi, Kenya": {
+    "lat": -1.3024,
+    "lng": 36.8289,
+    "label": "Nairobi, Nairobi County",
+    "code": "ke",
+    "kind": "boundary/historic:administrative",
+    "importance": 0.677
+  },
+  "country:Ukraine": {
+    "lat": 49.4872,
+    "lng": 31.2718,
+    "label": "Ukraine",
+    "code": "ua",
+    "kind": "boundary/administrative",
+    "importance": 0.89
+  },
+  "Kyiv, Ukraine": {
+    "lat": 50.45,
+    "lng": 30.5241,
+    "label": "Kyiv, Ukraine",
+    "code": "ua",
+    "kind": "boundary/administrative",
+    "importance": 0.786
+  },
+  "Shenzhen, China": {
+    "lat": 22.5446,
+    "lng": 114.0545,
+    "label": "Shenzhen, Guangdong",
+    "code": "cn",
+    "kind": "boundary/administrative",
+    "importance": 0.665
+  },
+  "country:Cambodia": {
+    "lat": 12.5433,
+    "lng": 104.8145,
+    "label": "Cambodia",
+    "code": "kh",
+    "kind": "boundary/administrative",
+    "importance": 0.749
+  },
+  "Phnom Penh, Cambodia": {
+    "lat": 11.573,
+    "lng": 104.8578,
+    "label": "Phnom Penh, Cambodia",
+    "code": "kh",
+    "kind": "boundary/administrative",
+    "importance": 0.633
+  },
+  "Battambang, Cambodia": {
+    "lat": 12.9257,
+    "lng": 103.2317,
+    "label": "Battambang, Cambodia",
+    "code": "kh",
+    "kind": "boundary/administrative",
+    "importance": 0.48
+  },
+  "country:Costa Rica": {
+    "lat": 10.2736,
+    "lng": -84.0739,
+    "label": "Costa Rica",
+    "code": "cr",
+    "kind": "boundary/administrative",
+    "importance": 0.769
+  },
+  "Puerto Limon, Costa Rica": {
+    "lat": 10.6829,
+    "lng": -83.666,
+    "label": "Puerto Lindo, Colorado",
+    "code": "cr",
+    "kind": "place/hamlet",
+    "importance": 0.133
+  },
+  "Bogota, Colombia": {
+    "lat": 4.6534,
+    "lng": -74.0836,
+    "label": "Bogota, Bogota",
+    "code": "co",
+    "kind": "boundary/administrative",
+    "importance": 0.707
+  },
+  "Richmond, VA, United States": {
+    "lat": 37.5385,
+    "lng": -77.4343,
+    "label": "Richmond, Virginia",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.675
+  },
+  "Hollywood, FL, United States": {
+    "lat": 26.0112,
+    "lng": -80.1495,
+    "label": "Hollywood, Broward County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.584
+  },
+  "Tesano, Ghana": {
+    "lat": 5.6006,
+    "lng": -0.2263,
+    "label": "Tesano, Accra",
+    "code": "gh",
+    "kind": "boundary/administrative",
+    "importance": 0.16
+  },
+  "Brooklyn, NY, United States": {
+    "lat": 40.6526,
+    "lng": -73.9497,
+    "label": "Brooklyn, Kings County",
+    "code": "us",
+    "kind": "boundary/administrative",
+    "importance": 0.738
+  },
+  "country:Canada": {
+    "lat": 61.0667,
+    "lng": -107.9917,
+    "label": "Canada",
+    "code": "ca",
+    "kind": "boundary/administrative",
+    "importance": 0.908
+  },
+  "Yukon, Canada": {
+    "lat": 63.0001,
+    "lng": -136.0025,
+    "label": "Yukon, Canada",
+    "code": "ca",
+    "kind": "boundary/administrative",
+    "importance": 0.628
   }
 }
