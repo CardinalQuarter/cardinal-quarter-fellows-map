@@ -1157,23 +1157,31 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
     return { link, group, base, fresh, entry: await cached(cache, link, () => fetchLinkedLogo(link, base)) };
   });
   // Report in sheet order, not completion order, so summaries are stable.
+  const uploaded = new Map<string, string>(); // domain → a Logo cell's file
   for (const { link, group, base, fresh, entry } of linked) {
     const first = group[0];
     if ("file" in entry) {
       if (fresh) report.logosFetched.push(`${first.partner_organization || base} ← ${entry.source}`);
-      for (const r of group) r.partner_logo = `logos/${entry.file}`;
+      for (const r of group) {
+        r.partner_logo = `logos/${entry.file}`;
+        const d = domainOf(r.partner_website);
+        if (d && !uploaded.has(d)) uploaded.set(d, r.partner_logo);
+      }
     } else {
       report.logoLinkFailed.push(`${first.where}: Logo "${link}": ${entry.error}`);
       for (const r of group) r.partner_logo = "";
     }
   }
 
-  // 2. Everyone else: one icon per organization domain.
+  // 2. Everyone else: the logo another fellow uploaded for the same
+  // organization, else one icon per domain. Fetching the icon anyway would
+  // overwrite the upload, which is saved under the same domain-based name.
   const byDomain = new Map<string, Placement[]>();
   for (const r of rows) {
     if (r.partner_logo || !r.partner_website) continue;
     const d = domainOf(r.partner_website);
-    if (d) byDomain.set(d, [...(byDomain.get(d) ?? []), r]);
+    if (d && uploaded.has(d)) r.partner_logo = uploaded.get(d)!;
+    else if (d) byDomain.set(d, [...(byDomain.get(d) ?? []), r]);
   }
   const icons = await mapLimit([...byDomain], LOGO_CONCURRENCY, async ([domain, group]) => {
     const fresh = !cache[domain] || ("error" in cache[domain] && isStale(cache[domain].at));

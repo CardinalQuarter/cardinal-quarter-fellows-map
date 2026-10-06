@@ -1,33 +1,8 @@
 {
-  "newdirectionsforwomen.org": {
-    "file": "newdirectionsforwomen.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:11:55.518Z"
-  },
   "everyvoicecoalition.org": {
     "file": "everyvoicecoalition.org.png",
     "source": "icon",
     "at": "2026-10-01T01:11:56.709Z"
-  },
-  "codedotx.org": {
-    "file": "codedotx.org.jpg",
-    "source": "icon",
-    "at": "2026-10-01T01:11:57.102Z"
-  },
-  "kbth.gov.gh": {
-    "file": "kbth.gov.gh.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:11:57.818Z"
-  },
-  "dnt.no": {
-    "file": "dnt.no.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:11:58.582Z"
-  },
-  "choc.org": {
-    "file": "choc.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:11:59.813Z"
   },
   "deschuteslandtrust.org": {
     "file": "deschuteslandtrust.org.jpg",
@@ -44,40 +19,20 @@
     "source": "favicon.ico",
     "at": "2026-10-01T01:12:00.966Z"
   },
-  "west.stanford.edu": {
-    "file": "west.stanford.edu.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:01.164Z"
-  },
   "solanocounty.gov": {
     "file": "solanocounty.gov.ico",
     "source": "favicon.ico",
     "at": "2026-10-01T01:12:01.393Z"
-  },
-  "oaklandca.gov": {
-    "file": "oaklandca.gov.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:01.563Z"
   },
   "ccsre.stanford.edu": {
     "file": "ccsre.stanford.edu.png",
     "source": "apple-touch-icon",
     "at": "2026-10-01T01:12:02.388Z"
   },
-  "ufwfoundation.org": {
-    "file": "ufwfoundation.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:02.617Z"
-  },
   "visegradinsight.eu": {
     "file": "visegradinsight.eu.png",
     "source": "apple-touch-icon",
     "at": "2026-10-01T01:12:02.963Z"
-  },
-  "pubdef.lacounty.gov": {
-    "file": "pubdef.lacounty.gov.png",
-    "source": "icon",
-    "at": "2026-10-01T01:12:04.171Z"
   },
   "sfartistsstudios.com": {
     "file": "sfartistsstudios.com.ico",
@@ -118,25 +73,10 @@
     "source": "apple-touch-icon",
     "at": "2026-10-01T01:12:08.489Z"
   },
-  "enterpriseforyouth.org": {
-    "file": "enterpriseforyouth.org.png",
-    "source": "icon",
-    "at": "2026-10-01T01:12:12.511Z"
-  },
-  "asianhealthservices.org": {
-    "file": "asianhealthservices.org.png",
-    "source": "icon",
-    "at": "2026-10-01T01:12:12.987Z"
-  },
   "sierraclub.org": {
     "file": "sierraclub.org.ico",
     "source": "favicon.ico",
     "at": "2026-10-01T01:12:13.852Z"
-  },
-  "slc.ca.gov": {
-    "file": "slc.ca.gov.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:13.931Z"
   },
   "iadb.org": {
     "error": "site returned HTTP 403",
@@ -146,11 +86,6 @@
     "file": "atlanticcouncil.org.png",
     "source": "apple-touch-icon",
     "at": "2026-10-01T01:12:15.827Z"
-  },
-  "capsunlock.org": {
-    "file": "capsunlock.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:15.981Z"
   },
   "worldjusticeproject.org": {
     "file": "worldjusticeproject.org.png",
@@ -162,74 +97,29 @@
     "source": "apple-touch-icon",
     "at": "2026-10-01T01:12:17.033Z"
   },
-  "tspmi.vu.lt": {
-    "file": "tspmi.vu.lt.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:18.315Z"
-  },
-  "lalela.org": {
-    "file": "lalela.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:20.539Z"
-  },
   "ieep.eu": {
     "error": "site returned The operation was aborted due to timeout",
     "at": "2026-10-01T01:12:22.490Z"
-  },
-  "restorejustice.org": {
-    "file": "restorejustice.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:47.694Z"
-  },
-  "unesco.org": {
-    "file": "unesco.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:48.172Z"
   },
   "museum.seoul.go.kr": {
     "file": "museum.seoul.go.kr.ico",
     "source": "favicon.ico",
     "at": "2026-10-01T01:12:49.469Z"
   },
-  "telasofa.org": {
-    "file": "telasofa.org.png",
-    "source": "icon",
-    "at": "2026-10-01T01:12:52.324Z"
-  },
   "rmhc-denver.org": {
     "file": "rmhc-denver.org.jpg",
     "source": "apple-touch-icon",
     "at": "2026-10-01T01:12:52.998Z"
-  },
-  "rmfi.org": {
-    "file": "rmfi.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:55.016Z"
   },
   "laborontheline.org": {
     "file": "laborontheline.org.png",
     "source": "apple-touch-icon",
     "at": "2026-10-01T01:12:55.957Z"
   },
-  "epacommunityarchive.org": {
-    "file": "epacommunityarchive.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:56.374Z"
-  },
   "moreincommonus.com": {
     "file": "moreincommonus.com.png",
     "source": "apple-touch-icon",
     "at": "2026-10-01T01:12:57.005Z"
-  },
-  "ccdcoe.org": {
-    "file": "ccdcoe.org.png",
-    "source": "apple-touch-icon",
-    "at": "2026-10-01T01:12:57.283Z"
-  },
-  "https://drive.google.com/file/d/199r2pyEdEIbsHlcu730H6BWfrjeNn8Th/view?usp=drive_link": {
-    "file": "newdirectionsforwomen.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:14:34.558Z"
   },
   "https://drive.google.com/file/d/12NRnGp4ok6UZUXIGAUI7v_e20pRYFidu/view?usp=drive_link": {
     "file": "everyvoicecoalition.org.webp",
@@ -245,16 +135,6 @@
     "file": "afghanhrcenter.org.webp",
     "source": "Google Drive",
     "at": "2026-10-02T23:14:38.588Z"
-  },
-  "https://drive.google.com/file/d/1Z98ewfouRi9rlyO12nZ20s7GRWuduqUr/view?usp=drive_link": {
-    "file": "codedotx.org.jpg",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:14:39.814Z"
-  },
-  "https://drive.google.com/file/d/1ukOdbXuxKfbcMtpTP41SiW-dvdwiGzpF/view?usp=drive_link": {
-    "file": "kbth.gov.gh.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:14:41.150Z"
   },
   "https://drive.google.com/file/d/17UFQxcA5Fhhjax9xLBKyDZZ7sbpFslaz/view?usp=drive_link": {
     "file": "greengenerationinitiative.org.png",
@@ -280,16 +160,6 @@
     "file": "facebook.com.png",
     "source": "Google Drive",
     "at": "2026-10-02T23:14:46.932Z"
-  },
-  "https://drive.google.com/file/d/1WpkTT99ueEbTyRBFSn2u-oY1fxwHeuEI/view?usp=drive_link": {
-    "file": "dnt.no.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:14:48.673Z"
-  },
-  "https://drive.google.com/file/d/1xnDNPMxpPN2jLYB8fIOQzkYWP2sYtlMx/view?usp=drive_link": {
-    "file": "choc.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:14:49.787Z"
   },
   "https://drive.google.com/file/d/1z1x6A81GtbFYR30YZGf_qfrbd7qZ96TG/view?usp=drive_link": {
     "file": "deschuteslandtrust.org.png",
@@ -356,11 +226,6 @@
     "source": "Google Drive",
     "at": "2026-10-02T23:15:05.300Z"
   },
-  "https://drive.google.com/file/d/1r0jjK6LWVrwHRbNbovu9XnAx7bliakoe/view?usp=sharing": {
-    "file": "west.stanford.edu.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:15:06.449Z"
-  },
   "https://drive.google.com/file/d/13BfWAecdgTgqfocIwAUPQAUwqBBBiV7q/view?usp=drive_link": {
     "file": "solanocounty.gov.jpg",
     "source": "Google Drive",
@@ -376,20 +241,10 @@
     "source": "Google Drive",
     "at": "2026-10-02T23:15:11.164Z"
   },
-  "https://drive.google.com/file/d/1AK5msCbs9BarcQ3MMFz2QJpDBE4jdTu8/view?usp=drive_link": {
-    "file": "ufwfoundation.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:15:12.259Z"
-  },
   "https://drive.google.com/file/d/1TzndqTXj6X0G__9p-CPXcodZ8NwKG7s_/view?usp=drive_link": {
     "file": "visegradinsight.eu.jpg",
     "source": "Google Drive",
     "at": "2026-10-02T23:15:13.385Z"
-  },
-  "https://drive.google.com/file/d/1ZE9QG54maQe9eSSa0k8bhpOT-RFtzyGd/view?usp=drive_link": {
-    "file": "pubdef.lacounty.gov.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:15:14.483Z"
   },
   "https://drive.google.com/file/d/1kNTfgkLx4qGmD8JFUKl52YGNqA2TGw2n/view?usp=drive_link": {
     "file": "neighborhooddefender.org.png",
@@ -400,11 +255,6 @@
     "file": "marincounty.gov.png",
     "source": "Google Drive",
     "at": "2026-10-02T23:15:16.811Z"
-  },
-  "https://drive.google.com/file/d/1ZlxjIYsMutbETylhe7Der8RYhaJx8Jhd/view?usp=drive_link": {
-    "file": "pubdef.lacounty.gov.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:15:17.934Z"
   },
   "https://drive.google.com/file/d/1oG9p_geMpFbr2jLnWrRbe8hArwsUr2XW/view?usp=drive_link": {
     "file": "opendoorlegal.org.jpg",
@@ -666,25 +516,10 @@
     "source": "Google Drive",
     "at": "2026-10-02T23:16:17.118Z"
   },
-  "https://drive.google.com/file/d/15dQTXLIx2z5zbSETIa0PrAq57ijmJbnL/view?usp=drive_link": {
-    "file": "enterpriseforyouth.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:16:18.205Z"
-  },
-  "https://drive.google.com/file/d/16ruVBXlC0se2Hnrl_OWRmYOPAjNbLn-N/view?usp=drive_link": {
-    "file": "asianhealthservices.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:16:19.399Z"
-  },
   "https://drive.google.com/file/d/18xzI8v_eFfvpW6Wy0AhRjEn8z_1C6b_n/view?usp=drive_link": {
     "file": "sierraclub.org.svg",
     "source": "Google Drive",
     "at": "2026-10-02T23:16:20.639Z"
-  },
-  "https://drive.google.com/file/d/1U--L9jisQYCXWIXoTBvnifbb5KfstCte/view?usp=drive_link": {
-    "file": "slc.ca.gov.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:16:21.741Z"
   },
   "https://drive.google.com/file/d/1Nk8nnPJhAEnJaPpzJrx1sPWhn-FxKGI3/view?usp=drive_link": {
     "file": "urldefense.com.jpg",
@@ -791,11 +626,6 @@
     "source": "Google Drive",
     "at": "2026-10-02T23:16:46.763Z"
   },
-  "https://drive.google.com/file/d/16732m1c7d3IfpC5GBPFKBkt-rXLpK-Vd/view?usp=drive_link": {
-    "file": "capsunlock.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:16:47.854Z"
-  },
   "https://drive.google.com/file/d/1uwl1rqfKkgklGoJ78YyJ1XFebGVoSABk/view?usp=drive_link": {
     "file": "worldjusticeproject.org.jpg",
     "source": "Google Drive",
@@ -805,16 +635,6 @@
     "file": "gssc.lt.jpg",
     "source": "Google Drive",
     "at": "2026-10-02T23:16:50.069Z"
-  },
-  "https://drive.google.com/file/d/1Rh0rvZ5JRdB2BAi4Azq3tMNdJY-HbDGk/view?usp=drive_link": {
-    "file": "tspmi.vu.lt.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:16:51.249Z"
-  },
-  "https://drive.google.com/file/d/13NzbpU2crO0-YftgDcQj5XU4El7--gN3/view?usp=drive_link": {
-    "file": "lalela.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:16:52.309Z"
   },
   "https://drive.google.com/file/d/10xUft7k_LWm5N9l1a5-_qCPHCecm91JJ/view?usp=drive_link": {
     "file": "galleriaborghese.cultura.gov.it.png",
@@ -830,11 +650,6 @@
     "file": "aravind.org.png",
     "source": "Google Drive",
     "at": "2026-10-02T23:16:55.883Z"
-  },
-  "https://drive.google.com/file/d/1XCRtGHOLGeRJzXUDuv_qdRt-BUZiCJLf/view?usp=drive_link": {
-    "file": "ccdcoe.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:16:57.029Z"
   },
   "https://drive.google.com/file/d/1Q4cXfBUT1K9cDiZUylyUu6RI0mD7ir3e/view?usp=drive_link": {
     "file": "voxukraine.org.png",
@@ -911,11 +726,6 @@
     "source": "Google Drive",
     "at": "2026-10-02T23:17:13.740Z"
   },
-  "https://drive.google.com/file/d/1PG0mNnSv6Hw16ILPgwTyiiS52z84K9M5/view?usp=drive_link": {
-    "file": "unesco.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:17:14.860Z"
-  },
   "https://drive.google.com/file/d/1-T9j1JEVMuxcxR-a13ERbZYJWoZLdBp4/view?usp=share_link": {
     "file": "vabamu.ee.png",
     "source": "Google Drive",
@@ -951,30 +761,15 @@
     "source": "Google Drive",
     "at": "2026-10-02T23:17:23.393Z"
   },
-  "https://drive.google.com/file/d/1whHC4zbqebXhfRpjr6wGi_UOhNj9ZLH1/view?usp=drive_link": {
-    "file": "telasofa.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:17:24.544Z"
-  },
   "https://drive.google.com/file/d/1mmCagtCZtCSZ61iGrg3x3PmM8UK2O7Mx/view?usp=drive_link": {
     "file": "rmhc-denver.org.png",
     "source": "Google Drive",
     "at": "2026-10-02T23:17:25.741Z"
   },
-  "https://drive.google.com/file/d/1ji1HbbLPcAF55bILznBKX3UXEQGppzRU/view?usp=drive_link": {
-    "file": "rmfi.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:17:26.977Z"
-  },
   "https://drive.google.com/file/d/1luOu4QeIiyew4d2fr9mhXR7XgME8KjTd/view?usp=drive_link": {
     "file": "laborontheline.org.jpg",
     "source": "Google Drive",
     "at": "2026-10-02T23:17:28.024Z"
-  },
-  "https://drive.google.com/file/d/1NiEZcuQQ18avZg2Y9TocFb0_4LvD50JD/view?usp=drive_link": {
-    "file": "epacommunityarchive.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:17:29.152Z"
   },
   "https://drive.google.com/file/d/1llTWRYKRO8hkeforZy7G0wxvDn8pNZBa/view?usp=drive_link": {
     "file": "moreincommonus.com.jpg",
@@ -1361,11 +1156,6 @@
     "source": "Google Drive",
     "at": "2026-10-02T23:19:01.259Z"
   },
-  "https://drive.google.com/file/d/1gtjBQRGivyd_IeDisedMsz3WnttzYWC4/view?usp=drive_link": {
-    "file": "pubdef.lacounty.gov.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:19:02.306Z"
-  },
   "https://drive.google.com/file/d/1wDkArhyMtYE0vLH9gXR90p2sFbVMY3Q0/view?usp=drive_link": {
     "file": "esperanza-la.org.avif",
     "source": "Google Drive",
@@ -1375,11 +1165,6 @@
     "file": "pdo.santaclaracounty.gov.png",
     "source": "Google Drive",
     "at": "2026-10-02T23:19:04.527Z"
-  },
-  "https://drive.google.com/file/d/16vrdfJzebGDeeWhmROKDCDnLNNQv2ckb/view?usp=drive_link": {
-    "file": "pubdef.lacounty.gov.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:19:05.659Z"
   },
   "https://drive.google.com/file/d/1QedkU8WgNSUq3LzxZUaR1n3983P0UU9r/view?usp=drive_link": {
     "file": "courts.state.hi.us.png",
@@ -1771,11 +1556,6 @@
     "source": "Google Drive",
     "at": "2026-10-02T23:20:35.807Z"
   },
-  "https://drive.google.com/file/d/1V896QyR1t80_iOiT6AsT79kvNPjyGY-E/view?usp=drive_link": {
-    "file": "oaklandca.gov.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:20:36.947Z"
-  },
   "https://drive.google.com/file/d/1qw3iPEnAek8pF2duVFvFKPUu8RDyp2vl/view?usp=drive_link": {
     "file": "sf.gov.png",
     "source": "Google Drive",
@@ -1920,11 +1700,6 @@
     "file": "endpovertyinca.org.png",
     "source": "Google Drive",
     "at": "2026-10-02T23:21:10.888Z"
-  },
-  "https://drive.google.com/file/d/1fB29zBB8G8rTUqcAZzL0Alt4J69ZWSPt/view?usp=drive_link": {
-    "file": "restorejustice.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:21:11.967Z"
   },
   "https://drive.google.com/file/d/1GVJt70aP_VzfAm4ZYh0Sgl6ZFg_Yo01c/view?usp=drive_link": {
     "file": "youthvgov.org.webp",
@@ -2585,11 +2360,6 @@
     "file": "actioncouncil.org.jpg",
     "source": "Google Drive",
     "at": "2026-10-02T23:23:41.058Z"
-  },
-  "https://drive.google.com/file/d/1m09jv-yW7YvlB93VO8HRu2s6sOVI3nS6/view?usp=drive_link": {
-    "file": "ufwfoundation.org.png",
-    "source": "Google Drive",
-    "at": "2026-10-02T23:23:42.162Z"
   },
   "https://drive.google.com/file/d/1V6cvIlLHWg83lShIymKebOGQOOMZq1so/view?usp=drive_link": {
     "file": "ridgefieldpark.org.png",
