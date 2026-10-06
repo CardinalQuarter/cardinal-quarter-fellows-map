@@ -175,8 +175,10 @@ the links the Google Form writes for file uploads, provided the file (or the
 form's upload folder) is shared as *Anyone with the link*. Otherwise the
 build fetches the website's icon (apple-touch-icon, web manifest, favicon)
 and checks the bytes are a real image. A blank value in Class Year, School, Affiliation or Interest
-Area shows on the site as "Not specified". Unrecognized or missing columns
-are listed in the build report; trailing empty columns are ignored. Accepted header spellings include the old export's names
+Area shows on the site as "Not specified". The build stops if a student tab
+has no Name, Organization or Country column, or no City column without
+Latitude and Longitude columns; the error lists the headers it found. Other
+unrecognized or missing columns are listed in the build report; trailing empty columns are ignored. Accepted header spellings include the old export's names
 (`Fellowship location`, `Name of Partner Organization`, `Link to Logo`, ...);
 see `ALIASES` in `scripts/build-data.ts`.
 
@@ -221,7 +223,8 @@ These input issues remain in the report until corrected in the sheet.
 
 One form, one response tab, listed in `Sources`. Settings: *Collect email
 addresses: Verified*, restrict to Stanford accounts. Question titles are the
-column headers above, so keep them as written.
+column headers above, so keep them as written; a reworded Organization,
+City or Country question stops the build until it is renamed back.
 
 | question                 | type                                            |
 | ------------------------ | ----------------------------------------------- |

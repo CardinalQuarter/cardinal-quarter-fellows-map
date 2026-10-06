@@ -30,6 +30,25 @@ test("missing period fails rather than guessing from graduation year", () => {
   assert.throws(() => rowsFromSource([legacyHeaders, student], {...source,defaultPeriod:undefined}), /Default Period/);
 });
 
+test("unrecognized key columns fail and name the headers found", () => {
+  const renamed = legacyHeaders.map((h) => (h === "Location of Fellowship (City/Town)" ? "What city will you work in?" : h));
+  const noCoords = renamed.filter((h) => h !== "Latitude" && h !== "Longitude");
+  assert.throws(() => rowsFromSource([noCoords], source), /no "city" column.*What city will you work in\?/);
+  // A tab with Latitude and Longitude can place pins without a city.
+  assert.deepEqual(rowsFromSource([renamed], source), []);
+  const noOrg = legacyHeaders.filter((h) => h !== "Name of Partner Organization");
+  assert.throws(() => rowsFromSource([noOrg], source), /no "organization" column/);
+});
+
+test("Google Form response headers map without renaming", () => {
+  const form = ["Timestamp", "Email Address", "Period", "Name", "Class Year", "Major", "School", "Affiliation", "Fellowship / Opportunity", "Interest Area", "Organization", "City", "Country", "Website", "Logo (optional)"];
+  const [row] = rowsFromSource([form, ["10/6/2026 9:00", "A@stanford.edu", "Summer 2027", "Ann", "2028", "CS", "Engineering", "Haas", "Fellowship", "Health", "Org", "Lima", "Peru", "org.pe", ""]], source);
+  assert.equal(row.email, "a@stanford.edu");
+  assert.equal(row.period, "Summer 2027");
+  assert.equal(row.fellowship_loc, "Lima");
+  assert.equal(row.partner_website, "https://org.pe");
+});
+
 test("current Students layout accepts blank tabs and future rows with a source default", () => {
   assert.deepEqual(rowsFromSource([legacyHeaders], {...source,label:'sheet tab "Students"'}), []);
   const [row] = rowsFromSource([legacyHeaders, student], {...source,label:'sheet tab "Students"'});

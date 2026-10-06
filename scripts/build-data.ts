@@ -524,9 +524,14 @@ export function rowsFromSource(rows: string[][], src: Source): Row[] {
   const [header, ...body] = rows;
   if (!header) return [];
   const cols = mapHeader(header, src.label);
-  const required: Field[] = ["name"];
-  for (const f of required) {
-    if (cols[f] === undefined) throw new Error(`${src.label}: no "${ALIASES[f][0]}" column (headers: ${header.join(", ")})`);
+  // Without these a renamed form question would silently drop every row's
+  // organization or pin it at the country centre, so stop instead.
+  const required: Field[] = ["name", "partner_organization", "country"];
+  if (cols.latitude === undefined || cols.longitude === undefined) required.push("fellowship_loc");
+  const missing = required.filter((f) => cols[f] === undefined);
+  if (missing.length) {
+    const names = missing.map((f) => `"${ALIASES[f][0]}"`).join(", ");
+    throw new Error(`${src.label}: no ${names} column. Rename the header (or form question) to match, or add the wording to ALIASES in scripts/build-data.ts. Headers found: ${header.filter((h) => h.trim()).join(", ")}`);
   }
   if (cols.period === undefined && !src.defaultPeriod) {
     throw new Error(`${src.label}: no "Period" column. Add one to the student tab or set a Default Period for this tab in Sources.`);
