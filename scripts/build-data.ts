@@ -31,7 +31,7 @@
  * from the manual deployment workflow show readable diffs. Emails never reach output.
  */
 import { createHash } from "node:crypto";
-import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import Papa from "papaparse";
@@ -59,6 +59,8 @@ const RETRY_FAILURES_AFTER_DAYS = 30;
 const FETCH_TIMEOUT_MS = 15_000;
 const MAX_LOGO_BYTES = 2_000_000;
 const NOMINATIM_GAP_MS = 1100; // usage policy: at most one request per second
+const LOGO_CONCURRENCY = 8; // each request goes to a different organization's site
+const CACHE_SAVE_MS = 30_000; // a run that dies keeps everything up to the last save
 
 // ---------------------------------------------------------------------------
 // Columns
@@ -261,7 +263,28 @@ async function readJson<T>(file: string, fallback: T): Promise<T> {
 }
 
 async function writeJson(file: string, value: unknown): Promise<void> {
-  await writeFile(file, JSON.stringify(value, null, 2) + "\n");
+  await writeAtomic(file, JSON.stringify(value, null, 2) + "\n");
+}
+
+/** Write via a temp file and rename, so a killed run never leaves half a file. */
+async function writeAtomic(file: string, data: string | Uint8Array): Promise<void> {
+  const tmp = `${file}.${process.pid}.${Math.random().toString(36).slice(2)}.tmp`;
+  await writeFile(tmp, data);
+  await rename(tmp, file);
+}
+
+/** Run fn over items, at most `limit` at a time; results keep input order. */
+async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const out = new Array<R>(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await fn(items[i]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return out;
 }
 
 function isStale(at: string): boolean {
@@ -1079,7 +1102,7 @@ function logoSources(link: string): string[] {
 
 async function saveLogo(bytes: Uint8Array, base: string, ext: string): Promise<string> {
   const file = `${base}.${ext}`;
-  await writeFile(path.join(LOGO_DIR, file), bytes);
+  await writeAtomic(path.join(LOGO_DIR, file), bytes);
   return file;
 }
 
@@ -1125,14 +1148,17 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
   // 1. Logo cells: one download per distinct link.
   const byLink = new Map<string, Placement[]>();
   for (const r of rows) if (r.partner_logo) byLink.set(r.partner_logo, [...(byLink.get(r.partner_logo) ?? []), r]);
-  for (const [link, group] of byLink) {
-    const first = group[0];
+  const linked = await mapLimit([...byLink], LOGO_CONCURRENCY, async ([link, group]) => {
     const base =
-      domainOf(first.partner_website) ||
-      slugify(first.partner_organization) ||
+      domainOf(group[0].partner_website) ||
+      slugify(group[0].partner_organization) ||
       createHash("sha1").update(link).digest("hex").slice(0, 12);
     const fresh = !cache[link] || ("error" in cache[link] && isStale(cache[link].at));
-    const entry = await cached(cache, link, () => fetchLinkedLogo(link, base));
+    return { link, group, base, fresh, entry: await cached(cache, link, () => fetchLinkedLogo(link, base)) };
+  });
+  // Report in sheet order, not completion order, so summaries are stable.
+  for (const { link, group, base, fresh, entry } of linked) {
+    const first = group[0];
     if ("file" in entry) {
       if (fresh) report.logosFetched.push(`${first.partner_organization || base} ← ${entry.source}`);
       for (const r of group) r.partner_logo = `logos/${entry.file}`;
@@ -1149,9 +1175,11 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
     const d = domainOf(r.partner_website);
     if (d) byDomain.set(d, [...(byDomain.get(d) ?? []), r]);
   }
-  for (const [domain, group] of byDomain) {
+  const icons = await mapLimit([...byDomain], LOGO_CONCURRENCY, async ([domain, group]) => {
     const fresh = !cache[domain] || ("error" in cache[domain] && isStale(cache[domain].at));
-    const entry = await cached(cache, domain, () => fetchSiteLogo(group[0].partner_website));
+    return { domain, group, fresh, entry: await cached(cache, domain, () => fetchSiteLogo(group[0].partner_website)) };
+  });
+  for (const { domain, group, fresh, entry } of icons) {
     if ("file" in entry) {
       if (fresh) report.logosFetched.push(`${domain} ← ${entry.source}`);
       for (const r of group) r.partner_logo = `logos/${entry.file}`;
@@ -1245,12 +1273,18 @@ async function main() {
 
   await mkdir(path.dirname(GEOCACHE), { recursive: true });
   const geocache = await readJson<GeoCache>(GEOCACHE, {});
-  await geocode(geocache, live);
-  await writeJson(GEOCACHE, geocache);
-
   const logocache = await readJson<Record<string, LogoEntry>>(LOGOCACHE, {});
-  await logos(logocache, live);
-  await writeJson(LOGOCACHE, logocache);
+  // Saves run one after another so an older snapshot never lands last.
+  let saving = Promise.resolve();
+  const saveCaches = () => (saving = saving.then(() => Promise.all([writeJson(GEOCACHE, geocache), writeJson(LOGOCACHE, logocache)])).then(() => {}));
+  const checkpoint = setInterval(() => saveCaches().catch((err) => console.warn(`Cache save failed: ${(err as Error).message}`)), CACHE_SAVE_MS);
+  try {
+    // Geocoding is rate-limited to one request a second; logos hit other hosts, so they overlap.
+    await Promise.all([geocode(geocache, live), logos(logocache, live)]);
+  } finally {
+    clearInterval(checkpoint);
+    await saveCaches();
+  }
 
   const index: Index = { periods: [], views: [] };
   const peopleByPeriod = new Map<string, number>();
