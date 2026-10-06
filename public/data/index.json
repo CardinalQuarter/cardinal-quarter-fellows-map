@@ -4,6 +4,11 @@
       "slug": "summer-2026",
       "displayName": "Summer 2026",
       "count": 622
+    },
+    {
+      "slug": "summer-2027",
+      "displayName": "Summer 2027",
+      "count": 6
     }
   ],
   "views": [
@@ -16,10 +21,19 @@
       "show": true
     },
     {
+      "slug": "summer-2027",
+      "displayName": "Summer 2027",
+      "periods": [
+        "summer-2027"
+      ],
+      "show": true
+    },
+    {
       "slug": "last-5-years",
       "displayName": "Last 5 years",
       "periods": [
-        "summer-2026"
+        "summer-2026",
+        "summer-2027"
       ],
       "show": false
     }
