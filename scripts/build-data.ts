@@ -46,7 +46,8 @@ const LOCAL_GROUPS = path.join(ROOT, "data", "groups.json");
 const GEOCACHE = path.join(ROOT, "data", "geocache.json");
 const LOGOCACHE = path.join(ROOT, "data", "logocache.json");
 
-const SHEET_ID = process.env.SHEET_ID?.trim();
+// Accept the bare ID or the whole sheet URL pasted into the secret.
+const SHEET_ID = process.env.SHEET_ID?.trim().replace(/^.*\/spreadsheets\/d\/([^/?#]+).*$/, "$1");
 const PERIODS_TAB = process.env.PERIODS_TAB?.trim() || "Periods";
 const SOURCES_TAB = process.env.SOURCES_TAB?.trim() || "Sources";
 const GROUPS_TAB = process.env.GROUPS_TAB?.trim() || "Groups";
@@ -235,6 +236,9 @@ async function fetchPolitely(url: string, init: RequestInit = {}): Promise<Respo
 
 async function fetchText(url: string): Promise<string> {
   const res = await fetchWithTimeout(url);
+  if (res.status === 404 && url.includes("/spreadsheets/d/")) {
+    throw new Error(`Google Sheets returned 404: no sheet has the ID in SHEET_ID. Copy the part of the sheet's URL between /d/ and /edit into the secret. (${url})`);
+  }
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} fetching ${url}`);
   return res.text();
 }
