@@ -415,7 +415,14 @@ export function MapView({ pins, selection, onSelect }: Props) {
         const el = donut(props);
         el.addEventListener("click", async (ev) => {
           ev.stopPropagation();
-          const [leaves, expansion] = await Promise.all([source.getClusterLeaves(id, Infinity, 0), source.getClusterExpansionZoom(id)]);
+          let leaves: GeoJSON.Feature[], expansion: number;
+          try {
+            [leaves, expansion] = await Promise.all([source.getClusterLeaves(id, Infinity, 0), source.getClusterExpansionZoom(id)]);
+          } catch {
+            // A ring clicked mid-zoom can name a cluster the new zoom level no longer has.
+            map.easeTo({ center: coords, zoom: Math.min(map.getZoom() + 1, MAX_ZOOM), duration: 400 });
+            return;
+          }
           const bounds = new maplibregl.LngLatBounds();
           for (const l of leaves) bounds.extend((l.geometry as GeoJSON.Point).coordinates as [number, number]);
           const ne = bounds.getNorthEast(), sw = bounds.getSouthWest();
@@ -486,11 +493,11 @@ export function MapView({ pins, selection, onSelect }: Props) {
         const pin = feats.length ? pinsRef.current[feats[0].properties.i as number] : undefined;
         if (pin) onSelectRef.current({ fellow: pin.fellow, fly: false });
       });
-      map.on("data", (e) => {
-        if ((e as { sourceId?: string }).sourceId === SOURCE && (e as { isSourceLoaded?: boolean }).isSourceLoaded) updateClusters();
+      // Rebuild markers only from fully loaded tiles. Mid-zoom the source still holds the
+      // previous zoom's tiles (or none), which left stale rings or dropped them entirely.
+      map.on("render", () => {
+        if (map.getSource(SOURCE) && map.isSourceLoaded(SOURCE)) updateClusters();
       });
-      map.on("move", updateClusters);
-      map.on("moveend", updateClusters);
       setReady(true);
     });
 

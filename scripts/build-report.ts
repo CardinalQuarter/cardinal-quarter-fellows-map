@@ -6,13 +6,15 @@ export type SheetReview = {
   failedLogoLinks: string[]; failedLogos: string[];
 };
 
-/** Keep input issues visible even when caches or fallbacks fix the map. */
-export function sheetReviewSection(review: SheetReview): string {
+/** Keep input issues visible even when caches or fallbacks fix the map. `limit` caps each list. */
+export function sheetReviewSection(review: SheetReview, limit = Infinity): string {
   const lines = ["### Things to address in the sheet", "", "Review these sheet edits, including issues the build corrected automatically. They remain until the input is corrected. Row references are CSV line numbers; use the student name to locate the row if the sheet has blank rows."];
   const group = (title: string, action: string, items: string[]) => {
     if (!items.length) return;
     lines.push("", `#### ${title}`, "", action, "");
-    for (const item of new Set(items)) lines.push(`- [ ] ${item.replace(/\r?\n/g, " ")}`);
+    const unique = [...new Set(items)];
+    for (const item of unique.slice(0, limit)) lines.push(`- [ ] ${item.replace(/\r?\n/g, " ")}`);
+    if (unique.length > limit) lines.push(`- …and ${unique.length - limit} more (see the full build report)`);
   };
   group("Periods", "Correct each row's Period or its source's Default Period, and list the period in Periods.", review.unknownPeriods);
   group("Groups", "Correct group members or remove unused example group rows.", review.groups);

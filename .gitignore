@@ -6,3 +6,4 @@ dist/
 .playwright-mcp/
 *.swp
 *.tmp
+build-report.md

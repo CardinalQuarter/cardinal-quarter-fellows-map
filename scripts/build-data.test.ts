@@ -91,3 +91,10 @@ test("sheet checklist includes automatic corrections and optional coordinates", 
   assert.equal(output.match(/- \[ \] Students line 2/g)?.length, 1);
   assert.doesNotMatch(output, /No sheet corrections/);
 });
+
+test("sheet checklist caps each list and says how many were cut", () => {
+  const empty: SheetReview = { unknownPeriods: [], groups: [], columns: [], skipped: [], duplicates: [], swapped: [], invalidCoords: [], suggestedCoords: [], remote: [], countryFallback: [], failedGeocodes: [], failedLogoLinks: [], failedLogos: [] };
+  const text = sheetReviewSection({ ...empty, duplicates: ["a", "b", "c", "d"] }, 2);
+  assert.match(text, /- \[ \] a\n- \[ \] b\n- …and 2 more/);
+  assert.doesNotMatch(text, /- \[ \] c/);
+});

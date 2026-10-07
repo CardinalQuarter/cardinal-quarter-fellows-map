@@ -1110,6 +1110,15 @@ async function saveLogo(bytes: Uint8Array, base: string, ext: string): Promise<s
   return file;
 }
 
+/** Cached failure reasons, in words a sheet editor can act on. */
+function plainLogoError(error: string): string {
+  if (error === "not an image") return "the link opens a web page, not an image file";
+  if (error === "not a link") return "the Logo cell is not a link";
+  if (/timeout|aborted/i.test(error)) return "the link timed out";
+  if (/fetch failed|ENOTFOUND|ECONNREFUSED/i.test(error)) return "the link could not be reached (the site or file may be gone)";
+  return error;
+}
+
 /** Download the image a Logo cell points at. */
 async function fetchLinkedLogo(link: string, base: string): Promise<LogoEntry> {
   const at = now();
@@ -1172,7 +1181,8 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
         if (d && !uploaded.has(d)) uploaded.set(d, r.partner_logo);
       }
     } else {
-      report.logoLinkFailed.push(`${first.where}: Logo "${link}": ${entry.error}`);
+      const others = group.length > 1 ? ` (and ${group.length - 1} other row(s) with the same link)` : "";
+      report.logoLinkFailed.push(`${first.where}: ${plainLogoError(entry.error)}${others}`);
       for (const r of group) r.partner_logo = "";
     }
   }
@@ -1205,9 +1215,17 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
 // Main
 // ---------------------------------------------------------------------------
 
-function summary(): string {
+/**
+ * GitHub drops a run summary over 1 MB. Each problem is listed once, in the
+ * checklist; work the build did on its own is counted, not listed. Only a
+ * summary still too big is cut, and the full one is always in build-report.md.
+ */
+const SUMMARY_MAX_BYTES = 900_000;
+const SUMMARY_LIST_LIMIT = 50;
+const BUILD_REPORT = path.join(ROOT, "build-report.md");
+
+function summary(limit = Infinity): string {
   const lines: string[] = ["## Cardinal Quarter Map data build", ""];
-  lines.push(`Lookup cache: ${report.cacheHits} hit(s); ${report.cacheMisses} new or retried entry/entries.`, "");
   lines.push("| Period | Fellows | Shown |", "| --- | ---: | --- |");
   for (const p of report.periods) lines.push(`| ${p.displayName} | ${p.count} | ${p.show ? "yes" : "hidden"} |`);
   if (report.groups.length) {
@@ -1216,29 +1234,15 @@ function summary(): string {
       lines.push(`| ${g.displayName} | ${g.periods.join(", ")} | ${g.count} | ${g.show ? "yes" : "hidden"} |`);
     }
   }
-  const section = (title: string, items: string[]) => {
-    if (!items.length) return;
-    lines.push("", `### ${title} (${items.length})`, "");
-    for (const i of items) lines.push(`- ${i}`);
-  };
-  section(
-    "Rows with a Period that is not in the Periods list (not published)",
-    [...report.orphans].map(([p, n]) => `"${p}": ${n} row(s)`),
-  );
-  section("Group notes", report.groupNotes);
-  section("Column notes", report.columns);
-  section("Rows skipped", report.skipped);
-  section("Duplicates resolved (last row wins)", report.duplicates);
-  section("Coordinates that were reversed and swapped", report.swapped);
-  section("Coordinates that were invalid and replaced by geocoding or skipped", report.badCoords);
-  section("Rows with several places (one pin each)", report.multi);
-  section("Addresses geocoded", report.geocoded);
-  section("Remote fellows pinned at the organization's address (from its website)", report.remotePlaced);
-  section("Pinned at the centre of the country (add Latitude/Longitude or a city to place precisely)", report.countryFallback);
-  section("Addresses that could not be geocoded", report.geocodeFailed);
-  section("Logos fetched", report.logosFetched);
-  section("Logo links that could not be downloaded (website icon used instead)", report.logoLinkFailed);
-  section("Logos not found (fellow shown without one)", report.logoFailed);
+  const counts: [number, string][] = [
+    [report.geocoded.length, "addresses geocoded"],
+    [report.logosFetched.length, "logos downloaded"],
+    [report.multi.length, "rows split into one pin per place"],
+    [report.duplicates.length, "duplicate rows resolved (listed below)"],
+    [report.cacheHits, "lookups reused from earlier builds"],
+  ];
+  lines.push("", "### This build", "");
+  for (const [n, what] of counts) if (n) lines.push(`- ${n} ${what}`);
   lines.push("", sheetReviewSection({
     unknownPeriods: [...report.orphans].map(([p,n]) => `"${p}": ${n} row(s)`),
     groups: report.groupNotes, columns: report.columns, skipped: report.skipped,
@@ -1247,7 +1251,7 @@ function summary(): string {
     remote: report.remotePlaced, countryFallback: report.countryFallback,
     failedGeocodes: report.geocodeFailed, failedLogoLinks: report.logoLinkFailed,
     failedLogos: report.logoFailed,
-  }));
+  }, limit));
   return lines.join("\n") + "\n";
 }
 
@@ -1354,7 +1358,12 @@ async function main() {
 
   const text = summary();
   console.log("\n" + text);
-  if (process.env.GITHUB_STEP_SUMMARY) await writeFile(process.env.GITHUB_STEP_SUMMARY, text, { flag: "a" });
+  await writeFile(BUILD_REPORT, text);
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    const fits = Buffer.byteLength(text) <= SUMMARY_MAX_BYTES;
+    const note = fits ? "" : "\n_Too long for this page, so lists are cut to 50 entries. The complete report is the **build-report** file under Artifacts at the bottom of this page._\n";
+    await writeFile(process.env.GITHUB_STEP_SUMMARY, note + (fits ? text : summary(SUMMARY_LIST_LIMIT)), { flag: "a" });
+  }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

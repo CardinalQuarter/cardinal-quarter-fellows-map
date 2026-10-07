@@ -30,6 +30,14 @@ jobs:
           # domain is attached; then set the BASE_PATH repo variable to "/".
           BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
         run: npm run build
+      - name: Upload full build report
+        # The run summary shows only the first 50 entries of each list.
+        if: always() && steps.build.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-report
+          path: build-report.md
+          if-no-files-found: ignore
       - name: Commit data snapshot
         # Every published change to the data is a readable diff in git history.
         # The snapshot is a nice-to-have: if the push cannot land (a re-run of
