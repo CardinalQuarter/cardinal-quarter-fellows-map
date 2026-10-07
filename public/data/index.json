@@ -63,7 +63,7 @@
       "periods": [
         "summer-2026"
       ],
-      "show": false
+      "show": true
     },
     {
       "slug": "summer-2025",
@@ -71,7 +71,7 @@
       "periods": [
         "summer-2025"
       ],
-      "show": false
+      "show": true
     },
     {
       "slug": "summer-2024",
@@ -164,23 +164,23 @@
         "summer-2026",
         "summer-2025"
       ],
-      "show": true
+      "show": false
     },
     {
-      "slug": "2022-2024",
-      "displayName": "2022-2024",
+      "slug": "2021-2024",
+      "displayName": "2021-2024",
       "periods": [
         "summer-2024",
         "summer-2023",
-        "summer-2022"
+        "summer-2022",
+        "summer-2021"
       ],
       "show": true
     },
     {
-      "slug": "2016-2021",
-      "displayName": "2016-2021",
+      "slug": "2016-2020",
+      "displayName": "2016-2020",
       "periods": [
-        "summer-2021",
         "summer-2020",
         "summer-2019",
         "summer-2018",
