@@ -204,6 +204,7 @@ const report = {
   geocodeFailed: [] as string[],
   logosFetched: [] as string[],
   logoLinkFailed: [] as string[],
+  logoLinkReplaced: 0,
   logoFailed: [] as string[],
 };
 
@@ -700,7 +701,9 @@ const inRange = (lat: number, lng: number) => Math.abs(lat) <= 90 && Math.abs(ln
 /** Fix swapped Latitude/Longitude cells; blank out pairs that are not on Earth. */
 function checkCoords(r: Row): void {
   if (!hasCoords(r)) {
-    if (r.latitude || r.longitude) report.badCoords.push(`${r.where}: Latitude "${r.latitude}", Longitude "${r.longitude}" is not a number pair, ignored`);
+    // One cell filled is a common slip; a fixed message lets the report merge those rows.
+    if (!r.latitude !== !r.longitude) report.badCoords.push(`${r.where}: only ${r.latitude ? "Latitude" : "Longitude"} is filled in, so City and Country were used`);
+    else if (r.latitude) report.badCoords.push(`${r.where}: Latitude "${r.latitude}", Longitude "${r.longitude}" is not a number pair, ignored`);
     r.latitude = "";
     r.longitude = "";
     return;
@@ -944,7 +947,7 @@ async function geocode(cache: GeoCache, rows: Placement[]): Promise<void> {
       report.countryFallback.push(`${r.where}: ${why}; pinned at the centre of ${r.country}`);
       continue;
     }
-    report.geocodeFailed.push(`${r.where}: ${place ? `"${place}"` : "no city or country"} could not be placed`);
+    report.geocodeFailed.push(`${r.where}: ${place ? `"${place}" could not be placed` : "no City or Country given"}`);
   }
 }
 
@@ -1171,6 +1174,7 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
   });
   // Report in sheet order, not completion order, so summaries are stable.
   const uploaded = new Map<string, string>(); // domain → a Logo cell's file
+  const failedLinks: { group: Placement[]; line: string }[] = [];
   for (const { link, group, base, fresh, entry } of linked) {
     const first = group[0];
     if ("file" in entry) {
@@ -1182,7 +1186,7 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
       }
     } else {
       const others = group.length > 1 ? ` (and ${group.length - 1} other row(s) with the same link)` : "";
-      report.logoLinkFailed.push(`${first.where}: ${plainLogoError(entry.error)}${others}`);
+      failedLinks.push({ group, line: `${first.where}: ${plainLogoError(entry.error)}${others}` });
       for (const r of group) r.partner_logo = "";
     }
   }
@@ -1208,6 +1212,12 @@ async function logos(cache: Record<string, LogoEntry>, rows: Placement[]): Promi
     } else {
       report.logoFailed.push(`${domain}: ${entry.error}`);
     }
+  }
+
+  // A broken Logo link only matters when the website icon did not cover for it.
+  for (const { group, line } of failedLinks) {
+    if (group.every((r) => r.partner_logo)) report.logoLinkReplaced++;
+    else report.logoLinkFailed.push(line);
   }
 }
 
@@ -1250,7 +1260,7 @@ function summary(limit = Infinity): string {
     invalidCoords: report.badCoords, suggestedCoords: report.suggestedCoords,
     remote: report.remotePlaced, countryFallback: report.countryFallback,
     failedGeocodes: report.geocodeFailed, failedLogoLinks: report.logoLinkFailed,
-    failedLogos: report.logoFailed,
+    failedLogos: report.logoFailed, replacedLogoLinks: report.logoLinkReplaced,
   }, limit));
   return lines.join("\n") + "\n";
 }

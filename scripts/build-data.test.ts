@@ -3,7 +3,7 @@ import test from "node:test";
 import { parseSources, rowsFromSource, splitCountries } from "./build-data.ts";
 import { countPeople, type Fellow } from "../src/types.ts";
 import { CLUSTER_PALETTE, PALETTE, UNSPECIFIED_COLOR, clusterColorIndex } from "../src/colors.ts";
-import { sheetReviewSection, type SheetReview } from "./build-report.ts";
+import { condense, lineRanges, sheetReviewSection, type SheetReview } from "./build-report.ts";
 
 const legacyHeaders = ["Affiliation", "Fellowship/Opportunity", "Name", "Stanford Email", "Class Year", "Major", "School", "Name of Partner Organization", "Location of Fellowship (City/Town)", "Location of Fellowship (Country)", "Latitude", "Longitude", "Partner Organization Website", "Organization's Logo", "Fellowship Interest Area"];
 const student = ["Haas Center", "Fellowship", "Test Student", "STUDENT@example.edu", "2027", "Biology", "Humanities & Sciences", "Partner", "Boston", "United States", "42.36", "-71.06", "https://example.org", "", "Health"];
@@ -86,7 +86,7 @@ test("sheet checklist includes automatic corrections and optional coordinates", 
   review.swapped = ['Students line 2 (Test): reversed', 'Students line 2 (Test): reversed'];
   review.suggestedCoords = ['Students line 3 (Other): Latitude 42, Longitude -71'];
   const output = sheetReviewSection(review);
-  assert.match(output, /build already swapped/);
+  assert.match(output, /map already shows them swapped/);
   assert.match(output, /Latitude 42, Longitude -71/);
   assert.equal(output.match(/- \[ \] Students line 2/g)?.length, 1);
   assert.doesNotMatch(output, /No sheet corrections/);
@@ -97,4 +97,32 @@ test("sheet checklist caps each list and says how many were cut", () => {
   const text = sheetReviewSection({ ...empty, duplicates: ["a", "b", "c", "d"] }, 2);
   assert.match(text, /- \[ \] a\n- \[ \] b\n- …and 2 more/);
   assert.doesNotMatch(text, /- \[ \] c/);
+});
+
+test("consecutive lines become ranges", () => {
+  assert.equal(lineRanges([655, 598, 599, 600, 702, 703]), "598–600, 655, 702–703");
+});
+
+test("rows with the same source and reason merge once there are three", () => {
+  const bad = (n: number) => `sheet tab "Old" line ${n} (S${n}): the link timed out`;
+  assert.deepEqual(condense([bad(5), bad(4), bad(9)]), ['sheet tab "Old", 3 rows: the link timed out (lines 4–5, 9)']);
+  assert.deepEqual(condense([bad(5), bad(9)]), [bad(5), bad(9)]);
+  assert.deepEqual(condense(["a replaced by b"]), ["a replaced by b"]);
+});
+
+test("checklist orders tiers by urgency and collapses optional cleanup", () => {
+  const empty: SheetReview = { unknownPeriods: [], groups: [], columns: [], skipped: [], duplicates: [], swapped: [], invalidCoords: [], suggestedCoords: [], remote: [], countryFallback: [], failedGeocodes: [], failedLogoLinks: [], failedLogos: [] };
+  const text = sheetReviewSection({ ...empty, skipped: ["Students line 2 (A): no place"], duplicates: ["x replaced by y"], failedLogos: ["a.org: no usable icon"], replacedLogoLinks: 7 });
+  const fix = text.indexOf("1. Fix"), review = text.indexOf("2. Review"), optional = text.indexOf("<details>");
+  assert.ok(fix >= 0 && fix < review && review < optional);
+  assert.match(text, /7 Logo link\(s\) could not be downloaded/);
+  assert.match(text, /<\/details>/);
+  assert.doesNotMatch(sheetReviewSection({ ...empty, duplicates: ["x replaced by y"] }), /1\. Fix/);
+});
+
+test("a skipped row already listed as unresolved appears once", () => {
+  const empty: SheetReview = { unknownPeriods: [], groups: [], columns: [], skipped: [], duplicates: [], swapped: [], invalidCoords: [], suggestedCoords: [], remote: [], countryFallback: [], failedGeocodes: [], failedLogoLinks: [], failedLogos: [] };
+  const text = sheetReviewSection({ ...empty, skipped: ['tab "A" line 4 (Z): no coordinates and the location could not be placed'], failedGeocodes: ['tab "A" line 4 (Z): "Sarajevo, Herzevognia" could not be placed'] });
+  assert.equal(text.match(/line 4/g)?.length, 1);
+  assert.match(text, /Herzevognia/);
 });
