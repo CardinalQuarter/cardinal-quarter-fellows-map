@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import maplibregl, { type Map as MlMap, type MapMouseEvent, type StyleSpecification } from "maplibre-gl";
 import type { FeatureCollection } from "geojson";
-import { sameSpot, type Fellow } from "../types";
+import { UNSPECIFIED, sameSpot, type Fellow } from "../types";
 import { CLUSTER_PALETTE, clusterColorIndex } from "../colors";
 
 export type Pin = { fellow: Fellow; color: string };
-/** The open pin. `fly` moves the map there (list click, shared link); a map click leaves the view alone. */
-export type Selection = { fellow: Fellow; fly: boolean };
+/**
+ * The open pin. `fly` moves the map there (list click, shared link); a map click leaves the view alone.
+ * `nearby` lists a max-zoom cluster's fellows, whose pins are too close to separate.
+ */
+export type Selection = { fellow: Fellow; fly: boolean; nearby?: Fellow[]; at?: [number, number] };
 
 /**
  * Basemap: OpenFreeMap "positron" (free, no key, no usage cap).
@@ -20,9 +23,12 @@ const LAYER = "fellows-circles";
 /** Unclustered copy of the data, shown only while exporting "individual pins". */
 const FLAT_SOURCE = "fellows-flat";
 const FLAT_LAYER = "fellows-flat-circles";
-/** Cluster right up to the last zoom so fellows at one address always show as a counted ring. */
+/**
+ * Cluster at every zoom, including the last, so pins too close to separate
+ * always show as a counted ring rather than overlapping.
+ */
 const MAX_ZOOM = 15;
-const CLUSTER_MAX_ZOOM = MAX_ZOOM - 1;
+const CLUSTER_MAX_ZOOM = MAX_ZOOM;
 const POPUP_MARGIN = 12;
 /** Below this width a popup is replaced by a bottom sheet, which reads far better on a phone. */
 const SHEET_QUERY = "(max-width: 767px)";
@@ -84,8 +90,11 @@ function useEnglishLabels(map: MlMap) {
   }
 }
 
+/** A card value, or "" when blank; older periods lack some columns. */
+const shown = (v: string | undefined) => (v && v !== UNSPECIFIED ? v : "");
+
 function OrgHeader({ f }: { f: Fellow }) {
-  const where = [f.fellowship_loc, f.country].filter(Boolean).join(", ");
+  const where = [shown(f.fellowship_loc), shown(f.country)].filter(Boolean).join(", ");
   return (
     <div className="mb-2 flex items-start gap-3">
       {f.partner_logo && (
@@ -112,31 +121,34 @@ function OrgHeader({ f }: { f: Fellow }) {
         ) : (
           <span className="block font-semibold leading-tight">{f.partner_organization}</span>
         )}
-        <span className="text-xs text-cool-grey">{where}</span>
+        {where && <span className="text-xs text-cool-grey">{where}</span>}
       </div>
     </div>
   );
 }
 
 function FellowDetails({ f }: { f: Fellow }) {
+  const subtitle = [shown(f.class_year) && `Class of ${f.class_year}`, shown(f.major)].filter(Boolean).join(" · ");
+  const rows = ([["Interest", f.interest_area], ["Program", f.fellowship], ["Affiliation", f.affiliation], ["Period", f.period]] as const)
+    .map(([label, v]) => [label, shown(v)] as const)
+    .filter(([, v]) => v);
   return (
     <div>
       <div className="font-semibold leading-tight">{f.name}</div>
-      <div className="text-[13px] text-cool-grey">
-        {[f.class_year && `Class of ${f.class_year}`, f.major].filter(Boolean).join(" · ")}
-      </div>
-      <dl className="m-0 mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
-        <dt className="text-cool-grey">Interest</dt><dd className="m-0">{f.interest_area}</dd>
-        <dt className="text-cool-grey">Program</dt><dd className="m-0">{f.fellowship}</dd>
-        {f.affiliation && <><dt className="text-cool-grey">Affiliation</dt><dd className="m-0">{f.affiliation}</dd></>}
-        {f.period && <><dt className="text-cool-grey">Period</dt><dd className="m-0">{f.period}</dd></>}
-      </dl>
+      {subtitle && <div className="text-[13px] text-cool-grey">{subtitle}</div>}
+      {rows.length > 0 && (
+        <dl className="m-0 mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
+          {rows.map(([label, v]) => (
+            <Fragment key={label}><dt className="text-cool-grey">{label}</dt><dd className="m-0">{v}</dd></Fragment>
+          ))}
+        </dl>
+      )}
     </div>
   );
 }
 
 /** One or many fellows at a spot, grouped by organization so the org header appears once. */
-function PopupList({ pins, full = false }: { pins: Pin[]; full?: boolean }) {
+function PopupList({ pins, full = false, nearby = false }: { pins: Pin[]; full?: boolean; nearby?: boolean }) {
   const groups = new Map<string, Fellow[]>();
   for (const p of pins) {
     const key = p.fellow.partner_organization;
@@ -146,7 +158,7 @@ function PopupList({ pins, full = false }: { pins: Pin[]; full?: boolean }) {
     <div className={full ? "font-sans" : "w-64 font-sans " + (pins.length > 1 ? "max-h-80 overflow-y-auto pr-1" : "")}>
       {pins.length > 1 && (
         <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-cool-grey">
-          {pins.length} fellows at this location
+          {pins.length} fellows {nearby ? "nearby" : "at this location"}
         </div>
       )}
       {[...groups.entries()].map(([org, fellows], gi) => (
@@ -362,7 +374,7 @@ export function MapView({ pins, selection, onSelect }: Props) {
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const markers = useRef<Map<number, maplibregl.Marker>>(new Map());
   const [ready, setReady] = useState(false);
-  const [sheet, setSheet] = useState<Pin[] | null>(null);
+  const [sheet, setSheet] = useState<{ pins: Pin[]; nearby: boolean } | null>(null);
   pinsRef.current = pins;
   onSelectRef.current = onSelect;
 
@@ -403,14 +415,17 @@ export function MapView({ pins, selection, onSelect }: Props) {
         const el = donut(props);
         el.addEventListener("click", async (ev) => {
           ev.stopPropagation();
-          const leaves = await source.getClusterLeaves(id, Infinity, 0);
+          const [leaves, expansion] = await Promise.all([source.getClusterLeaves(id, Infinity, 0), source.getClusterExpansionZoom(id)]);
           const bounds = new maplibregl.LngLatBounds();
           for (const l of leaves) bounds.extend((l.geometry as GeoJSON.Point).coordinates as [number, number]);
           const ne = bounds.getNorthEast(), sw = bounds.getSouthWest();
+          const fellows = leaves.map((l) => pinsRef.current[(l.properties as { i: number }).i]?.fellow).filter((f): f is Fellow => !!f);
           if (Math.abs(ne.lng - sw.lng) < 1e-6 && Math.abs(ne.lat - sw.lat) < 1e-6) {
             // Everyone here shares one address; zooming would not separate them.
-            const first = pinsRef.current[(leaves[0].properties as { i: number }).i];
-            if (first) onSelectRef.current({ fellow: first.fellow, fly: false });
+            if (fellows[0]) onSelectRef.current({ fellow: fellows[0], fly: false });
+          } else if (expansion > MAX_ZOOM) {
+            // Separate addresses, but too close to split even at the last zoom: list them all.
+            if (fellows[0]) onSelectRef.current({ fellow: fellows[0], fly: false, nearby: fellows, at: coords });
           } else {
             const {clientWidth, clientHeight} = map.getContainer();
             const padding = Math.round(Math.min(80, clientWidth * 0.15, clientHeight * 0.15));
@@ -523,21 +538,24 @@ export function MapView({ pins, selection, onSelect }: Props) {
     const map = mapRef.current;
     if (!map || !ready) return;
     if (!selection) { closePopup(); return; }
-    const hits = pins.filter((p) => sameSpot(p.fellow, selection.fellow));
+    const nearby = selection.nearby && new Set(selection.nearby);
+    const hits = pins.filter((p) => (nearby ? nearby.has(p.fellow) : sameSpot(p.fellow, selection.fellow)));
     if (hits.length === 0) { closePopup(); return; }
-    const lngLat: [number, number] = [selection.fellow.longitude, selection.fellow.latitude];
+    const lngLat: [number, number] = selection.at ?? [selection.fellow.longitude, selection.fellow.latitude];
     const mobile = window.matchMedia(SHEET_QUERY).matches;
 
     const open = () => {
       if (mobile) {
         closePopup();
-        setSheet(hits);
+        setSheet({ pins: hits, nearby: !!nearby });
         return;
       }
       const el = document.createElement("div");
-      popupRoot.current?.unmount();
+      // This can run inside React's commit; unmounting another root there logs a race warning.
+      const oldRoot = popupRoot.current;
+      if (oldRoot) setTimeout(() => oldRoot.unmount());
       popupRoot.current = createRoot(el);
-      popupRoot.current.render(<PopupList pins={hits} />);
+      popupRoot.current.render(<PopupList pins={hits} nearby={!!nearby} />);
       const popup = new maplibregl.Popup({ offset: 12, maxWidth: "320px" }).setLngLat(lngLat).setDOMContent(el);
       // Closing with the × clears the selection; replacing the popup must not.
       popup.on("close", () => { if (popupRef.current === popup) { popupRef.current = null; onSelectRef.current(null); } });
@@ -582,7 +600,7 @@ export function MapView({ pins, selection, onSelect }: Props) {
               ×
             </button>
           </div>
-          <PopupList pins={sheet} full />
+          <PopupList pins={sheet.pins} nearby={sheet.nearby} full />
         </div>
       )}
     </div>
