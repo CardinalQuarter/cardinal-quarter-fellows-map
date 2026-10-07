@@ -26,9 +26,6 @@ jobs:
         id: build
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
-          # Project page lives at https://<org>.github.io/<repo>/ until a custom
-          # domain is attached; then set the BASE_PATH repo variable to "/".
-          BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
         run: npm run build
       - name: Upload full build report
         # The run summary shows only the first 50 entries of each list.

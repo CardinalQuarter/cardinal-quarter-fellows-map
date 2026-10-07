@@ -46,9 +46,11 @@ Student emails are used to deduplicate and are never published.
 - [ ] **Settings → Pages**: set Source to *GitHub Actions*.
 - [ ] Export old periods from Bluehost (`public_html/upload/*.csv`) and paste
       them into a sheet tab listed in `Sources` (or drop them in `data/csv/`).
-- [ ] Point the `cardinalquarterfellows.cardinalservice.org` CNAME at GitHub
-      Pages, add it under **Settings → Pages → Custom domain**, and add a repo
-      variable `BASE_PATH` with value `/`.
+- [ ] In Bluehost DNS, replace the `cardinalquarterfellows` A record with a
+      CNAME to `cardinalquarter.github.io`, then enter
+      `cardinalquarterfellows.cardinalservice.org` under **Settings → Pages →
+      Custom domain** and tick *Enforce HTTPS* once offered. No rebuild is
+      needed: asset paths are relative, so one build serves either address.
 - [ ] After cutover: revoke the old Google Maps API key, rotate the Bluehost
       database password, and take the Bluehost site down.
 
