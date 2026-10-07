@@ -230,25 +230,52 @@ function donut(props: Record<string, unknown>): HTMLElement {
   return el;
 }
 
-/** Nudge the map so an open popup sits fully inside the map, not clipped at an edge. */
+/** Pan the map just enough that the popup sits fully inside it, clear of the zoom control. */
+function nudgeIntoView(map: MlMap, popup: maplibregl.Popup) {
+  const el = popup.getElement();
+  if (!el) return;
+  const box = el.getBoundingClientRect();
+  const view = map.getContainer().getBoundingClientRect();
+  let dx = 0, dy = 0;
+  if (box.left < view.left + POPUP_MARGIN) dx = box.left - (view.left + POPUP_MARGIN);
+  else if (box.right > view.right - POPUP_MARGIN) dx = box.right - (view.right - POPUP_MARGIN);
+  if (box.top < view.top + POPUP_MARGIN) dy = box.top - (view.top + POPUP_MARGIN);
+  else if (box.bottom > view.bottom - POPUP_MARGIN) dy = box.bottom - (view.bottom - POPUP_MARGIN);
+  // The zoom control sits top-right; slide the popup below it rather than behind it.
+  const ctrl = map.getContainer().querySelector(".maplibregl-ctrl-top-right")?.getBoundingClientRect();
+  if (ctrl && box.right - dx > ctrl.left - POPUP_MARGIN && box.top - dy < ctrl.bottom + POPUP_MARGIN) {
+    dy = box.top - (ctrl.bottom + POPUP_MARGIN);
+  }
+  if (Math.abs(dx) > 1 || Math.abs(dy) > 1) map.panBy([dx, dy], { duration: 300 });
+}
+
+/**
+ * Keep an open popup fully inside the map. Its content renders after the popup
+ * is placed and grows as logos load, so re-check whenever its size changes,
+ * until the popup closes or the user moves the map themselves.
+ */
 function keepPopupInView(map: MlMap, popup: maplibregl.Popup) {
-  requestAnimationFrame(() => {
-    const el = popup.getElement();
-    if (!el) return;
-    const box = el.getBoundingClientRect();
-    const view = map.getContainer().getBoundingClientRect();
-    let dx = 0, dy = 0;
-    if (box.left < view.left + POPUP_MARGIN) dx = box.left - (view.left + POPUP_MARGIN);
-    else if (box.right > view.right - POPUP_MARGIN) dx = box.right - (view.right - POPUP_MARGIN);
-    if (box.top < view.top + POPUP_MARGIN) dy = box.top - (view.top + POPUP_MARGIN);
-    else if (box.bottom > view.bottom - POPUP_MARGIN) dy = box.bottom - (view.bottom - POPUP_MARGIN);
-    // The zoom control sits top-right; slide the popup below it rather than behind it.
-    const ctrl = map.getContainer().querySelector(".maplibregl-ctrl-top-right")?.getBoundingClientRect();
-    if (ctrl && box.right - dx > ctrl.left - POPUP_MARGIN && box.top - dy < ctrl.bottom + POPUP_MARGIN) {
-      dy = box.top - (ctrl.bottom + POPUP_MARGIN);
-    }
-    if (dx || dy) map.panBy([dx, dy], { duration: 300 });
-  });
+  const el = popup.getElement();
+  if (!el) return;
+  let frame = 0;
+  const check = () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      // Re-placing the popup lets MapLibre pick the side that fits its new size.
+      popup.setLngLat(popup.getLngLat());
+      nudgeIntoView(map, popup);
+    });
+  };
+  const observer = new ResizeObserver(check);
+  observer.observe(el);
+  const stop = () => {
+    observer.disconnect();
+    cancelAnimationFrame(frame);
+    map.off("dragstart", stop);
+  };
+  map.on("dragstart", stop);
+  popup.once("close", stop);
+  check();
 }
 
 /**
