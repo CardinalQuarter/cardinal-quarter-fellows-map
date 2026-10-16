@@ -222,7 +222,7 @@
   },
   {
     "id": "summer-2026|444",
-    "name": "Addison Mallot",
+    "name": "Addison Mallott",
     "class_year": "2026",
     "major": "Earth Systems, Native American Studies",
     "school": "Doerr School of Sustainability",
@@ -442,6 +442,23 @@
     "interest_area": "Environmental Sustainability"
   },
   {
+    "id": "summer-2026|513",
+    "name": "Alex Mondragon",
+    "class_year": "2027",
+    "major": "Biology",
+    "school": "School of Humanities & Sciences",
+    "fellowship": "Non-Funded or Self-Funded Cardinal Quarter",
+    "partner_organization": "Big Island Drug Court",
+    "country": "United States",
+    "fellowship_loc": "Kailua-Kona, HI",
+    "latitude": 19.6383,
+    "longitude": -155.995,
+    "affiliation": "Haas Center for Public Service",
+    "partner_website": "https://www.courts.state.hi.us/news_and_reports/2021/08/big-island-drug-court-celebrates-57th-graduation-ceremony",
+    "partner_logo": "logos/courts.state.hi.us.png",
+    "interest_area": "Law, Policy, & Justice"
+  },
+  {
     "id": "summer-2026|265",
     "name": "Alexander Lozano",
     "class_year": "2029",
@@ -476,40 +493,6 @@
     "interest_area": "Civic Engagement"
   },
   {
-    "id": "summer-2026|143",
-    "name": "Alexandra Jones",
-    "class_year": "2028",
-    "major": "Human Biology",
-    "school": "Vice Provost for Undergraduate Education",
-    "fellowship": "Global Studies Internship Program",
-    "partner_organization": "Kaohsiung Medical University Chung-Ho Memorial Hospital",
-    "country": "Taiwan",
-    "fellowship_loc": "Kaohsiung",
-    "latitude": 22.645861,
-    "longitude": 120.30925,
-    "affiliation": "Global Studies",
-    "partner_website": "https://www.kmuh.org.tw/english/",
-    "partner_logo": "logos/kmuh.org.tw.png",
-    "interest_area": "Health"
-  },
-  {
-    "id": "summer-2026|513",
-    "name": "Alexandra Mondragon",
-    "class_year": "2027",
-    "major": "Biology",
-    "school": "School of Humanities & Sciences",
-    "fellowship": "Non-Funded or Self-Funded Cardinal Quarter",
-    "partner_organization": "Big Island Drug Court",
-    "country": "United States",
-    "fellowship_loc": "Kailua-Kona, HI",
-    "latitude": 19.6383,
-    "longitude": -155.995,
-    "affiliation": "Haas Center for Public Service",
-    "partner_website": "https://www.courts.state.hi.us/news_and_reports/2021/08/big-island-drug-court-celebrates-57th-graduation-ceremony",
-    "partner_logo": "logos/courts.state.hi.us.png",
-    "interest_area": "Law, Policy, & Justice"
-  },
-  {
     "id": "summer-2026|553",
     "name": "Alexianie Elis Negron",
     "class_year": "2027",
@@ -542,6 +525,23 @@
     "partner_website": "https://pubdef.lacounty.gov/",
     "partner_logo": "logos/pubdef.lacounty.gov.png",
     "interest_area": "Law, Policy, & Justice"
+  },
+  {
+    "id": "summer-2026|614",
+    "name": "Alexis Hernandez",
+    "class_year": "2026",
+    "major": "Electrical Engineering",
+    "school": "School of Engineering",
+    "fellowship": "Global Engineering Internships",
+    "partner_organization": "Zhejiang University International Education Research Industry Program",
+    "country": "China",
+    "fellowship_loc": "Hangzhou",
+    "latitude": 30.2741,
+    "longitude": 120.1551,
+    "affiliation": "School of Engineering",
+    "partner_website": "https://www.zju.edu.cn/english/",
+    "partner_logo": "",
+    "interest_area": "Technology & Engineering"
   },
   {
     "id": "summer-2026|331",
@@ -627,6 +627,23 @@
     "partner_website": "https://www.edf.org/",
     "partner_logo": "logos/edf.org.png",
     "interest_area": "Environmental Sustainability"
+  },
+  {
+    "id": "summer-2026|143",
+    "name": "Ally Jones",
+    "class_year": "2028",
+    "major": "Human Biology",
+    "school": "Vice Provost for Undergraduate Education",
+    "fellowship": "Global Studies Internship Program",
+    "partner_organization": "Kaohsiung Medical University Chung-Ho Memorial Hospital",
+    "country": "Taiwan",
+    "fellowship_loc": "Kaohsiung",
+    "latitude": 22.645861,
+    "longitude": 120.30925,
+    "affiliation": "Global Studies",
+    "partner_website": "https://www.kmuh.org.tw/english/",
+    "partner_logo": "logos/kmuh.org.tw.png",
+    "interest_area": "Health"
   },
   {
     "id": "summer-2026|524",
@@ -715,7 +732,7 @@
   },
   {
     "id": "summer-2026|538",
-    "name": "Ameera Eshtwei",
+    "name": "Ameera Eshtewi",
     "class_year": "2027",
     "major": "English and Creative Writing",
     "school": "School of Humanities & Sciences",
@@ -750,7 +767,7 @@
   {
     "id": "summer-2026|558",
     "name": "Amir Erfan Shahla",
-    "class_year": "2029",
+    "class_year": "2027",
     "major": "Mechanical Engineering",
     "school": "School of Engineering",
     "fellowship": "Community Service Work Study",
@@ -1430,7 +1447,7 @@
   {
     "id": "summer-2026|608",
     "name": "Ashley Mujica-Pinto",
-    "class_year": "2029",
+    "class_year": "2028",
     "major": "Undeclared",
     "school": "Vice Provost for Undergraduate Education",
     "fellowship": "SILICON Unicode Internship",
@@ -1651,7 +1668,7 @@
   {
     "id": "summer-2026|213",
     "name": "Avery Kamalu",
-    "class_year": "2026",
+    "class_year": "2027",
     "major": "Art History and Native American Studies",
     "school": "School of Humanities & Sciences",
     "fellowship": "Indigenous Communities Fellowships",
@@ -1787,7 +1804,7 @@
   {
     "id": "summer-2026|115",
     "name": "Barron Nguyen",
-    "class_year": "2026",
+    "class_year": "2027",
     "major": "Earth and Planetary Sciences",
     "school": "Doerr School of Sustainability",
     "fellowship": "Environment and Policy Internships (EPIC)",
@@ -2365,7 +2382,7 @@
   {
     "id": "summer-2026|110",
     "name": "Carolyn He",
-    "class_year": "2029",
+    "class_year": "2028",
     "major": "Undeclared",
     "school": "Vice Provost for Undergraduate Education",
     "fellowship": "Environment and Policy Internships (EPIC)",
@@ -3708,7 +3725,7 @@
   {
     "id": "summer-2026|380",
     "name": "Evelyn Guzman",
-    "class_year": "2028",
+    "class_year": "2029",
     "major": "Undeclared",
     "school": "Vice Provost for Undergraduate Education",
     "fellowship": "Stanford in Government Stipends - Round 1",
@@ -3878,7 +3895,7 @@
   {
     "id": "summer-2026|248",
     "name": "Gabriella Ignacio",
-    "class_year": "2026",
+    "class_year": "2027",
     "major": "History",
     "school": "School of Humanities & Sciences",
     "fellowship": "Partnerships for Climate Justice in the Bay Fellowships - Round 2",
@@ -4167,7 +4184,7 @@
   {
     "id": "summer-2026|410",
     "name": "Hannah Treehan",
-    "class_year": "2027",
+    "class_year": "2026",
     "major": "Management Science & Engineering",
     "school": "School of Engineering",
     "fellowship": "Stanford in Government Stipends - Round 2",
@@ -4435,6 +4452,23 @@
     "partner_website": "https://justiciaracial.org",
     "partner_logo": "logos/justiciaracial.org.svg",
     "interest_area": "Law, Policy, & Justice"
+  },
+  {
+    "id": "summer-2026|610",
+    "name": "Irma Gomez",
+    "class_year": "2027",
+    "major": "Biology",
+    "school": "School of Humanities & Sciences",
+    "fellowship": "Bill Lane Center Community Engaged Research",
+    "partner_organization": "Greenbelt Alliance; Santa Clara County Climate Collaborative",
+    "country": "United States",
+    "fellowship_loc": "Oakland, CA",
+    "latitude": 37.8044,
+    "longitude": -122.2712,
+    "affiliation": "Bill Lane Center for the American West",
+    "partner_website": "https://www.greenbelt.org",
+    "partner_logo": "",
+    "interest_area": "Environmental Sustainability"
   },
   {
     "id": "summer-2026|325",
@@ -5119,7 +5153,7 @@
   {
     "id": "summer-2026|246",
     "name": "Joelle Cheeseman",
-    "class_year": "2028",
+    "class_year": "2029",
     "major": "Computer Science",
     "school": "School of Engineering",
     "fellowship": "Partnerships for Climate Justice in the Bay Fellowships - Round 2",
@@ -5355,21 +5389,21 @@
     "interest_area": "Environmental Sustainability"
   },
   {
-    "id": "summer-2026|160",
-    "name": "Joshua Shaw",
-    "class_year": "2029",
-    "major": "Computer Science",
+    "id": "summer-2026|613",
+    "name": "Juan Pablo Gonzalez Pacheco",
+    "class_year": "2026",
+    "major": "Computer Science and Product Design",
     "school": "School of Engineering",
-    "fellowship": "Global Studies Internship Program",
-    "partner_organization": "Latvian Strategy and Economic Research (LaSER)",
-    "country": "Latvia",
-    "fellowship_loc": "Riga",
-    "latitude": 56.946,
-    "longitude": 24.1052,
-    "affiliation": "Global Studies",
-    "partner_website": "https://domnicalaser.lv/en/home/",
-    "partner_logo": "logos/domnicalaser.lv.png",
-    "interest_area": "Health"
+    "fellowship": "Global Engineering Internships",
+    "partner_organization": "Hong Kong-Shenzhen Innovation and Technology Park",
+    "country": "China",
+    "fellowship_loc": "Hong Kong",
+    "latitude": 22.489,
+    "longitude": 114.0281,
+    "affiliation": "School of Engineering",
+    "partner_website": "https://www.hsitp.org/en",
+    "partner_logo": "logos/hsitp.org.png",
+    "interest_area": "Technology & Engineering"
   },
   {
     "id": "summer-2026|17",
@@ -6426,6 +6460,23 @@
     "interest_area": "Health"
   },
   {
+    "id": "summer-2026|611",
+    "name": "Lisa Katz",
+    "class_year": "2027",
+    "major": "International Relations/History",
+    "school": "School of Humanities & Sciences",
+    "fellowship": "Bill Lane Center Community Engaged Research",
+    "partner_organization": "Environmental Defense Fund, Groundwater Demand Management Network, and CA Dept of Water Resources",
+    "country": "United States",
+    "fellowship_loc": "Sacramento, CA",
+    "latitude": 38.5816,
+    "longitude": -121.4944,
+    "affiliation": "Bill Lane Center for the American West",
+    "partner_website": "https://www.edf.org",
+    "partner_logo": "logos/edf.org.png",
+    "interest_area": "Environmental Sustainability"
+  },
+  {
     "id": "summer-2026|359",
     "name": "Liv Kriger",
     "class_year": "2029",
@@ -6713,6 +6764,23 @@
     "partner_website": "https://www.9dots.org",
     "partner_logo": "logos/9dots.org.png",
     "interest_area": "Technology & Engineering"
+  },
+  {
+    "id": "summer-2026|617",
+    "name": "Malaika Onyia",
+    "class_year": "2028",
+    "major": "Undeclared",
+    "school": "Vice Provost for Undergraduate Education",
+    "fellowship": "Rising Bird Fellows",
+    "partner_organization": "U.S. House of Representatives",
+    "country": "United States",
+    "fellowship_loc": "Los Angeles, CA",
+    "latitude": 34.0522,
+    "longitude": -118.2437,
+    "affiliation": "CareerEd",
+    "partner_website": "https://www.house.gov",
+    "partner_logo": "logos/house.gov.png",
+    "interest_area": "Civic Engagement"
   },
   {
     "id": "summer-2026|257",
@@ -7091,7 +7159,7 @@
   {
     "id": "summer-2026|442",
     "name": "Max Yan",
-    "class_year": "2028",
+    "class_year": "2029",
     "major": "Undeclared",
     "school": "Vice Provost for Undergraduate Education",
     "fellowship": "Tilting Futures International Public Service Fellowship",
@@ -7482,7 +7550,7 @@
   {
     "id": "summer-2026|409",
     "name": "Miguel Tejeda",
-    "class_year": "2026",
+    "class_year": "2027",
     "major": "International Relations",
     "school": "School of Humanities & Sciences",
     "fellowship": "Stanford in Government Stipends - Round 2",
@@ -7953,6 +8021,23 @@
     "affiliation": "CS + Social Good",
     "partner_website": "https://terradot.earth/",
     "partner_logo": "logos/terradot.earth.png",
+    "interest_area": "Environmental Sustainability"
+  },
+  {
+    "id": "summer-2026|612",
+    "name": "Nick Mendez",
+    "class_year": "2029",
+    "major": "Undeclared",
+    "school": "Vice Provost for Undergraduate Education",
+    "fellowship": "Bill Lane Center Community Engaged Research",
+    "partner_organization": "Environmental Defense Fund, Groundwater Demand Management Network, and CA Dept of Water Resources",
+    "country": "United States",
+    "fellowship_loc": "Sacramento, CA",
+    "latitude": 38.5816,
+    "longitude": -121.4944,
+    "affiliation": "Bill Lane Center for the American West",
+    "partner_website": "https://www.edf.org",
+    "partner_logo": "logos/edf.org.png",
     "interest_area": "Environmental Sustainability"
   },
   {
@@ -8738,6 +8823,23 @@
     "interest_area": "Environmental Sustainability"
   },
   {
+    "id": "summer-2026|447",
+    "name": "Samantha Dizon",
+    "class_year": "2026",
+    "major": "Communication and Human Rights",
+    "school": "School of Humanities & Sciences",
+    "fellowship": "Lyric McHenry Community Artist Fellowship",
+    "partner_organization": "Creative Growth",
+    "country": "United States",
+    "fellowship_loc": "Oakland, CA",
+    "latitude": 37.8044,
+    "longitude": -122.2712,
+    "affiliation": "Institute for Diversity in the Arts",
+    "partner_website": "https://www.creativegrowth.org/",
+    "partner_logo": "logos/creativegrowth.org.png",
+    "interest_area": "Arts & Media"
+  },
+  {
     "id": "summer-2026|264",
     "name": "Samantha Heredia",
     "class_year": "2027",
@@ -8753,23 +8855,6 @@
     "partner_website": "https://iibayarea.org/",
     "partner_logo": "logos/iibayarea.org.svg",
     "interest_area": "Law, Policy, & Justice"
-  },
-  {
-    "id": "summer-2026|447",
-    "name": "Samantha Isabelle Dizon",
-    "class_year": "2026",
-    "major": "Communication and Human Rights",
-    "school": "School of Humanities & Sciences",
-    "fellowship": "Lyric McHenry Community Artist Fellowship",
-    "partner_organization": "Creative Growth",
-    "country": "United States",
-    "fellowship_loc": "Oakland, CA",
-    "latitude": 37.8044,
-    "longitude": -122.2712,
-    "affiliation": "Institute for Diversity in the Arts",
-    "partner_website": "https://www.creativegrowth.org/",
-    "partner_logo": "logos/creativegrowth.org.png",
-    "interest_area": "Arts & Media"
   },
   {
     "id": "summer-2026|549",
@@ -9063,7 +9148,7 @@
   {
     "id": "summer-2026|350",
     "name": "Shayla Fitzsimmons-Call",
-    "class_year": "2026",
+    "class_year": "2027",
     "major": "International Relations",
     "school": "School of Humanities & Sciences",
     "fellowship": "Stanford in Government Fellowships",
@@ -9282,6 +9367,23 @@
     "interest_area": "Environmental Sustainability"
   },
   {
+    "id": "summer-2026|134",
+    "name": "Sofia Demianets",
+    "class_year": "2029",
+    "major": "Undeclared",
+    "school": "Vice Provost for Undergraduate Education",
+    "fellowship": "Global Studies Internship Program",
+    "partner_organization": "VoxUkraine",
+    "country": "Ukraine",
+    "fellowship_loc": "Kyiv",
+    "latitude": 50.4501,
+    "longitude": 30.5234,
+    "affiliation": "Global Studies",
+    "partner_website": "https://voxukraine.org/en/",
+    "partner_logo": "logos/voxukraine.org.png",
+    "interest_area": "Civic Engagement"
+  },
+  {
     "id": "summer-2026|270",
     "name": "Sofia Furbeck",
     "class_year": "2027",
@@ -9331,23 +9433,6 @@
     "partner_website": "https://www.hkstp.org/en/",
     "partner_logo": "logos/hkstp.org.png",
     "interest_area": "Technology & Engineering"
-  },
-  {
-    "id": "summer-2026|134",
-    "name": "Sofiia Demianets",
-    "class_year": "2029",
-    "major": "Undeclared",
-    "school": "Vice Provost for Undergraduate Education",
-    "fellowship": "Global Studies Internship Program",
-    "partner_organization": "VoxUkraine",
-    "country": "Ukraine",
-    "fellowship_loc": "Kyiv",
-    "latitude": 50.4501,
-    "longitude": 30.5234,
-    "affiliation": "Global Studies",
-    "partner_website": "https://voxukraine.org/en/",
-    "partner_logo": "logos/voxukraine.org.png",
-    "interest_area": "Civic Engagement"
   },
   {
     "id": "summer-2026|582",
@@ -9758,6 +9843,23 @@
     "interest_area": "Environmental Sustainability"
   },
   {
+    "id": "summer-2026|615",
+    "name": "Tianjun Zhu",
+    "class_year": "2029",
+    "major": "Undeclared",
+    "school": "Vice Provost for Undergraduate Education",
+    "fellowship": "Global Engineering Internships",
+    "partner_organization": "Zhejiang University International Education Research Industry Program",
+    "country": "China",
+    "fellowship_loc": "Hangzhou",
+    "latitude": 30.2741,
+    "longitude": 120.1551,
+    "affiliation": "School of Engineering",
+    "partner_website": "https://www.zju.edu.cn/english/",
+    "partner_logo": "",
+    "interest_area": "Technology & Engineering"
+  },
+  {
     "id": "summer-2026|284",
     "name": "Tianyi Jiang",
     "class_year": "2028",
@@ -10032,7 +10134,7 @@
   {
     "id": "summer-2026|463",
     "name": "Vivian Kao",
-    "class_year": "2029",
+    "class_year": "2028",
     "major": "Undeclared",
     "school": "Vice Provost for Undergraduate Education",
     "fellowship": "energyStartup Internship",
@@ -10149,6 +10251,23 @@
     "interest_area": "Health"
   },
   {
+    "id": "summer-2026|160",
+    "name": "Yasha Shaw",
+    "class_year": "2029",
+    "major": "Computer Science",
+    "school": "School of Engineering",
+    "fellowship": "Global Studies Internship Program",
+    "partner_organization": "Latvian Strategy and Economic Research (LaSER)",
+    "country": "Latvia",
+    "fellowship_loc": "Riga",
+    "latitude": 56.946,
+    "longitude": 24.1052,
+    "affiliation": "Global Studies",
+    "partner_website": "https://domnicalaser.lv/en/home/",
+    "partner_logo": "logos/domnicalaser.lv.png",
+    "interest_area": "Health"
+  },
+  {
     "id": "summer-2026|433",
     "name": "Yashita Singh",
     "class_year": "2027",
@@ -10198,6 +10317,23 @@
     "partner_website": "https://www.lacc.edu/admissions/upward-bound",
     "partner_logo": "logos/lacc.edu.png",
     "interest_area": "Education & Youth Development"
+  },
+  {
+    "id": "summer-2026|616",
+    "name": "Yu Ming Huang",
+    "class_year": "",
+    "major": "ICME (MS)",
+    "school": "School of Engineering",
+    "fellowship": "Global Engineering Internships - Graduate Student",
+    "partner_organization": "Hong Kong Science and Technology Park",
+    "country": "China",
+    "fellowship_loc": "Hong Kong",
+    "latitude": 22.3964,
+    "longitude": 114.2168,
+    "affiliation": "School of Engineering",
+    "partner_website": "https://www.hkstp.org/en/",
+    "partner_logo": "logos/hkstp.org.png",
+    "interest_area": "Technology & Engineering"
   },
   {
     "id": "summer-2026|307",
