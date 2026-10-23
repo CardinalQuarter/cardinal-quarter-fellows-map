@@ -889,5 +889,13 @@
     "code": "in",
     "kind": "boundary/administrative",
     "importance": 0.635
+  },
+  "country:America Samoa": {
+    "error": "no match",
+    "at": "2026-10-23T20:46:31.645Z"
+  },
+  "Pao Pago, America Samoa": {
+    "error": "no match",
+    "at": "2026-10-23T20:46:32.436Z"
   }
 }
