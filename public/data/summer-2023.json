@@ -181,7 +181,7 @@
     "fellowship_loc": "Cape Town",
     "latitude": -34.042088,
     "longitude": 18.349866,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.lalela.org/",
     "partner_logo": "logos/lalela.org.png",
     "interest_area": "Arts & Media"
@@ -266,7 +266,7 @@
     "fellowship_loc": "Dublin",
     "latitude": 53.344864,
     "longitude": -6.268587,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://gaietyschool.com/",
     "partner_logo": "logos/gaietyschool.com.jpg",
     "interest_area": "Arts & Media"
@@ -368,7 +368,7 @@
     "fellowship_loc": "Braga",
     "latitude": 41.55,
     "longitude": -8.4333,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://inl.int",
     "partner_logo": "logos/inl.int.png",
     "interest_area": "Technology & Engineering"
@@ -470,7 +470,7 @@
     "fellowship_loc": "Kaohsiung City",
     "latitude": 22.88795381,
     "longitude": 120.3489431,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.kmuh.org.tw/english/",
     "partner_logo": "logos/kmuh.org.tw.jpg",
     "interest_area": "Health"
@@ -589,7 +589,7 @@
     "fellowship_loc": "Cape Town",
     "latitude": -34.042088,
     "longitude": 18.349866,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.lalela.org/",
     "partner_logo": "logos/lalela.org.png",
     "interest_area": "Arts & Media"
@@ -640,7 +640,7 @@
     "fellowship_loc": "Boston, MA",
     "latitude": 42.36222681,
     "longitude": -71.04996708,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://datanutrition.org/",
     "partner_logo": "logos/oaklandca.gov.jpg",
     "interest_area": "Technology & Engineering"
@@ -810,7 +810,7 @@
     "fellowship_loc": "Stanford, CA",
     "latitude": 37.42456166,
     "longitude": -122.1676371,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://ccsre.stanford.edu",
     "partner_logo": "logos/ccsre.stanford.edu.webp",
     "interest_area": "Law, Policy, & Justice"
@@ -929,7 +929,7 @@
     "fellowship_loc": "Shanghai",
     "latitude": 31.01033292,
     "longitude": 121.517799,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "http://www.keruknowledge.com/",
     "partner_logo": "logos/keruknowledge.com.png",
     "interest_area": "Human Rights"
@@ -997,7 +997,7 @@
     "fellowship_loc": "Santiago",
     "latitude": -33.43981895,
     "longitude": -70.69166627,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.summaedu.org/?lang=en",
     "partner_logo": "",
     "interest_area": "Human Rights"
@@ -1014,7 +1014,7 @@
     "fellowship_loc": "Paris",
     "latitude": 48.8504741,
     "longitude": 2.343391,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.musee-moyenage.fr/en/",
     "partner_logo": "",
     "interest_area": "Arts & Media"
@@ -1082,7 +1082,7 @@
     "fellowship_loc": "Hong Kong",
     "latitude": 22.321867,
     "longitude": 114.21072,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.ygn.org.hk/en/",
     "partner_logo": "logos/ygn.org.hk.png",
     "interest_area": "Education & Youth Development"
@@ -1371,7 +1371,7 @@
     "fellowship_loc": "Riga",
     "latitude": 57.03389361,
     "longitude": 24.13591712,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://balticsecurity.eu/",
     "partner_logo": "logos/balticsecurity.eu.png",
     "interest_area": "Law, Policy, & Justice"
@@ -1439,7 +1439,7 @@
     "fellowship_loc": "Kaohsiung City",
     "latitude": 22.88795381,
     "longitude": 120.3489431,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.kmuh.org.tw/english/",
     "partner_logo": "logos/kmuh.org.tw.jpg",
     "interest_area": "Health"
@@ -1541,7 +1541,7 @@
     "fellowship_loc": "Taipei",
     "latitude": 25.04460048,
     "longitude": 121.5642377,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.icdi.network/",
     "partner_logo": "logos/icdi.network.png",
     "interest_area": "Environmental Sustainability"
@@ -1847,7 +1847,7 @@
     "fellowship_loc": "Hong Kong",
     "latitude": 22.321867,
     "longitude": 114.21072,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.ygn.org.hk/en/",
     "partner_logo": "logos/ygn.org.hk.png",
     "interest_area": "Education & Youth Development"
@@ -1898,7 +1898,7 @@
     "fellowship_loc": "Oakland, CA",
     "latitude": 37.8044,
     "longitude": -122.2712,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.somosfamiliabay.org",
     "partner_logo": "logos/somosfamiliabay.org.gif",
     "interest_area": "Human Rights"
@@ -2153,7 +2153,7 @@
     "fellowship_loc": "Mumbai",
     "latitude": 19.10658122,
     "longitude": 72.92229387,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.magicbus.org",
     "partner_logo": "logos/magicbus.org.webp",
     "interest_area": "Education & Youth Development"
@@ -2323,7 +2323,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.77562334,
     "longitude": -122.4152887,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "http://www.tgijp.org/",
     "partner_logo": "logos/oaklandca.gov.jpg",
     "interest_area": "Human Rights"
@@ -2510,7 +2510,7 @@
     "fellowship_loc": "Singapore",
     "latitude": 1.39704519,
     "longitude": 103.7686739,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://rivervalleyirregulars.com/",
     "partner_logo": "logos/rivervalleyirregulars.com.png",
     "interest_area": "Technology & Engineering"
@@ -2612,7 +2612,7 @@
     "fellowship_loc": "Kaohsiung City",
     "latitude": 22.88795381,
     "longitude": 120.3489431,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.kmuh.org.tw/english/",
     "partner_logo": "logos/kmuh.org.tw.jpg",
     "interest_area": "Health"
@@ -2646,7 +2646,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.85347751,
     "longitude": 4.356875947,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.bruegel.org/",
     "partner_logo": "logos/bruegel.org.png",
     "interest_area": "Affordability"
@@ -2986,7 +2986,7 @@
     "fellowship_loc": "Tallinn",
     "latitude": 59.4332405,
     "longitude": 24.73943142,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.vabamu.ee",
     "partner_logo": "logos/vabamu.ee.jpg",
     "interest_area": "Education & Youth Development"
@@ -3020,7 +3020,7 @@
     "fellowship_loc": "Sarajevo",
     "latitude": 43.860863,
     "longitude": 18.418204,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.p-crc.org/",
     "partner_logo": "logos/p-crc.org.svg",
     "interest_area": "Law, Policy, & Justice"
@@ -3105,7 +3105,7 @@
     "fellowship_loc": "Tallinn",
     "latitude": 59.4332405,
     "longitude": 24.73943142,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ccdcoe.org/",
     "partner_logo": "logos/ccdcoe.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -3122,7 +3122,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.85347751,
     "longitude": 4.356875947,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.bruegel.org/",
     "partner_logo": "logos/bruegel.org.png",
     "interest_area": "Affordability"
@@ -3479,7 +3479,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.7598864,
     "longitude": -122.4177505,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://missionculturalcenter.org/",
     "partner_logo": "logos/missionculturalcenter.org.png",
     "interest_area": "Arts & Media"
@@ -3717,7 +3717,7 @@
     "fellowship_loc": "Sarajevo",
     "latitude": 43.860863,
     "longitude": 18.418204,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.p-crc.org/",
     "partner_logo": "logos/p-crc.org.svg",
     "interest_area": "Law, Policy, & Justice"
@@ -3768,7 +3768,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.85347751,
     "longitude": 4.356875947,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.bruegel.org/",
     "partner_logo": "logos/bruegel.org.png",
     "interest_area": "Affordability"
@@ -3955,7 +3955,7 @@
     "fellowship_loc": "Dallas, TX",
     "latitude": 32.77475471,
     "longitude": -96.80300087,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://ccsre.stanford.edu",
     "partner_logo": "logos/ccsre.stanford.edu.webp",
     "interest_area": "Human Rights"
@@ -3972,7 +3972,7 @@
     "fellowship_loc": "Mumbai",
     "latitude": 19.10658122,
     "longitude": 72.92229387,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.magicbus.org",
     "partner_logo": "logos/magicbus.org.webp",
     "interest_area": "Education & Youth Development"
@@ -3989,7 +3989,7 @@
     "fellowship_loc": "Taipei",
     "latitude": 25.04460048,
     "longitude": 121.5642377,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.icdi.network/",
     "partner_logo": "logos/icdi.network.png",
     "interest_area": "Environmental Sustainability"
@@ -4533,7 +4533,7 @@
     "fellowship_loc": "Sabah",
     "latitude": 5.9558,
     "longitude": 116.0368,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.facebook.com/faezahlawfirm/",
     "partner_logo": "logos/facebook.com.png",
     "interest_area": "Law, Policy, & Justice"
@@ -5060,7 +5060,7 @@
     "fellowship_loc": "Stanford, CA",
     "latitude": 37.42456166,
     "longitude": -122.1676371,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://ccsre.stanford.edu",
     "partner_logo": "logos/ccsre.stanford.edu.webp",
     "interest_area": "Arts & Media"
@@ -5247,7 +5247,7 @@
     "fellowship_loc": "Boston, MA",
     "latitude": 42.36222681,
     "longitude": -71.04996708,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://datanutrition.org/",
     "partner_logo": "logos/oaklandca.gov.jpg",
     "interest_area": "Technology & Engineering"
@@ -5298,7 +5298,7 @@
     "fellowship_loc": "Kyiv",
     "latitude": 50.46162173,
     "longitude": 30.51755712,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ccl.org.ua/en/",
     "partner_logo": "logos/ccl.org.ua.png",
     "interest_area": "Human Rights"
@@ -5519,7 +5519,7 @@
     "fellowship_loc": "Stanford, CA",
     "latitude": 37.42456166,
     "longitude": -122.1676371,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://ccsre.stanford.edu",
     "partner_logo": "logos/ccsre.stanford.edu.webp",
     "interest_area": "Arts & Media"
@@ -5638,7 +5638,7 @@
     "fellowship_loc": "London",
     "latitude": 51.51079018,
     "longitude": -0.138703994,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://maydayrooms.org/",
     "partner_logo": "logos/maydayrooms.org.png",
     "interest_area": "Arts & Media"
@@ -5910,7 +5910,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.85347751,
     "longitude": 4.356875947,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.ceps.eu/",
     "partner_logo": "logos/ceps.eu.png",
     "interest_area": "Affordability"
@@ -6097,7 +6097,7 @@
     "fellowship_loc": "Istanbul",
     "latitude": 41.00707338,
     "longitude": 28.99556946,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ihrelief.org/en/",
     "partner_logo": "logos/ihrelief.org.png",
     "interest_area": "Human Rights"
@@ -6114,7 +6114,7 @@
     "fellowship_loc": "Taipei",
     "latitude": 25.06753612,
     "longitude": 121.5249326,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://english.tier.org.tw",
     "partner_logo": "logos/english.tier.org.tw.jpg",
     "interest_area": "Education & Youth Development"
@@ -6267,7 +6267,7 @@
     "fellowship_loc": "Tallinn",
     "latitude": 59.4332405,
     "longitude": 24.73943142,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.vabamu.ee",
     "partner_logo": "logos/vabamu.ee.jpg",
     "interest_area": "Education & Youth Development"
@@ -6573,7 +6573,7 @@
     "fellowship_loc": "Singapore",
     "latitude": 1.39704519,
     "longitude": 103.7686739,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://rivervalleyirregulars.com/",
     "partner_logo": "logos/rivervalleyirregulars.com.png",
     "interest_area": "Technology & Engineering"
@@ -6845,7 +6845,7 @@
     "fellowship_loc": "Paris",
     "latitude": 48.85854412,
     "longitude": 2.338101457,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://gagosian.com/locations/paris/",
     "partner_logo": "logos/gagosian.com.jpg",
     "interest_area": "Arts & Media"
@@ -7049,7 +7049,7 @@
     "fellowship_loc": "Los Angeles, CA",
     "latitude": 34.04690572,
     "longitude": -118.2634537,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://ccsre.stanford.edu",
     "partner_logo": "logos/ccsre.stanford.edu.webp",
     "interest_area": "Social Entrepreneurship & Corporate Social Responsibility"
@@ -7287,7 +7287,7 @@
     "fellowship_loc": "Stanford, CA",
     "latitude": 37.42456166,
     "longitude": -122.1676371,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://ccsre.stanford.edu",
     "partner_logo": "logos/ccsre.stanford.edu.webp",
     "interest_area": "Law, Policy, & Justice"
@@ -7644,7 +7644,7 @@
     "fellowship_loc": "Tallinn",
     "latitude": 59.4332405,
     "longitude": 24.73943142,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ccdcoe.org/",
     "partner_logo": "logos/ccdcoe.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -7763,7 +7763,7 @@
     "fellowship_loc": "Tartu",
     "latitude": 58.37962895,
     "longitude": 26.71690674,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://skytte.ut.ee/en",
     "partner_logo": "logos/skytte.ut.ee.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -8018,7 +8018,7 @@
     "fellowship_loc": "Islamabad",
     "latitude": 33.69981646,
     "longitude": 73.02289981,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "http://www.ndma.gov.pk/",
     "partner_logo": "logos/ndma.gov.pk.png",
     "interest_area": "Law, Policy, & Justice"
@@ -8035,7 +8035,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.77562334,
     "longitude": -122.4152887,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "http://www.tgijp.org/",
     "partner_logo": "logos/oaklandca.gov.jpg",
     "interest_area": "Human Rights"
@@ -8205,7 +8205,7 @@
     "fellowship_loc": "Oakland, CA",
     "latitude": 37.8044,
     "longitude": -122.2712,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "http://filipinos4justice.org/",
     "partner_logo": "logos/filipinos4justice.org.png",
     "interest_area": "Human Rights"
@@ -8341,7 +8341,7 @@
     "fellowship_loc": "Rabat",
     "latitude": 33.97588992,
     "longitude": -6.854518503,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.moorsandsaints.com/",
     "partner_logo": "",
     "interest_area": "Arts & Media"
@@ -8579,7 +8579,7 @@
     "fellowship_loc": "Washington, D.C.",
     "latitude": 38.909563,
     "longitude": -77.041106,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://carnegieendowment.org/",
     "partner_logo": "logos/carnegieendowment.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -8664,7 +8664,7 @@
     "fellowship_loc": "Istanbul",
     "latitude": 41.00707338,
     "longitude": 28.99556946,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ihrelief.org/en/",
     "partner_logo": "logos/ihrelief.org.png",
     "interest_area": "Human Rights"
@@ -9123,7 +9123,7 @@
     "fellowship_loc": "São Luís, Maranhão",
     "latitude": -2.531648158,
     "longitude": -44.29966682,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://institutotrabalhodecente.org/en",
     "partner_logo": "logos/institutotrabalhodecente.org.svg",
     "interest_area": "Human Rights"
@@ -9208,7 +9208,7 @@
     "fellowship_loc": "Stanford, CA",
     "latitude": 37.42456166,
     "longitude": -122.1676371,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://ccsre.stanford.edu",
     "partner_logo": "logos/ccsre.stanford.edu.webp",
     "interest_area": "Human Rights"
@@ -9276,7 +9276,7 @@
     "fellowship_loc": "São Luís, Maranhão",
     "latitude": -2.531648158,
     "longitude": -44.29966682,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://institutotrabalhodecente.org/en",
     "partner_logo": "logos/institutotrabalhodecente.org.svg",
     "interest_area": "Human Rights"
@@ -9548,7 +9548,7 @@
     "fellowship_loc": "Stanford, CA",
     "latitude": 37.42456166,
     "longitude": -122.1676371,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://ccsre.stanford.edu",
     "partner_logo": "logos/ccsre.stanford.edu.webp",
     "interest_area": "Human Rights"
@@ -9871,7 +9871,7 @@
     "fellowship_loc": "Arusha",
     "latitude": -3.381176473,
     "longitude": 36.70742244,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://lohada.org/",
     "partner_logo": "logos/lohada.org.png",
     "interest_area": "Human Rights"
@@ -10194,7 +10194,7 @@
     "fellowship_loc": "Oakland, CA",
     "latitude": 37.8044,
     "longitude": -122.2712,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.centrolegal.org/youth-law-academy/",
     "partner_logo": "logos/centrolegal.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -10211,7 +10211,7 @@
     "fellowship_loc": "Manila",
     "latitude": 14.5976507,
     "longitude": 120.9908868,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.crs.org/our-work-overseas/where-we-work/philippines",
     "partner_logo": "",
     "interest_area": "Human Rights"
@@ -10228,7 +10228,7 @@
     "fellowship_loc": "Buenos Aires",
     "latitude": -34.6075494,
     "longitude": -58.41202151,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "http://www.puerta18.org.ar/",
     "partner_logo": "logos/puerta18.org.ar.png",
     "interest_area": "Philanthropy"
@@ -10262,7 +10262,7 @@
     "fellowship_loc": "Santa Elena",
     "latitude": 10.31615931,
     "longitude": -84.82493434,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.unitedplanet.org/",
     "partner_logo": "logos/unitedplanet.org.jpg",
     "interest_area": "Human Rights"
@@ -10313,7 +10313,7 @@
     "fellowship_loc": "Shanghai",
     "latitude": 31.01033292,
     "longitude": 121.517799,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "http://www.keruknowledge.com/",
     "partner_logo": "logos/keruknowledge.com.png",
     "interest_area": "Human Rights"
@@ -10330,7 +10330,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.71870131,
     "longitude": -122.4397679,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.sfrising.org/",
     "partner_logo": "logos/sfrising.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -10432,7 +10432,7 @@
     "fellowship_loc": "Arusha",
     "latitude": -3.381176473,
     "longitude": 36.70742244,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://lohada.org/",
     "partner_logo": "logos/lohada.org.png",
     "interest_area": "Human Rights"
@@ -10585,7 +10585,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.7790262,
     "longitude": -122.419906,
-    "affiliation": "Center for Comparative Studies in Race & Ethnicity (CCSRE)",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://stopaapihate.org",
     "partner_logo": "logos/stopaapihate.org.png",
     "interest_area": "Human Rights"

@@ -113,7 +113,7 @@
     "fellowship_loc": "Tokyo",
     "latitude": 35.6612458,
     "longitude": 139.7153516,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://telljp.com",
     "partner_logo": "logos/telljp.com.png",
     "interest_area": "Health"
@@ -164,7 +164,7 @@
     "fellowship_loc": "Sarajevo",
     "latitude": 43.860863,
     "longitude": 18.418204,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.p-crc.org/",
     "partner_logo": "logos/p-crc.org.svg",
     "interest_area": "Law, Policy, & Justice"
@@ -181,7 +181,7 @@
     "fellowship_loc": "Fairfax, VA",
     "latitude": 38.8289566,
     "longitude": -77.32274628,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "http://www.arabstudiesinstitute.org",
     "partner_logo": "logos/arabstudiesinstitute.org.png",
     "interest_area": "Education & Youth Development"
@@ -453,7 +453,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.8063134,
     "longitude": -122.4054505,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://cpasf.org/",
     "partner_logo": "logos/cpasf.org.png",
     "interest_area": "Human Rights"
@@ -521,7 +521,7 @@
     "fellowship_loc": "Oakland, CA",
     "latitude": 37.8053194,
     "longitude": -122.2725813,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.oaklandca.gov",
     "partner_logo": "logos/oaklandca.gov.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -572,7 +572,7 @@
     "fellowship_loc": "Mumbai",
     "latitude": 19.10658122,
     "longitude": 72.92229387,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.magicbus.org",
     "partner_logo": "logos/magicbus.org.webp",
     "interest_area": "Education & Youth Development"
@@ -589,7 +589,7 @@
     "fellowship_loc": "North Fair Oaks, CA",
     "latitude": 37.46614456,
     "longitude": -122.2074661,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.stanfordchildrens.org/en/location/gardner-health",
     "partner_logo": "logos/stanfordchildrens.org.svg",
     "interest_area": "Health"
@@ -657,7 +657,7 @@
     "fellowship_loc": "Tallinn",
     "latitude": 59.4332405,
     "longitude": 24.73943142,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.vabamu.ee",
     "partner_logo": "logos/vabamu.ee.jpg",
     "interest_area": "Education & Youth Development"
@@ -861,7 +861,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.775179,
     "longitude": -122.415302,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.sfrising.org/",
     "partner_logo": "logos/sfrising.org.png",
     "interest_area": "Human Rights"
@@ -895,7 +895,7 @@
     "fellowship_loc": "Cape Town",
     "latitude": -34.042088,
     "longitude": 18.349866,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.lalela.org/",
     "partner_logo": "logos/lalela.org.png",
     "interest_area": "Arts & Media"
@@ -1082,7 +1082,7 @@
     "fellowship_loc": "Sydney",
     "latitude": -33.868795,
     "longitude": 151.217435,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.artgallery.nsw.gov.au/",
     "partner_logo": "logos/artgallery.nsw.gov.au.svg",
     "interest_area": "Arts & Media"
@@ -1269,7 +1269,7 @@
     "fellowship_loc": "Dublin",
     "latitude": 53.344864,
     "longitude": -6.268587,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://gaietyschool.com/",
     "partner_logo": "logos/gaietyschool.com.jpg",
     "interest_area": "Arts & Media"
@@ -1303,7 +1303,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.775179,
     "longitude": -122.415302,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.sfrising.org/",
     "partner_logo": "logos/sfrising.org.png",
     "interest_area": "Human Rights"
@@ -1575,7 +1575,7 @@
     "fellowship_loc": "Tartu",
     "latitude": 58.37962895,
     "longitude": 26.71690674,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://skytte.ut.ee/en",
     "partner_logo": "logos/skytte.ut.ee.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -2034,7 +2034,7 @@
     "fellowship_loc": "Oakland, CA",
     "latitude": 37.8044557,
     "longitude": -122.2713563,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.somosfamiliabay.org",
     "partner_logo": "logos/somosfamiliabay.org.gif",
     "interest_area": "Human Rights"
@@ -2221,7 +2221,7 @@
     "fellowship_loc": "Sarajevo",
     "latitude": 43.860863,
     "longitude": 18.418204,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.p-crc.org/",
     "partner_logo": "logos/p-crc.org.svg",
     "interest_area": "Law, Policy, & Justice"
@@ -2323,7 +2323,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.84611541,
     "longitude": 4.372153786,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ieep.eu",
     "partner_logo": "logos/ieep.eu.jpg",
     "interest_area": "Environmental Sustainability"
@@ -2901,7 +2901,7 @@
     "fellowship_loc": "Hong Kong",
     "latitude": 22.321867,
     "longitude": 114.21072,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.ygn.org.hk/en/",
     "partner_logo": "logos/ygn.org.hk.png",
     "interest_area": "Education & Youth Development"
@@ -2952,7 +2952,7 @@
     "fellowship_loc": "Sydney",
     "latitude": -33.868795,
     "longitude": 151.217435,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.artgallery.nsw.gov.au/",
     "partner_logo": "logos/artgallery.nsw.gov.au.svg",
     "interest_area": "Arts & Media"
@@ -3241,7 +3241,7 @@
     "fellowship_loc": "Taipei City",
     "latitude": 25.06753612,
     "longitude": 121.5249326,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://english.tier.org.tw",
     "partner_logo": "logos/english.tier.org.tw.jpg",
     "interest_area": "Education & Youth Development"
@@ -3479,7 +3479,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.7790262,
     "longitude": -122.419906,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://stopaapihate.org",
     "partner_logo": "logos/stopaapihate.org.png",
     "interest_area": "Human Rights"
@@ -3581,7 +3581,7 @@
     "fellowship_loc": "Oakland, CA",
     "latitude": 37.8044,
     "longitude": -122.2712,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.centrolegal.org/youth-law-academy/",
     "partner_logo": "logos/centrolegal.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -3904,7 +3904,7 @@
     "fellowship_loc": "Paris",
     "latitude": 48.85418255,
     "longitude": 2.359303261,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.paris.fr/equipements/bibliotheque-forney-18",
     "partner_logo": "logos/paris.fr.jpg",
     "interest_area": "Education & Youth Development"
@@ -4040,7 +4040,7 @@
     "fellowship_loc": "Amman",
     "latitude": 31.94926312,
     "longitude": 35.83156051,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.unrwa.org",
     "partner_logo": "logos/unrwa.org.png",
     "interest_area": "Human Rights"
@@ -4482,7 +4482,7 @@
     "fellowship_loc": "Oakland, CA",
     "latitude": 37.8044,
     "longitude": -122.2712,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "http://filipinos4justice.org/",
     "partner_logo": "logos/filipinos4justice.org.png",
     "interest_area": "Human Rights"
@@ -4499,7 +4499,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.78103638,
     "longitude": -122.41185,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.transgenderdistrictsf.com",
     "partner_logo": "logos/transgenderdistrictsf.com.png",
     "interest_area": "Human Rights"
@@ -4584,7 +4584,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.84611541,
     "longitude": 4.372153786,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ieep.eu",
     "partner_logo": "logos/ieep.eu.jpg",
     "interest_area": "Environmental Sustainability"
@@ -5060,7 +5060,7 @@
     "fellowship_loc": "Washington, D.C.",
     "latitude": 38.909563,
     "longitude": -77.041106,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://carnegieendowment.org/",
     "partner_logo": "logos/carnegieendowment.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -5298,7 +5298,7 @@
     "fellowship_loc": "Shanghai",
     "latitude": 31.2322758,
     "longitude": 121.4692071,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.keruknowledge.com/",
     "partner_logo": "logos/keruknowledge.com.png",
     "interest_area": "Environmental Sustainability"
@@ -5417,7 +5417,7 @@
     "fellowship_loc": "Cape Town",
     "latitude": -34.042088,
     "longitude": 18.349866,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.lalela.org/",
     "partner_logo": "logos/lalela.org.png",
     "interest_area": "Arts & Media"
@@ -5451,7 +5451,7 @@
     "fellowship_loc": "Chicago, IL",
     "latitude": 41.95717239,
     "longitude": -87.69833374,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://hanacenter.org",
     "partner_logo": "logos/hanacenter.org.png",
     "interest_area": "Human Rights"
@@ -5468,7 +5468,7 @@
     "fellowship_loc": "Dublin",
     "latitude": 53.344864,
     "longitude": -6.268587,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://gaietyschool.com/",
     "partner_logo": "logos/gaietyschool.com.jpg",
     "interest_area": "Arts & Media"
@@ -5723,7 +5723,7 @@
     "fellowship_loc": "Shanghai",
     "latitude": 31.2322758,
     "longitude": 121.4692071,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.keruknowledge.com/",
     "partner_logo": "logos/keruknowledge.com.png",
     "interest_area": "Environmental Sustainability"
@@ -5961,7 +5961,7 @@
     "fellowship_loc": "Tartu",
     "latitude": 58.37962895,
     "longitude": 26.71690674,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://skytte.ut.ee/en",
     "partner_logo": "logos/skytte.ut.ee.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -6284,7 +6284,7 @@
     "fellowship_loc": "Washington, D.C.",
     "latitude": 38.909563,
     "longitude": -77.041106,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://carnegieendowment.org/",
     "partner_logo": "logos/carnegieendowment.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -6301,7 +6301,7 @@
     "fellowship_loc": "San Francisco, CA",
     "latitude": 37.80032269,
     "longitude": -122.452025,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://qwocmap.org",
     "partner_logo": "",
     "interest_area": "Human Rights"
@@ -6335,7 +6335,7 @@
     "fellowship_loc": "Shanghai",
     "latitude": 31.2322758,
     "longitude": 121.4692071,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.keruknowledge.com/",
     "partner_logo": "logos/keruknowledge.com.png",
     "interest_area": "Environmental Sustainability"
@@ -6590,7 +6590,7 @@
     "fellowship_loc": "Seoul",
     "latitude": 37.518241,
     "longitude": 126.9367935,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.cmcsungmo.or.kr/en.common.main.main.sp",
     "partner_logo": "logos/cmcsungmo.or.kr.png",
     "interest_area": "Health"
@@ -6658,7 +6658,7 @@
     "fellowship_loc": "Karachi",
     "latitude": 24.91820693,
     "longitude": 67.13318306,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.deafreach.com",
     "partner_logo": "logos/deafreach.com.png",
     "interest_area": "Education & Youth Development"

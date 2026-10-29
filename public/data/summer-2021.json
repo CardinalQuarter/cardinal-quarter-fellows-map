@@ -147,7 +147,7 @@
     "fellowship_loc": "New York",
     "latitude": 40.7285351,
     "longitude": -73.9925758,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.ssrc.org/",
     "partner_logo": "logos/ssrc.org.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -351,7 +351,7 @@
     "fellowship_loc": "New Delhi",
     "latitude": 28.6138954,
     "longitude": 77.2090057,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.pratham.org/",
     "partner_logo": "logos/pratham.org.png",
     "interest_area": "Education & Youth Development"
@@ -589,7 +589,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.84975068,
     "longitude": 4.365004583,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://carnegieeurope.eu/",
     "partner_logo": "logos/carnegieeurope.eu.gif",
     "interest_area": "Law, Policy, & Justice"
@@ -640,7 +640,7 @@
     "fellowship_loc": "Tallinn",
     "latitude": 59.4372155,
     "longitude": 24.7453688,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.vabamu.ee/",
     "partner_logo": "logos/vabamu.ee.jpg",
     "interest_area": "Education & Youth Development"
@@ -946,7 +946,7 @@
     "fellowship_loc": "Taipei",
     "latitude": 25.06666338,
     "longitude": 121.5249793,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://english.tier.org.tw/",
     "partner_logo": "logos/english.tier.org.tw.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -1014,7 +1014,7 @@
     "fellowship_loc": "Richmond, CA",
     "latitude": 37.93605671,
     "longitude": -122.3596429,
-    "affiliation": "Center for Comparative Studies in Race and Ethnicity",
+    "affiliation": "Center for Comparative Studies in Race & Ethnicity",
     "partner_website": "https://www.safereturnprj.org/",
     "partner_logo": "logos/safereturnprj.org.webp",
     "interest_area": "Law, Policy, & Justice"
@@ -1473,7 +1473,7 @@
     "fellowship_loc": "Shanghai",
     "latitude": 31.2322758,
     "longitude": 121.4692071,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.keruknowledge.com/",
     "partner_logo": "logos/keruknowledge.com.png",
     "interest_area": "Environmental Sustainability"
@@ -1626,7 +1626,7 @@
     "fellowship_loc": "Cape Town",
     "latitude": -33.928992,
     "longitude": 18.417396,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.lalela.org/",
     "partner_logo": "logos/lalela.org.png",
     "interest_area": "Arts & Media"
@@ -1643,7 +1643,7 @@
     "fellowship_loc": "Sarajevo",
     "latitude": 43.8519774,
     "longitude": 18.3866868,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.peaceinsight.org/en/organisations/pcrc/?location=western-balkans&theme",
     "partner_logo": "logos/peaceinsight.org.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -1881,7 +1881,7 @@
     "fellowship_loc": "Tartu",
     "latitude": 58.3801207,
     "longitude": 26.72245,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://skytte.ut.ee/en",
     "partner_logo": "logos/skytte.ut.ee.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -2510,7 +2510,7 @@
     "fellowship_loc": "Seoul",
     "latitude": 37.3915249,
     "longitude": 126.627022,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://coreanaconnect.org/",
     "partner_logo": "",
     "interest_area": "Human Rights"
@@ -2646,7 +2646,7 @@
     "fellowship_loc": "Hyderabad Telangana",
     "latitude": 17.361719,
     "longitude": 78.475166,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.ilpnet.org/",
     "partner_logo": "logos/ilpnet.org.jpg",
     "interest_area": "Education & Youth Development"
@@ -3037,7 +3037,7 @@
     "fellowship_loc": "Sarajevo",
     "latitude": 43.8519774,
     "longitude": 18.3866868,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.peaceinsight.org/en/organisations/pcrc/?location=western-balkans&theme",
     "partner_logo": "logos/peaceinsight.org.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -3224,7 +3224,7 @@
     "fellowship_loc": "Seoul",
     "latitude": 37.3915249,
     "longitude": 126.627022,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://coreanaconnect.org/",
     "partner_logo": "",
     "interest_area": "Human Rights"
@@ -3343,7 +3343,7 @@
     "fellowship_loc": "Tallinn",
     "latitude": 59.4372155,
     "longitude": 24.7453688,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.vabamu.ee/",
     "partner_logo": "logos/vabamu.ee.jpg",
     "interest_area": "Education & Youth Development"
@@ -3428,7 +3428,7 @@
     "fellowship_loc": "Karachi",
     "latitude": 24.83491857,
     "longitude": 67.0998442,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.tcf.org.pk/",
     "partner_logo": "logos/tcf.org.pk.png",
     "interest_area": "Education & Youth Development"
@@ -3768,7 +3768,7 @@
     "fellowship_loc": "Shanghai",
     "latitude": 31.2322758,
     "longitude": 121.4692071,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.keruknowledge.com/",
     "partner_logo": "logos/keruknowledge.com.png",
     "interest_area": "Environmental Sustainability"
@@ -3887,7 +3887,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.8465573,
     "longitude": 4.351697,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ieep.eu/",
     "partner_logo": "logos/ieep.eu.jpg",
     "interest_area": "Environmental Sustainability"
@@ -4108,7 +4108,7 @@
     "fellowship_loc": "Hong Kong",
     "latitude": 22.42466521,
     "longitude": 114.2321295,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.projectc-ygn.org/",
     "partner_logo": "logos/projectc-ygn.org.webp",
     "interest_area": "Technology & Engineering"
@@ -4465,7 +4465,7 @@
     "fellowship_loc": "Washington D.C.",
     "latitude": 38.90938825,
     "longitude": -77.041046,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://carnegieendowment.org/",
     "partner_logo": "logos/carnegieendowment.org.png",
     "interest_area": "Law, Policy, & Justice"
@@ -4584,7 +4584,7 @@
     "fellowship_loc": "New York",
     "latitude": 40.7285351,
     "longitude": -73.9925758,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://www.ssrc.org/",
     "partner_logo": "logos/ssrc.org.jpg",
     "interest_area": "Law, Policy, & Justice"
@@ -5162,7 +5162,7 @@
     "fellowship_loc": "Kyiv",
     "latitude": 50.44091631,
     "longitude": 30.52379573,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ccl.org.ua/en/",
     "partner_logo": "logos/ccl.org.ua.webp",
     "interest_area": "Law, Policy, & Justice"
@@ -5179,7 +5179,7 @@
     "fellowship_loc": "Brussels",
     "latitude": 50.8465573,
     "longitude": 4.351697,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://ieep.eu/",
     "partner_logo": "logos/ieep.eu.jpg",
     "interest_area": "Environmental Sustainability"
@@ -5213,7 +5213,7 @@
     "fellowship_loc": "Taipei",
     "latitude": 25.06666338,
     "longitude": 121.5249793,
-    "affiliation": "Stanford Global Studies",
+    "affiliation": "Global Studies",
     "partner_website": "https://english.tier.org.tw/",
     "partner_logo": "logos/english.tier.org.tw.jpg",
     "interest_area": "Law, Policy, & Justice"
